@@ -6,6 +6,8 @@ complexity:
     ignoreAnnotated: ['Composable']
 
 naming:
+  EnumNaming:
+    enumEntryPattern: '[A-Z][A-Z0-9]*(_[A-Z0-9]+)*'
   FunctionNaming:
     ignoreAnnotated: ['Composable']
 
