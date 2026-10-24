@@ -26,3 +26,8 @@ detekt-formatting = { module = "io.gitlab.arturbosch.detekt:detekt-formatting", 
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+quizz-android-mobile-application = { id = "quizz.android.mobile.application" }
+quizz-android-tv-application = { id = "quizz.android.tv.application" }
+quizz-android-shared-library = { id = "quizz.android.shared.library" }
+quizz-android-mobile-library = { id = "quizz.android.mobile.library" }
+quizz-android-tv-library = { id = "quizz.android.tv.library" }

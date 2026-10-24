@@ -1,5 +1,5 @@
 plugins {
-    id("quizz.android.tv.application")
+    alias(libs.plugins.quizz.android.tv.application)
 }
 
 android {

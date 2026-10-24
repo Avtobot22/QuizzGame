@@ -1,5 +1,5 @@
 plugins {
-    id("quizz.android.mobile.library")
+    alias(libs.plugins.quizz.android.mobile.library)
 }
 
 android {
