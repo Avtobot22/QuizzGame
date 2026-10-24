@@ -71,7 +71,7 @@ fun QuizzOtpInput(
             Text(
                 errorMessage,
                 color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
             )
         }
     }
@@ -94,7 +94,7 @@ fun QuizzRoomCodeField(
         onValueChange = { input ->
             onValueChange(
                 input.filter { it in 'a'..'z' || it in 'A'..'Z' || it in '0'..'9' }
-                    .uppercase(Locale.ROOT).take(length)
+                    .uppercase(Locale.ROOT).take(length),
             )
         },
         label = { Text(label) },
@@ -103,7 +103,7 @@ fun QuizzRoomCodeField(
         supportingText = (errorMessage ?: supportingText)?.let { text -> { Text(text) } },
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Characters,
-            keyboardType = KeyboardType.Ascii
+            keyboardType = KeyboardType.Ascii,
         ),
         singleLine = true,
         modifier = modifier,
@@ -139,7 +139,7 @@ private fun OtpDecoration(
                         .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.medium)
                         .border(
                             BorderStroke(if (active) 2.dp else 1.dp, border),
-                            MaterialTheme.shapes.medium
+                            MaterialTheme.shapes.medium,
                         )
                         .padding(vertical = 12.dp),
                     contentAlignment = Alignment.Center,
@@ -149,7 +149,7 @@ private fun OtpDecoration(
                         style = MaterialTheme.typography.headlineLarge.copy(
                             fontWeight = FontWeight.Bold,
                             lineHeight = 32.sp,
-                        )
+                        ),
                     )
                 }
             }

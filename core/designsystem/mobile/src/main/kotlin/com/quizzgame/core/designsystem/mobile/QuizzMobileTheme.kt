@@ -180,7 +180,7 @@ private val MobileShapes = Shapes(
 @Composable
 fun QuizzMobileTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        LocalQuizzGameColors provides if (darkTheme) MobileDarkGameColors else MobileLightGameColors
+        LocalQuizzGameColors provides if (darkTheme) MobileDarkGameColors else MobileLightGameColors,
     ) {
         MaterialTheme(
             colorScheme = if (darkTheme) MobileDarkColors else MobileLightColors,

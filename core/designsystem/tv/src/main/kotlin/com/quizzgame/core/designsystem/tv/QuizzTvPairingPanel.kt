@@ -34,7 +34,7 @@ fun QuizzTvPairingPanel(
             PairingState.APPROVED -> R.string.quizz_status_approved
             PairingState.EXPIRED -> R.string.quizz_status_expired
             PairingState.DENIED -> R.string.quizz_status_denied
-        }
+        },
     )
     Surface(
         modifier = modifier.semantics {

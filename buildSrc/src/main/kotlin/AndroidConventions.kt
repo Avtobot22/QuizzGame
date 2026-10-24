@@ -76,7 +76,7 @@ fun Project.configureAndroidApplication() {
     dependencies.add(implementation.name, libs.androidx.activity.compose)
     dependencies.add(
         androidTestImplementation.name,
-        dependencies.platform(libs.androidx.compose.bom)
+        dependencies.platform(libs.androidx.compose.bom),
     )
     dependencies.add(androidTestImplementation.name, libs.androidx.compose.ui.test.junit4)
     dependencies.add(androidTestImplementation.name, libs.androidx.test.junit)

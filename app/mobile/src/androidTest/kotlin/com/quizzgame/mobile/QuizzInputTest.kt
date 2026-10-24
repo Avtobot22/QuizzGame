@@ -72,7 +72,7 @@ class QuizzInputTest {
                     value = "123456",
                     onValueChange = {},
                     label = "Verification code",
-                    errorMessage = "Code has expired"
+                    errorMessage = "Code has expired",
                 )
             }
         }
@@ -91,7 +91,7 @@ class QuizzInputTest {
                     value = "123456",
                     onValueChange = { changes++ },
                     label = "Verification code",
-                    enabled = false
+                    enabled = false,
                 )
             }
         }
@@ -127,7 +127,7 @@ class QuizzInputTest {
                     onValueChange = {},
                     label = "Room code",
                     supportingText = "Enter the code on TV",
-                    errorMessage = "Room is unavailable"
+                    errorMessage = "Room is unavailable",
                 )
             }
         }
@@ -146,7 +146,7 @@ class QuizzInputTest {
                     value = "ABC123",
                     onValueChange = { changes++ },
                     label = "Room code",
-                    enabled = false
+                    enabled = false,
                 )
             }
         }
