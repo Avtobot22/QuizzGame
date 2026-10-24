@@ -1,0 +1,141 @@
+package com.quizzgame.core.designsystem.mobile
+
+import com.quizzgame.core.ui.tokens.QuizzPalette
+
+internal object MobileLightPalette {
+    val primary = QuizzPalette.primary40
+    val onPrimary = QuizzPalette.primary100
+    val primaryContainer = QuizzPalette.primary90
+    val onPrimaryContainer = QuizzPalette.primary10
+    val primaryFixed = QuizzPalette.primary90
+    val primaryFixedDim = QuizzPalette.primary80
+    val onPrimaryFixed = QuizzPalette.primary10
+    val onPrimaryFixedVariant = QuizzPalette.primary30
+    val secondary = QuizzPalette.secondary40
+    val onSecondary = QuizzPalette.secondary100
+    val secondaryContainer = QuizzPalette.secondary90
+    val onSecondaryContainer = QuizzPalette.secondary10
+    val secondaryFixed = QuizzPalette.secondary90
+    val secondaryFixedDim = QuizzPalette.secondary80
+    val onSecondaryFixed = QuizzPalette.secondary10
+    val onSecondaryFixedVariant = QuizzPalette.secondary30
+    val tertiary = QuizzPalette.tertiary40
+    val onTertiary = QuizzPalette.tertiary100
+    val tertiaryContainer = QuizzPalette.tertiary90
+    val onTertiaryContainer = QuizzPalette.tertiary10
+    val tertiaryFixed = QuizzPalette.tertiary90
+    val tertiaryFixedDim = QuizzPalette.tertiary80
+    val onTertiaryFixed = QuizzPalette.tertiary10
+    val onTertiaryFixedVariant = QuizzPalette.tertiary30
+    val error = QuizzPalette.error40
+    val onError = QuizzPalette.error100
+    val errorContainer = QuizzPalette.error90
+    val onErrorContainer = QuizzPalette.error10
+    val background = QuizzPalette.neutral98
+    val onBackground = QuizzPalette.neutral10
+    val surface = QuizzPalette.neutral98
+    val onSurface = QuizzPalette.neutral10
+    val surfaceVariant = QuizzPalette.neutralVariant90
+    val onSurfaceVariant = QuizzPalette.neutralVariant30
+    val surfaceDim = QuizzPalette.neutral87
+    val surfaceBright = QuizzPalette.neutral98
+    val surfaceContainerLowest = QuizzPalette.neutral100
+    val surfaceContainerLow = QuizzPalette.neutral96
+    val surfaceContainer = QuizzPalette.neutral94
+    val surfaceContainerHigh = QuizzPalette.neutral92
+    val surfaceContainerHighest = QuizzPalette.neutral90
+    val inverseSurface = QuizzPalette.neutral20
+    val inverseOnSurface = QuizzPalette.neutral95
+    val inversePrimary = QuizzPalette.primary80
+    val outline = QuizzPalette.neutralVariant50
+    val outlineVariant = QuizzPalette.neutralVariant80
+    val surfaceTint = QuizzPalette.primary40
+    val shadow = QuizzPalette.neutral0
+    val scrim = QuizzPalette.neutral0
+}
+
+internal object MobileDarkPalette {
+    val primary = QuizzPalette.primary80
+    val onPrimary = QuizzPalette.primary20
+    val primaryContainer = QuizzPalette.primary30
+    val onPrimaryContainer = QuizzPalette.primary90
+    val primaryFixed = QuizzPalette.primary90
+    val primaryFixedDim = QuizzPalette.primary80
+    val onPrimaryFixed = QuizzPalette.primary10
+    val onPrimaryFixedVariant = QuizzPalette.primary30
+    val secondary = QuizzPalette.secondary80
+    val onSecondary = QuizzPalette.secondary20
+    val secondaryContainer = QuizzPalette.secondary30
+    val onSecondaryContainer = QuizzPalette.secondary90
+    val secondaryFixed = QuizzPalette.secondary90
+    val secondaryFixedDim = QuizzPalette.secondary80
+    val onSecondaryFixed = QuizzPalette.secondary10
+    val onSecondaryFixedVariant = QuizzPalette.secondary30
+    val tertiary = QuizzPalette.tertiary80
+    val onTertiary = QuizzPalette.tertiary20
+    val tertiaryContainer = QuizzPalette.tertiary30
+    val onTertiaryContainer = QuizzPalette.tertiary90
+    val tertiaryFixed = QuizzPalette.tertiary90
+    val tertiaryFixedDim = QuizzPalette.tertiary80
+    val onTertiaryFixed = QuizzPalette.tertiary10
+    val onTertiaryFixedVariant = QuizzPalette.tertiary30
+    val error = QuizzPalette.error80
+    val onError = QuizzPalette.error20
+    val errorContainer = QuizzPalette.error30
+    val onErrorContainer = QuizzPalette.error90
+    val background = QuizzPalette.neutral6
+    val onBackground = QuizzPalette.neutral90
+    val surface = QuizzPalette.neutral6
+    val onSurface = QuizzPalette.neutral90
+    val surfaceVariant = QuizzPalette.neutralVariant30
+    val onSurfaceVariant = QuizzPalette.neutralVariant80
+    val surfaceDim = QuizzPalette.neutral6
+    val surfaceBright = QuizzPalette.neutral24
+    val surfaceContainerLowest = QuizzPalette.neutral4
+    val surfaceContainerLow = QuizzPalette.neutral10
+    val surfaceContainer = QuizzPalette.neutral12
+    val surfaceContainerHigh = QuizzPalette.neutral17
+    val surfaceContainerHighest = QuizzPalette.neutral22
+    val inverseSurface = QuizzPalette.neutral90
+    val inverseOnSurface = QuizzPalette.neutral20
+    val inversePrimary = QuizzPalette.primary40
+    val outline = QuizzPalette.neutralVariant60
+    val outlineVariant = QuizzPalette.neutralVariant30
+    val surfaceTint = QuizzPalette.primary80
+    val shadow = QuizzPalette.neutral0
+    val scrim = QuizzPalette.neutral0
+}
+
+internal object GameMobileLightPalette {
+    val answerCorrect = QuizzPalette.success40
+    val onAnswerCorrect = QuizzPalette.success100
+    val answerWrong = QuizzPalette.error40
+    val onAnswerWrong = QuizzPalette.error100
+    val answerSelected = QuizzPalette.secondary90
+    val onAnswerSelected = QuizzPalette.secondary10
+    val timerAccent = QuizzPalette.tertiary40
+    val onTimerAccent = QuizzPalette.tertiary100
+    val streak = QuizzPalette.tertiary90
+    val onStreak = QuizzPalette.tertiary10
+    val scoreHighlight = QuizzPalette.primary90
+    val onScoreHighlight = QuizzPalette.primary10
+    val answerIdle = QuizzPalette.neutral96
+    val onAnswerIdle = QuizzPalette.neutral10
+}
+
+internal object GameMobileDarkPalette {
+    val answerCorrect = QuizzPalette.success80
+    val onAnswerCorrect = QuizzPalette.success20
+    val answerWrong = QuizzPalette.error80
+    val onAnswerWrong = QuizzPalette.error20
+    val answerSelected = QuizzPalette.secondary30
+    val onAnswerSelected = QuizzPalette.secondary90
+    val timerAccent = QuizzPalette.tertiary80
+    val onTimerAccent = QuizzPalette.tertiary20
+    val streak = QuizzPalette.tertiary30
+    val onStreak = QuizzPalette.tertiary90
+    val scoreHighlight = QuizzPalette.primary30
+    val onScoreHighlight = QuizzPalette.primary90
+    val answerIdle = QuizzPalette.neutral10
+    val onAnswerIdle = QuizzPalette.neutral90
+}

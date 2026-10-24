@@ -1,8 +1,8 @@
 <resources>
-    <string name="quizz_title" translatable="false">Quizz</string>
-    <string name="quizz_mobile_description">Вы сможете войти гостем по QR-коду комнаты на ТВ.</string>
-    <string name="quizz_tv_description">Вы сможете выбрать игру на ТВ гостем и пригласить друзей по QR-коду комнаты.</string>
-    <string name="quizz_show_instructions">Как играть</string>
-    <string name="quizz_hide_instructions">Скрыть подсказку</string>
-    <string name="quizz_instructions">Вопросы будут на ТВ, а участники ответят с телефонов. В комнату можно будет войти гостем по QR-коду на ТВ. Для некоторых игр нужен вход на ТВ. На телефоне входить не нужно. QR-присоединение и запуск пока недоступны.</string>
+    <string name="quizz_status_waiting">Ожидание</string>
+    <string name="quizz_status_approved">Подтверждено</string>
+    <string name="quizz_status_expired">Срок действия истёк</string>
+    <string name="quizz_status_denied">Отклонено</string>
+    <string name="quizz_answer_correct">Правильный ответ</string>
+    <string name="quizz_answer_wrong">Неправильный ответ</string>
 </resources>

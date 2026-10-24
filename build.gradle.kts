@@ -1,18 +1,13 @@
 import io.gitlab.arturbosch.detekt.Detekt
 
 plugins {
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.android.library) apply false
-    // AGP's built-in Kotlin uses this version without applying the Android Kotlin plugin.
-    alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.detekt)
 }
 
 detekt {
     buildUponDefaultConfig = true
     config.setFrom(files("config/detekt/detekt.yml"))
-    source.setFrom(files("app", "core", "build.gradle.kts", "settings.gradle.kts"))
+    source.setFrom(files("app", "core", "buildSrc", "build.gradle.kts", "settings.gradle.kts"))
     parallel = true
 }
 
@@ -34,6 +29,10 @@ tasks.register("qualityCheck") {
     description = "Runs static analysis, unit tests, and builds both Android applications."
     dependsOn(
         "detekt",
+        ":core:designsystem:mobile:lint",
+        ":core:designsystem:mobile:testDebugUnitTest",
+        ":core:designsystem:tv:lint",
+        ":core:designsystem:tv:testDebugUnitTest",
         ":core:ui:lint",
         ":core:ui:testDebugUnitTest",
         ":app:mobile:lint",
