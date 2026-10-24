@@ -1,19 +1,68 @@
+# Overrides for Detekt 1.23.8; buildUponDefaultConfig keeps the standard rules enabled.
+# Keep this file small: https://detekt.dev/docs/1.23.8/introduction/configurations/
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
 config:
   validation: true
+  warningsAsErrors: true
 
 complexity:
   LongParameterList:
-    ignoreAnnotated: ['Composable']
+    # Defaulted UI options do not count; required arguments remain bounded, including Compose.
+    functionThreshold: 8
+    constructorThreshold: 8
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    ignoreAnnotatedFunctions: ['Preview']
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true
+
+exceptions:
+  NotImplementedDeclaration:
+    active: true
 
 naming:
   EnumNaming:
     enumEntryPattern: '[A-Z][A-Z0-9]*(_[A-Z0-9]+)*'
   FunctionNaming:
     ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    # Accept both Kotlin CONSTANT_CASE and Compose PascalCase constants.
+    constantPattern: '[A-Z][A-Za-z0-9]*(_[A-Z0-9]+)*'
 
 style:
   MagicNumber:
+    # Theme tokens and UI measurements are declarations, not domain magic numbers.
     ignorePropertyDeclaration: true
     ignoreAnnotated: ['Composable', 'Preview']
+  ReturnCount:
+    excludeGuardClauses: true
   UnusedPrivateMember:
     ignoreAnnotated: ['Preview']
+  # detekt-formatting owns these checks to avoid duplicate reports.
+  MaxLineLength:
+    active: false
+  ModifierOrder:
+    active: false
+  UnusedImports:
+    active: false
+  WildcardImport:
+    active: false
+
+formatting:
+  active: true
+  android: true
+  MaximumLineLength:
+    maxLineLength: 120
+  NoWildcardImports:
+    packagesToUseImportOnDemandProperty: ''
+  TrailingCommaOnCallSite:
+    active: true
+    useTrailingCommaOnCallSite: true
+  TrailingCommaOnDeclarationSite:
+    active: true
+    useTrailingCommaOnDeclarationSite: true

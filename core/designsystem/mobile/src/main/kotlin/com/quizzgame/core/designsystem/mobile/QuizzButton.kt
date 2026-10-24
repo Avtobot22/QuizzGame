@@ -22,7 +22,7 @@ fun QuizzButton(
 ) {
     val target = modifier.sizeIn(
         minWidth = QuizzDimensions.mobileMinTouchDp.dp,
-        minHeight = QuizzDimensions.mobileMinTouchDp.dp
+        minHeight = QuizzDimensions.mobileMinTouchDp.dp,
     )
     when (style) {
         QuizzButtonStyle.FILLED -> Button(onClick, target, enabled, content = content)

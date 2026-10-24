@@ -40,6 +40,8 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 
 Команда запускает Detekt, Android lint и unit-test tasks, собирает debug/release и APK инструментальных тестов обоих приложений. Отчёты сохраняются в `build/reports/` соответствующих модулей.
 
+Правила Kotlin-анализа заданы в [конфиге Detekt](config/detekt/detekt.yml), настройки редактора - в [.editorconfig](.editorconfig). Проверка не меняет исходники; для исправления форматирования запусти `./gradlew detekt --auto-correct`, затем проверь diff и повтори `./gradlew detekt`.
+
 Для UI-тестов подключи телефон или TV-устройство и запусти нужную команду отдельно:
 
 ```sh

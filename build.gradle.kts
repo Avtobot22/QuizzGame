@@ -5,10 +5,14 @@ plugins {
 }
 
 detekt {
+    toolVersion = libs.versions.detekt.get()
     buildUponDefaultConfig = true
     config.setFrom(files("config/detekt/detekt.yml"))
-    source.setFrom(files("app", "core", "buildSrc", "build.gradle.kts", "settings.gradle.kts"))
+    source.setFrom(files(rootDir))
+    basePath = rootDir.absolutePath
     parallel = true
+    ignoreFailures = false
+    autoCorrect = false
 }
 
 dependencies {
@@ -17,10 +21,13 @@ dependencies {
 
 tasks.withType<Detekt>().configureEach {
     include("**/*.kt", "**/*.kts")
-    exclude("**/build/**")
+    exclude("**/build/**", "**/.*/**")
+    jvmTarget = "17"
     reports {
         html.required.set(true)
         sarif.required.set(true)
+        xml.required.set(false)
+        md.required.set(false)
     }
 }
 
