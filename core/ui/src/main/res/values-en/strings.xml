@@ -1,0 +1,7 @@
+<resources>
+    <string name="quizz_mobile_description">You will be able to join as a guest with the room QR code on the TV.</string>
+    <string name="quizz_tv_description">You will be able to browse games as a guest on TV and invite friends with a room QR code.</string>
+    <string name="quizz_show_instructions">How to play</string>
+    <string name="quizz_hide_instructions">Hide instructions</string>
+    <string name="quizz_instructions">Questions will be on TV; players will answer on their phones. Guests will join using the room QR code on TV. Some games require sign-in on TV. No phone sign-in is needed. QR joining and game launch are not available yet.</string>
+</resources>

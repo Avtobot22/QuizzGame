@@ -1,0 +1,35 @@
+# Gradle and local build state
+.gradle/
+.gradle-user-home/
+.gradle-home/
+.kotlin/
+**/build/
+local.properties
+
+# IDE and OS files
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local signing and runtime configuration
+*.jks
+*.keystore
+keystore.properties
+signing.properties
+.env
+.env.*
+!.env.example
+google-services.json
+
+# Local output and diagnostics
+*.hprof
+*.log
+captures/
+.cxx/
+.externalNativeBuild/
+
+# Distributables are produced by CI, never stored as sources
+*.apk
+*.aab
+*.apks
