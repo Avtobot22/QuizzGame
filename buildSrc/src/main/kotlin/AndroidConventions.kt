@@ -1,9 +1,11 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
+import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.artifacts.VersionCatalogsExtension
+import org.gradle.api.artifacts.Configuration
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -36,16 +38,13 @@ private fun Project.configureKotlin() {
     }
 }
 
-fun Project.addCatalogDependency(configuration: String, alias: String) {
-    val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-    dependencies.add(configuration, catalog.findLibrary(alias).get())
-}
+val Project.libs: LibrariesForLibs
+    get() = extensions.getByType<LibrariesForLibs>()
 
-private fun Project.configureCompose(configuration: String = "implementation") {
-    val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
-    dependencies.add(configuration, dependencies.platform(catalog.findLibrary("androidx-compose-bom").get()))
-    addCatalogDependency(configuration, "androidx-compose-foundation")
-    addCatalogDependency(configuration, "androidx-compose-ui")
+private fun Project.configureCompose(configuration: Configuration) {
+    dependencies.add(configuration.name, dependencies.platform(libs.androidx.compose.bom))
+    dependencies.add(configuration.name, libs.androidx.compose.foundation)
+    dependencies.add(configuration.name, libs.androidx.compose.ui)
 }
 
 fun Project.configureAndroidApplication() {
@@ -70,21 +69,24 @@ fun Project.configureAndroidApplication() {
         }
     }
     configureKotlin()
-    configureCompose()
-    addCatalogDependency("implementation", "androidx-activity-compose")
-    val catalog = extensions.getByType<VersionCatalogsExtension>().named("libs")
+    val implementation = configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
+    val androidTestImplementation = configurations.getByName("androidTestImplementation")
+    val debugImplementation = configurations.getByName("debugImplementation")
+    configureCompose(implementation)
+    dependencies.add(implementation.name, libs.androidx.activity.compose)
     dependencies.add(
-        "androidTestImplementation",
-        dependencies.platform(catalog.findLibrary("androidx-compose-bom").get())
+        androidTestImplementation.name,
+        dependencies.platform(libs.androidx.compose.bom)
     )
-    addCatalogDependency("androidTestImplementation", "androidx-compose-ui-test-junit4")
-    addCatalogDependency("androidTestImplementation", "androidx-test-junit")
-    addCatalogDependency("androidTestImplementation", "androidx-test-runner")
-    addCatalogDependency("debugImplementation", "androidx-compose-ui-test-manifest")
+    dependencies.add(androidTestImplementation.name, libs.androidx.compose.ui.test.junit4)
+    dependencies.add(androidTestImplementation.name, libs.androidx.test.junit)
+    dependencies.add(androidTestImplementation.name, libs.androidx.test.runner)
+    dependencies.add(debugImplementation.name, libs.androidx.compose.ui.test.manifest)
 }
 
 fun Project.configureAndroidLibrary() {
     extensions.configure<LibraryExtension> { configureAndroid() }
     configureKotlin()
-    configureCompose("api")
+    val api = configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME)
+    configureCompose(api)
 }
