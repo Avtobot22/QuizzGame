@@ -1,0 +1,23 @@
+name: Возможность
+description: Пользовательский сценарий или техническое улучшение
+title: "[Feature]: "
+body:
+  - type: textarea
+    id: scenario
+    attributes:
+      label: Сценарий и проблема
+      description: Кто выполняет действие, на каком устройстве и зачем.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Критерии готовности
+      description: Наблюдаемое поведение, ошибки, отмена, восстановление, управление с пульта.
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Границы и материалы
+      description: Доступные участникам задачи материалы, зависимости, открытые вопросы и исключения; существенные требования изложить здесь.

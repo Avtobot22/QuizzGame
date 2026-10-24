@@ -1,0 +1,33 @@
+name: Ошибка
+description: Воспроизводимая проблема Android Mobile или Android TV
+title: "[Bug]: "
+body:
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Платформа
+      options:
+        - Android TV
+        - Android Mobile
+        - Обе
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Как воспроизвести
+      description: Шаги, ожидаемый результат и фактическое поведение.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Окружение
+      description: Устройство, версия Android, версия приложения, способ ввода и состояние сети.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Подтверждение
+      description: Логи без персональных данных и токенов; при необходимости снимок экрана.
