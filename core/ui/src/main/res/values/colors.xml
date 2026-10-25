@@ -1,3 +1,6 @@
 <resources>
-    <color name="quizz_icon_background">#0A090F</color>
+    <color name="quizz_surface_light">#F6FAFB</color>
+    <color name="quizz_surface_dark">#111415</color>
+    <color name="quizz_primary_dark">#7FD5CC</color>
+    <color name="quizz_icon_background">@color/quizz_surface_dark</color>
 </resources>

@@ -3,5 +3,5 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-    <path android:fillColor="#C2BEFF" android:pathData="M54,22a28,28 0,1 0,0 56a28,28 0,1 0,0 -56M54,34a16,16 0,1 1,0 32a16,16 0,1 1,0 -32M64,64l9,-7l16,20l-9,7z" />
+    <path android:fillColor="@color/quizz_primary_dark" android:pathData="M54,22a28,28 0,1 0,0 56a28,28 0,1 0,0 -56M54,34a16,16 0,1 1,0 32a16,16 0,1 1,0 -32M64,64l9,-7l16,20l-9,7z" />
 </vector>
