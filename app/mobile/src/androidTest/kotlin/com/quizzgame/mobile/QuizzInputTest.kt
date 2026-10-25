@@ -11,18 +11,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithContentDescription
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performSemanticsAction
-import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.text.AnnotatedString
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
 import com.quizzgame.core.designsystem.mobile.QuizzOtpInput
@@ -35,6 +25,9 @@ class QuizzInputTest {
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
+    private val screen: InputsScreen
+        get() = InputsScreen(compose)
+
     @Test
     fun otpPastesIntoOneAccessibleFieldAndLimitsDigits() {
         compose.setContent {
@@ -43,8 +36,8 @@ class QuizzInputTest {
                 QuizzOtpInput(value = value, onValueChange = { value = it }, label = "Verification code")
             }
         }
-        compose.onAllNodes(hasSetTextAction()).assertCountEquals(1)
-        val field = compose.onNodeWithContentDescription("Verification code")
+        screen.assertEditableFieldCount(1)
+        val field = screen.otp
         field.performClick()
 
         val clipboard = compose.activity.getSystemService(ClipboardManager::class.java)
@@ -58,7 +51,12 @@ class QuizzInputTest {
                 when {
                     previousClip != null -> clipboard.setPrimaryClip(previousClip)
                     Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> clipboard.clearPrimaryClip()
-                    else -> clipboard.setPrimaryClip(ClipData.newPlainText("", ""))
+                    else -> clipboard.setPrimaryClip(
+                        ClipData.newPlainText(
+                            "",
+                            "",
+                        ),
+                    )
                 }
             }
         }
@@ -77,8 +75,8 @@ class QuizzInputTest {
             }
         }
 
-        compose.onNodeWithText("Code has expired").assertIsDisplayed()
-        compose.onNodeWithContentDescription("Verification code")
+        screen.text("Code has expired").apply { assertIsDisplayed() }
+        screen.otp
             .assert(SemanticsMatcher.expectValue(SemanticsProperties.Error, "Code has expired"))
     }
 
@@ -96,10 +94,11 @@ class QuizzInputTest {
             }
         }
 
-        val field = compose.onNodeWithContentDescription("Verification code").assertIsNotEnabled()
-        field.assert(hasSetTextAction().not()).performClick()
+        val field = screen.otp.apply { assertIsNotEnabled() }
+        field.assert(hasSetTextAction().not())
+        field.performClick()
         field.assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true).not())
-            .assertTextEquals("123456")
+        field.assertTextEquals("123456")
         compose.runOnIdle { assertEquals(0, changes) }
     }
 
@@ -112,8 +111,8 @@ class QuizzInputTest {
             }
         }
 
-        compose.onNode(hasSetTextAction()).performTextInput("abßı-12 cd345")
-        compose.onNode(hasSetTextAction()).assert(
+        screen.editable.performTextInput("abßı-12 cd345")
+        screen.editable.assert(
             SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("AB12CD")),
         )
     }
@@ -132,9 +131,9 @@ class QuizzInputTest {
             }
         }
 
-        compose.onNodeWithText("Room is unavailable", useUnmergedTree = true).assertIsDisplayed()
-        compose.onNodeWithText("Enter the code on TV").assertDoesNotExist()
-        compose.onNode(hasSetTextAction()).assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
+        screen.text("Room is unavailable", useUnmergedTree = true).apply { assertIsDisplayed() }
+        screen.text("Enter the code on TV").assertDoesNotExist()
+        screen.editable.assert(SemanticsMatcher.keyIsDefined(SemanticsProperties.Error))
     }
 
     @Test
@@ -151,10 +150,9 @@ class QuizzInputTest {
             }
         }
 
-        val field = compose.onNode(
-            SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("ABC123")),
-        ).assertIsNotEnabled()
-        field.assert(hasSetTextAction().not()).performClick()
+        val field = screen.roomCodeWithValue("ABC123").apply { assertIsNotEnabled() }
+        field.assert(hasSetTextAction().not())
+        field.performClick()
         field.assert(SemanticsMatcher.expectValue(SemanticsProperties.Focused, true).not())
         field.assert(SemanticsMatcher.expectValue(SemanticsProperties.EditableText, AnnotatedString("ABC123")))
         compose.runOnIdle { assertEquals(0, changes) }
