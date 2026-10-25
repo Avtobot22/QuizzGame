@@ -49,4 +49,6 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 ./gradlew :app:tv:connectedDebugAndroidTest
 ```
 
+UI-тесты используют Kakao Compose со screen objects и Espresso для аппаратных клавиш и Android View. Общие тестовые зависимости подключаются через convention plugins, версии закреплены в version catalog.
+
 Изменения проходят через PR в `main`. Перед отправкой запусти `qualityCheck`; при изменениях TV-интерфейса проверь управление пультом, фокус и Back.

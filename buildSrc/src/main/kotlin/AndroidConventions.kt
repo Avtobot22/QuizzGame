@@ -81,6 +81,8 @@ fun Project.configureAndroidApplication() {
     dependencies.add(androidTestImplementation.name, libs.androidx.compose.ui.test.junit4)
     dependencies.add(androidTestImplementation.name, libs.androidx.test.junit)
     dependencies.add(androidTestImplementation.name, libs.androidx.test.runner)
+    dependencies.add(androidTestImplementation.name, libs.kakao.compose)
+    dependencies.add(androidTestImplementation.name, libs.androidx.test.espresso.core)
     dependencies.add(debugImplementation.name, libs.androidx.compose.ui.test.manifest)
 }
 
