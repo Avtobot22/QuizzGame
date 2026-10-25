@@ -5,4 +5,8 @@
     <string name="quizz_status_denied">Отклонено</string>
     <string name="quizz_answer_correct">Правильный ответ</string>
     <string name="quizz_answer_wrong">Неправильный ответ</string>
+    <string name="quizz_tv_code_label">Код</string>
+    <string name="quizz_tv_code_progress">Введено символов: %1$d из %2$d</string>
+    <string name="quizz_tv_code_delete">Удалить последний символ</string>
+    <string name="quizz_tv_code_error">Неверный код. Попробуйте ещё раз.</string>
 </resources>
