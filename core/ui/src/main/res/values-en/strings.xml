@@ -5,4 +5,8 @@
     <string name="quizz_status_denied">Denied</string>
     <string name="quizz_answer_correct">Correct answer</string>
     <string name="quizz_answer_wrong">Wrong answer</string>
+    <string name="quizz_tv_code_label">Code</string>
+    <string name="quizz_tv_code_progress">Entered characters: %1$d / %2$d</string>
+    <string name="quizz_tv_code_delete">Delete last character</string>
+    <string name="quizz_tv_code_error">Invalid code. Try again.</string>
 </resources>

@@ -9,20 +9,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
-import androidx.compose.ui.test.assert
-import androidx.compose.ui.test.assertCountEquals
-import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertIsNotFocused
-import androidx.compose.ui.test.assertIsNotSelected
-import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.pressKey
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.AnswerVisualState
 import com.quizzgame.core.designsystem.tv.PairingState
@@ -34,10 +23,14 @@ import com.quizzgame.core.ui.R
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import android.view.KeyEvent as AndroidKeyEvent
 
 class QuizzTvComponentTest {
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
+
+    private val screen: TvComponentScreen
+        get() = TvComponentScreen(compose)
 
     @Test
     fun movingFocusDoesNotChangeAnswerSelectionOrActivateIt() {
@@ -51,7 +44,9 @@ class QuizzTvComponentTest {
                         helperText = "A",
                         state = AnswerVisualState.IDLE,
                         onClick = { activations++ },
-                        modifier = Modifier.fillMaxWidth().focusRequester(initialFocus),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .focusRequester(initialFocus),
                     )
                     QuizzTvAnswerCard(
                         title = "Chosen answer",
@@ -64,11 +59,23 @@ class QuizzTvComponentTest {
             LaunchedEffect(initialFocus) { initialFocus.requestFocus() }
         }
 
-        compose.onNodeWithText("First answer").assertIsFocused().assertIsNotSelected()
-        compose.onNodeWithText("Chosen answer").assertIsNotFocused().assertIsSelected()
-        compose.onNodeWithText("First answer").performKeyInput { pressKey(Key.DirectionDown) }
-        compose.onNodeWithText("Chosen answer").assertIsFocused().assertIsSelected()
-        compose.onNodeWithText("First answer").assertIsNotFocused().assertIsNotSelected()
+        screen.text("First answer").apply {
+            assertIsFocused()
+            assertIsNotSelected()
+        }
+        screen.text("Chosen answer").apply {
+            assertIsNotFocused()
+            assertIsSelected()
+        }
+        TvRemote.press(AndroidKeyEvent.KEYCODE_DPAD_DOWN)
+        screen.text("Chosen answer").apply {
+            assertIsFocused()
+            assertIsSelected()
+        }
+        screen.text("First answer").apply {
+            assertIsNotFocused()
+            assertIsNotSelected()
+        }
         compose.runOnIdle { assertEquals(0, activations) }
     }
 
@@ -89,8 +96,8 @@ class QuizzTvComponentTest {
             LaunchedEffect(initialFocus) { initialFocus.requestFocus() }
         }
 
-        compose.onNodeWithText("Answer").assertIsFocused()
-            .performKeyInput { pressKey(Key.DirectionCenter) }
+        screen.text("Answer").assertIsFocused()
+        TvRemote.press(AndroidKeyEvent.KEYCODE_DPAD_CENTER)
         compose.runOnIdle { assertEquals(1, activations) }
     }
 
@@ -111,8 +118,11 @@ class QuizzTvComponentTest {
             LaunchedEffect(initialFocus) { initialFocus.requestFocus() }
         }
 
-        compose.onNodeWithText("Unavailable answer").assertIsNotEnabled().assertIsFocused()
-            .performKeyInput { pressKey(Key.DirectionCenter) }
+        screen.text("Unavailable answer").apply {
+            assertIsNotEnabled()
+            assertIsFocused()
+        }
+        TvRemote.press(AndroidKeyEvent.KEYCODE_DPAD_CENTER)
         compose.runOnIdle { assertEquals(0, activations) }
     }
 
@@ -139,7 +149,7 @@ class QuizzTvComponentTest {
 
         listOf("Correct answer" to R.string.quizz_answer_correct, "Wrong answer" to R.string.quizz_answer_wrong)
             .forEach { (title, description) ->
-                compose.onNodeWithText(title).assert(
+                screen.text(title).assert(
                     SemanticsMatcher.expectValue(
                         SemanticsProperties.StateDescription,
                         compose.activity.getString(description),
@@ -174,14 +184,14 @@ class QuizzTvComponentTest {
         }
 
         val hasFocusState = SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused)
-        compose.onAllNodes(hasFocusState).assertCountEquals(2)
+        screen.assertFocusableCount(2)
         listOf("QR image", "ROOM42", "Expires in 02:00").forEach { text ->
-            compose.onNodeWithText(text, useUnmergedTree = true).assert(hasFocusState.not())
+            screen.text(text, useUnmergedTree = true).assert(hasFocusState.not())
         }
-        compose.onNodeWithText("Refresh").assertIsFocused()
-            .performKeyInput { pressKey(Key.DirectionRight) }
-        compose.onNodeWithText("Cancel").assertIsFocused()
-            .performKeyInput { pressKey(Key.DirectionCenter) }
+        screen.text("Refresh").assertIsFocused()
+        TvRemote.press(AndroidKeyEvent.KEYCODE_DPAD_RIGHT)
+        screen.text("Cancel").assertIsFocused()
+        TvRemote.press(AndroidKeyEvent.KEYCODE_DPAD_CENTER)
         compose.runOnIdle { assertEquals(1, cancelled) }
     }
 }
