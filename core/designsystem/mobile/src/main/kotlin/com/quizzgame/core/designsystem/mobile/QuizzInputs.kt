@@ -57,10 +57,12 @@ fun QuizzOtpInput(
             enabled = enabled,
             singleLine = true,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
-            modifier = Modifier.onFocusChanged { focused = it.isFocused }.semantics {
-                contentDescription = label
-                if (errorMessage != null) error(errorMessage)
-            },
+            modifier = Modifier
+                .onFocusChanged { focused = it.isFocused }
+                .semantics {
+                    contentDescription = label
+                    if (errorMessage != null) error(errorMessage)
+                },
             textStyle = MaterialTheme.typography.titleLarge.copy(color = Color.Transparent),
             cursorBrush = SolidColor(Color.Transparent),
             decorationBox = { innerTextField ->
@@ -121,7 +123,11 @@ private fun OtpDecoration(
 ) {
     val outline = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline
     Box {
-        Box(Modifier.size(1.dp).alpha(0f)) { innerTextField() }
+        Box(
+            Modifier
+                .size(1.dp)
+                .alpha(0f),
+        ) { innerTextField() }
         Row(
             Modifier.clearAndSetSemantics {},
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -134,7 +140,9 @@ private fun OtpDecoration(
                     outline
                 }
                 Box(
-                    Modifier.weight(1f).heightIn(min = 48.dp)
+                    Modifier
+                        .weight(1f)
+                        .heightIn(min = 48.dp)
                         .alpha(if (enabled) 1f else 0.38f)
                         .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.medium)
                         .border(
