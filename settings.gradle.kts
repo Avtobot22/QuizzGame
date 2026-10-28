@@ -28,4 +28,9 @@ dependencyResolutionManagement {
 
 rootProject.name = "QuizzGame"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-include(":app:mobile", ":app:tv", ":core:ui", ":core:designsystem:mobile", ":core:designsystem:tv")
+include(":app:mobile")
+include(":app:tv")
+include(":core:ui")
+include(":core:designsystem:mobile")
+include(":core:designsystem:tv")
+include(":core:network")

@@ -4,6 +4,8 @@
 
 Проект в разработке. Готовы отдельные приложения для телефона и ТВ, темы и компоненты дизайн-системы. Игровые экраны, комнаты и авторизация пока не реализованы; при запуске приложения показывают пустой экран.
 
+Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network). Модуль проверяется отдельно; приложения пока его не используют.
+
 ## Сборка и запуск
 
 Нужны JDK 21, Android SDK Platform 37.0, Build Tools 36.0.0 и Android Studio с поддержкой версии AGP из [version catalog](gradle/libs.versions.toml). Приложения поддерживают Android 8.0 (API 26) и выше.
@@ -27,6 +29,7 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 | `app/mobile` | Приложение участника на телефоне |
 | `app/tv` | Приложение ведущего на телевизоре |
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
+| `core/network` | HTTP-клиенты, JSON, общие заголовки и конфигурация транспорта |
 | `core/designsystem/mobile` | Темы и компоненты Material 3 |
 | `core/designsystem/tv` | Темы и компоненты TV Material |
 
