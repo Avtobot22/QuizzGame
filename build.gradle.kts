@@ -21,7 +21,7 @@ dependencies {
 
 tasks.withType<Detekt>().configureEach {
     include("**/*.kt", "**/*.kts")
-    exclude("docs/**", "**/build/**", "**/.*/**")
+    exclude("docs/**", "external/android-mock-server/**", "**/build/**", "**/.*/**")
     jvmTarget = "17"
     reports {
         html.required.set(true)

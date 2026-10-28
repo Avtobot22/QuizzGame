@@ -16,6 +16,7 @@ retrofit = "2.11.0"
 #noinspection NewerVersionAvailable
 serialization = "1.11.0"
 junit = "4.13.2"
+androidMock = "0.1.0-SNAPSHOT"
 
 [libraries]
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
@@ -42,6 +43,8 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 retrofit-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 junit = { module = "junit:junit", version.ref = "junit" }
+androidmock-core = { module = "dev.androidmock:mock-core", version.ref = "androidMock" }
+androidmock-okhttp-server = { module = "dev.androidmock:mock-okhttp-server", version.ref = "androidMock" }
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }

@@ -1,0 +1,3 @@
+[submodule "external/android-mock-server"]
+	path = external/android-mock-server
+	url = https://github.com/Avtobot22/android-mock-server.git

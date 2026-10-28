@@ -34,3 +34,14 @@ include(":core:ui")
 include(":core:designsystem:mobile")
 include(":core:designsystem:tv")
 include(":core:network")
+
+val mockSdkDirectory = file("external/android-mock-server")
+check(mockSdkDirectory.resolve("settings.gradle.kts").isFile) {
+    "Initialize the pinned mock SDK: git submodule update --init --recursive"
+}
+includeBuild(mockSdkDirectory) {
+    dependencySubstitution {
+        substitute(module("dev.androidmock:mock-core")).using(project(":mock-core"))
+        substitute(module("dev.androidmock:mock-okhttp-server")).using(project(":mock-okhttp-server"))
+    }
+}

@@ -4,11 +4,17 @@
 
 Проект в разработке. Готовы отдельные приложения для телефона и ТВ, темы и компоненты дизайн-системы. Игровые экраны, комнаты и авторизация пока не реализованы; при запуске приложения показывают пустой экран.
 
-Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network). Модуль проверяется отдельно; приложения пока его не используют.
+Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network).
 
 ## Сборка и запуск
 
-Нужны JDK 21, Android SDK Platform 37.0, Build Tools 36.0.0 и Android Studio с поддержкой версии AGP из [version catalog](gradle/libs.versions.toml). Приложения поддерживают Android 8.0 (API 26) и выше.
+Нужны JDK 21 для приложения, JDK 17 для mock SDK, Android SDK Platform 37.0, Build Tools 36.0.0 и Android Studio с поддержкой версии AGP из [version catalog](gradle/libs.versions.toml). Приложения поддерживают Android 8.0 (API 26) и выше.
+
+После клонирования загрузи закреплённые исходники mock SDK:
+
+```sh
+git submodule update --init --recursive
+```
 
 1. Открой корень проекта в Android Studio и выбери JDK 21 для Gradle.
 2. Укажи путь к SDK в `local.properties` (`sdk.dir=...`) или через `ANDROID_HOME`.
