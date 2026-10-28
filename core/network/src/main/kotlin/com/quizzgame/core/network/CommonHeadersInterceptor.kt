@@ -6,7 +6,6 @@ import java.io.IOException
 
 internal class CommonHeadersInterceptor(
     private val configuration: NetworkConfiguration,
-    private val stripAuthorization: Boolean,
 ) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -19,7 +18,6 @@ internal class CommonHeadersInterceptor(
             .header(HttpHeaderNames.X_ENDPOINT_VERSION, headers.apiVersion.toString())
             .header(HttpHeaderNames.X_CLIENT_PLATFORM, headers.clientPlatform)
             .header(HttpHeaderNames.USER_AGENT, headers.userAgent)
-        if (stripAuthorization) request.removeHeader(HttpHeaderNames.AUTHORIZATION)
         return chain.proceed(request.build())
     }
 }

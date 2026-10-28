@@ -16,6 +16,7 @@ import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Call
+import retrofit2.Invocation
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
@@ -63,6 +64,7 @@ class NetworkClientFactoryTest {
         assertEquals("test-host/1", request.getHeader("User-Agent"))
         assertNull(request.getHeader("Authorization"))
         assertEquals(marker, response.raw().request.tag(Marker::class.java))
+        assertEquals("get", response.raw().request.tag(Invocation::class.java)!!.method().name)
     }
 
     @Test

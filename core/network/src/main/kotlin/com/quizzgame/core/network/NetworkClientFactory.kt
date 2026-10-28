@@ -12,7 +12,10 @@ class NetworkClient internal constructor(
     val retrofit: Retrofit,
 )
 
-class NetworkClientFactory(private val configuration: NetworkConfiguration) {
+class NetworkClientFactory(
+    private val configuration: NetworkConfiguration,
+    private val credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
+) {
 
     val json: Json = Json {
         ignoreUnknownKeys = true
@@ -21,11 +24,11 @@ class NetworkClientFactory(private val configuration: NetworkConfiguration) {
         coerceInputValues = false
     }
 
-    fun createApiClient(): NetworkClient = create(stripAuthorization = false)
+    fun createApiClient(): NetworkClient = create(refresh = false)
 
-    fun createRefreshClient(): NetworkClient = create(stripAuthorization = true)
+    fun createRefreshClient(): NetworkClient = create(refresh = true)
 
-    private fun create(stripAuthorization: Boolean): NetworkClient {
+    private fun create(refresh: Boolean): NetworkClient {
         val timeouts = configuration.timeouts
         val client = OkHttpClient.Builder()
             .connectTimeout(timeouts.connect.inWholeMilliseconds, TimeUnit.MILLISECONDS)
@@ -35,7 +38,10 @@ class NetworkClientFactory(private val configuration: NetworkConfiguration) {
             .retryOnConnectionFailure(false)
             .followRedirects(false)
             .followSslRedirects(false)
-            .addInterceptor(CommonHeadersInterceptor(configuration, stripAuthorization))
+            .addInterceptor(CommonHeadersInterceptor(configuration))
+            .addInterceptor(
+                if (refresh) AnonymousRequestInterceptor() else AccessTokenInterceptor(credentialsProvider),
+            )
             .addInterceptor(RestoreRetryAfterInterceptor())
             .addNetworkInterceptor(PreventServerRetryInterceptor())
             .build()

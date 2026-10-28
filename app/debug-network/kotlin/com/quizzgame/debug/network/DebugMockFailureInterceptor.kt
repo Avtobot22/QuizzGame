@@ -19,11 +19,11 @@ internal class DebugMockFailureInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
         val failure = when (MockServerFailureProtocol.failureName(response)) {
-            "NoMatchingRule"  -> DebugMockFailure.NO_MATCHING_RULE
-            "InvalidRequest"  -> DebugMockFailure.INVALID_REQUEST
+            "NoMatchingRule" -> DebugMockFailure.NO_MATCHING_RULE
+            "InvalidRequest" -> DebugMockFailure.INVALID_REQUEST
             "CallbackFailure" -> DebugMockFailure.CALLBACK_FAILURE
             "InvalidResponse" -> DebugMockFailure.INVALID_RESPONSE
-            else              -> return response
+            else -> return response
         }
         response.close()
         throw DebugMockTransportException(failure)

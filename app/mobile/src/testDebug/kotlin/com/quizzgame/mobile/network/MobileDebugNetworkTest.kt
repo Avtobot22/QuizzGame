@@ -1,6 +1,10 @@
 package com.quizzgame.mobile.network
 
+import com.quizzgame.core.network.AuthPolicy
+import com.quizzgame.core.network.CredentialsProvider
+import com.quizzgame.core.network.CredentialsSnapshot
 import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.RequestPolicy
 import com.quizzgame.debug.network.DebugMockFailure
 import com.quizzgame.debug.network.DebugMockTransportException
 import com.quizzgame.debug.network.DebugNetworkConfiguration
@@ -18,8 +22,10 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Call
 import retrofit2.http.GET
+import retrofit2.http.Tag
 import java.io.ByteArrayInputStream
 import java.io.IOException
+import java.util.concurrent.atomic.AtomicReference
 
 class MobileDebugNetworkTest {
     private val graphs = mutableListOf<DebugNetworkGraph>()
@@ -53,21 +59,38 @@ class MobileDebugNetworkTest {
 
     @Test
     fun separateGraphsKeepIndependentRulesAndClosingOneLeavesTheOtherUsable() {
-        val first = openMock("""{"source":"first-graph"}""")
-        val second = openMock("""{"source":"second-graph"}""")
+        val firstCredentials = AtomicReference(CredentialsSnapshot("first-access", 1))
+        val first = openMock("""{"source":"first-graph"}""", CredentialsProvider { firstCredentials.get() })
+        val second = openMock(
+            """{"source":"second-graph"}""",
+            CredentialsProvider { CredentialsSnapshot("second-access", 1) },
+        )
         assertNotEquals(first.api.retrofit.baseUrl(), second.api.retrofit.baseUrl())
         assertNotSame(first.api.httpClient.connectionPool, second.api.httpClient.connectionPool)
         assertNotSame(first.refresh.httpClient.dispatcher, second.refresh.httpClient.dispatcher)
         val firstApi = first.api.retrofit.create(MobileProbeApi::class.java)
         val secondApi = second.api.retrofit.create(MobileProbeApi::class.java)
-        assertEquals("first-graph", firstApi.probe().execute().body()!!["source"]!!.jsonPrimitive.content)
-        assertEquals("second-graph", secondApi.probe().execute().body()!!["source"]!!.jsonPrimitive.content)
+        val policy = RequestPolicy(AuthPolicy.OPTIONAL)
+        val firstResponse = firstApi.probe(policy).execute()
+        val secondResponse = secondApi.probe(policy).execute()
+        assertEquals("first-graph", firstResponse.body()!!["source"]!!.jsonPrimitive.content)
+        assertEquals("second-graph", secondResponse.body()!!["source"]!!.jsonPrimitive.content)
+        assertEquals("Bearer first-access", firstResponse.raw().request.header("Authorization"))
+        assertEquals("Bearer second-access", secondResponse.raw().request.header("Authorization"))
+        firstCredentials.set(CredentialsSnapshot("changed-first-access", 2))
+        val updated = firstApi.probe(policy).execute()
+        assertEquals("Bearer changed-first-access", updated.raw().request.header("Authorization"))
         first.close()
         assertThrows(IOException::class.java) { firstApi.probe().execute() }
-        assertEquals("second-graph", secondApi.probe().execute().body()!!["source"]!!.jsonPrimitive.content)
+        val remaining = secondApi.probe(policy).execute()
+        assertEquals("second-graph", remaining.body()!!["source"]!!.jsonPrimitive.content)
+        assertEquals("Bearer second-access", remaining.raw().request.header("Authorization"))
     }
 
-    private fun openMock(fixture: String? = null): DebugNetworkGraph = openMobileDebugNetwork(
+    private fun openMock(
+        fixture: String? = null,
+        credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
+    ): DebugNetworkGraph = openMobileDebugNetwork(
         DebugNetworkConfiguration(
             DebugNetworkMode.MOCK,
             PlatformHeaders("test-mobile", "mobile-debug-tests/1", 1),
@@ -76,11 +99,12 @@ class MobileDebugNetworkTest {
             fixture?.let { ByteArrayInputStream(it.toByteArray()) }
                 ?: checkNotNull(javaClass.classLoader!!.getResourceAsStream(path))
         },
+        credentialsProvider = credentialsProvider,
     ).also(graphs::add)
 
     interface MobileProbeApi {
         @GET("debug/mobile/probe")
-        fun probe(): Call<JsonObject>
+        fun probe(@Tag policy: RequestPolicy? = null): Call<JsonObject>
 
         @GET("debug/mobile/missing")
         fun missing(): Call<JsonObject>

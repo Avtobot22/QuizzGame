@@ -1,5 +1,6 @@
 package com.quizzgame.tv.network
 
+import com.quizzgame.core.network.CredentialsProvider
 import com.quizzgame.core.network.NetworkTimeouts
 import com.quizzgame.core.network.PlatformHeaders
 import com.quizzgame.debug.network.DebugNetworkConfiguration
@@ -26,13 +27,14 @@ abstract class DebugNetworkTestFixture {
     protected fun openMock(
         timeouts: NetworkTimeouts = NetworkTimeouts(),
         rules: List<Rule>? = null,
+        credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
     ): DebugNetworkGraph {
         val configuration = DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers, timeouts = timeouts)
         val graph = if (rules == null) {
             val assets = DebugMockAssets { path -> checkNotNull(javaClass.classLoader!!.getResourceAsStream(path)) }
-            openTvDebugNetwork(configuration, bodyAssets = assets)
+            openTvDebugNetwork(configuration, bodyAssets = assets, credentialsProvider = credentialsProvider)
         } else {
-            DebugNetworkGraph.open(configuration, mockRules = rules)
+            DebugNetworkGraph.open(configuration, mockRules = rules, credentialsProvider = credentialsProvider)
         }
         return graph.also(graphs::add)
     }

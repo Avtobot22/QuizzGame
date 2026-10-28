@@ -1,6 +1,11 @@
 package com.quizzgame.tv.network
 
+import com.quizzgame.core.network.AuthPolicy
+import com.quizzgame.core.network.CredentialsProvider
+import com.quizzgame.core.network.CredentialsSnapshot
 import com.quizzgame.core.network.NetworkTimeouts
+import com.quizzgame.core.network.ReplayPolicy
+import com.quizzgame.core.network.RequestPolicy
 import com.quizzgame.debug.network.DebugMockFailure
 import com.quizzgame.debug.network.DebugMockFailureInterceptor
 import com.quizzgame.debug.network.DebugMockTransportException
@@ -25,6 +30,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
+import retrofit2.http.Tag
 import java.io.IOException
 import java.net.HttpURLConnection.HTTP_INTERNAL_ERROR
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
@@ -66,6 +72,7 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
         val calls = CopyOnWriteArrayList<String>()
         val authentications = AtomicInteger()
         val graph = openMock(
+            credentialsProvider = CredentialsProvider { CredentialsSnapshot("fixture-access-1", 1) },
             rules = mockRules {
                 rule("private", "/test/private") {
                     match { method("GET") }
@@ -94,8 +101,9 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
             },
         )
         val refresh = graph.refresh.retrofit.create(ProbeApi::class.java)
+        val policy = RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE)
         val client = graph.api.httpClient.newBuilder().authenticator { _, response ->
-            if (response.priorResponse != null) {
+            if (response.priorResponse != null || response.request.tag(RequestPolicy::class.java) != policy) {
                 null
             } else {
                 authentications.incrementAndGet()
@@ -106,7 +114,7 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
             }
         }.build()
         val api = graph.api.retrofit.newBuilder().client(client).build().create(ProbeApi::class.java)
-        val response = api.privateResource("Bearer fixture-access-1").execute()
+        val response = api.privateResource("stale-supplied-header", policy).execute()
         assertTrue(response.isSuccessful)
         assertEquals(HTTP_UNAUTHORIZED, response.raw().priorResponse!!.code)
         assertEquals(1, authentications.get())
@@ -117,6 +125,7 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
     fun repeatedHTTP401StopsWhenTheTestAuthenticatorRejectsAnotherFollowUp() {
         val requests = AtomicInteger()
         val graph = openMock(
+            credentialsProvider = CredentialsProvider { CredentialsSnapshot("initial-fixture", 1) },
             rules = mockRules {
                 rule("reject", "/test/private") {
                     respondWith { _, _ ->
@@ -126,15 +135,16 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
                 }
             },
         )
+        val policy = RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE)
         val client = graph.api.httpClient.newBuilder().authenticator { _, response ->
-            if (response.priorResponse == null) {
+            if (response.priorResponse == null && response.request.tag(RequestPolicy::class.java) == policy) {
                 response.request.newBuilder().header("Authorization", "fixture").build()
             } else {
                 null
             }
         }.build()
         val api = graph.api.retrofit.newBuilder().client(client).build().create(ProbeApi::class.java)
-        val response = api.privateResource("initial-fixture").execute()
+        val response = api.privateResource("stale-supplied-header", policy).execute()
         assertEquals(HTTP_UNAUTHORIZED, response.code())
         response.errorBody()?.close()
         assertEquals(2, requests.get())
@@ -292,7 +302,10 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
         fun launch(): Call<JsonObject>
 
         @GET("test/private")
-        fun privateResource(@Header("Authorization") authorization: String): Call<JsonObject>
+        fun privateResource(
+            @Header("Authorization") authorization: String,
+            @Tag policy: RequestPolicy? = null,
+        ): Call<JsonObject>
 
         @POST("test/refresh")
         fun refresh(@Body payload: JsonObject, @Header("Authorization") authorization: String): Call<JsonObject>

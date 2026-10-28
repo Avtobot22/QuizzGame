@@ -13,6 +13,7 @@ internal object HttpHeaderNames {
 internal object HttpHeaderValues {
 
     const val APPLICATION_JSON = "application/json"
+    const val BEARER_PREFIX = "Bearer "
     const val RETRY_AFTER_IMMEDIATE_SECONDS = 0L
     const val RETRY_AFTER_DEFERRED_SECONDS = 1L
 }

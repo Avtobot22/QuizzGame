@@ -1,6 +1,7 @@
 package com.quizzgame.debug.network
 
 import com.quizzgame.core.network.ApiBaseUrl
+import com.quizzgame.core.network.CredentialsProvider
 import com.quizzgame.core.network.NetworkClient
 import com.quizzgame.core.network.NetworkClientFactory
 import com.quizzgame.core.network.NetworkConfiguration
@@ -36,6 +37,7 @@ class DebugNetworkGraph private constructor(
         fun open(
             configuration: DebugNetworkConfiguration,
             mockRules: List<Rule> = emptyList(),
+            credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
         ): DebugNetworkGraph {
             val server = if (configuration.mode == DebugNetworkMode.MOCK) {
                 val engine = RuleEngine()
@@ -51,6 +53,7 @@ class DebugNetworkGraph private constructor(
                     ?: ApiBaseUrl.https(requireNotNull(configuration.realBaseUrl))
                 val factory = NetworkClientFactory(
                     NetworkConfiguration(baseUrl, configuration.headers, configuration.timeouts),
+                    credentialsProvider,
                 )
                 val closed = AtomicBoolean(false)
                 val api = decorate(factory.createApiClient(), closed, server != null).also(clients::add)
