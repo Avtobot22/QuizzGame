@@ -9,4 +9,8 @@ android {
 
 dependencies {
     implementation(projects.core.designsystem.tv)
+    debugImplementation(projects.core.network)
+    debugImplementation(libs.androidmock.core)
+    debugImplementation(libs.androidmock.okhttp.server)
+    testDebugImplementation(libs.junit)
 }
