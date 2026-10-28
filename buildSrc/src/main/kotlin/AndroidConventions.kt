@@ -67,6 +67,11 @@ fun Project.configureAndroidApplication() {
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
             }
         }
+        sourceSets.getByName("debug").apply {
+            kotlin.directories += rootProject.file("app/debug-network/kotlin").absolutePath
+            res.directories += rootProject.file("app/debug-network/res").absolutePath
+        }
+        sourceSets.getByName("testDebug").resources.directories += "src/debug/assets"
     }
     configureKotlin()
     val implementation = configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
