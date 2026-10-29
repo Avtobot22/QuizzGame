@@ -36,6 +36,7 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 | `app/tv` | Приложение ведущего на телевизоре |
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
 | `core/network` | HTTP-клиенты, JSON, общие заголовки и конфигурация транспорта |
+| `core/session` | Защищённое хранение токенов, состояние сессии и ID установки |
 | `core/designsystem/mobile` | Темы и компоненты Material 3 |
 | `core/designsystem/tv` | Темы и компоненты TV Material |
 

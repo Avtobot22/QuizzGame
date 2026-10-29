@@ -15,6 +15,7 @@ class NetworkClient internal constructor(
 class NetworkClientFactory(
     private val configuration: NetworkConfiguration,
     private val credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
+    private val refreshCoordinator: RefreshCoordinator? = null,
 ) {
 
     val json: Json = Json {
@@ -30,7 +31,12 @@ class NetworkClientFactory(
 
     private fun create(refresh: Boolean): NetworkClient {
         val timeouts = configuration.timeouts
-        val client = OkHttpClient.Builder()
+        val calls = if (!refresh && refreshCoordinator != null) {
+            AuthCallRegistry(credentialsProvider, refreshCoordinator)
+        } else {
+            null
+        }
+        val builder = OkHttpClient.Builder()
             .connectTimeout(timeouts.connect.inWholeMilliseconds, TimeUnit.MILLISECONDS)
             .readTimeout(timeouts.read.inWholeMilliseconds, TimeUnit.MILLISECONDS)
             .writeTimeout(timeouts.write.inWholeMilliseconds, TimeUnit.MILLISECONDS)
@@ -40,11 +46,20 @@ class NetworkClientFactory(
             .followSslRedirects(false)
             .addInterceptor(CommonHeadersInterceptor(configuration))
             .addInterceptor(
-                if (refresh) AnonymousRequestInterceptor() else AccessTokenInterceptor(credentialsProvider),
+                if (refresh) {
+                    AnonymousRequestInterceptor()
+                } else {
+                    AccessTokenInterceptor(credentialsProvider, calls)
+                },
             )
             .addInterceptor(RestoreRetryAfterInterceptor())
             .addNetworkInterceptor(PreventServerRetryInterceptor())
-            .build()
+        if (calls != null) {
+            builder.eventListenerFactory(calls)
+                .authenticator(SessionAuthenticator(credentialsProvider))
+                .addNetworkInterceptor(AuthReplayGuardInterceptor(credentialsProvider))
+        }
+        val client = builder.build()
         val retrofit = Retrofit.Builder()
             .baseUrl(configuration.baseUrl.value)
             .client(client)

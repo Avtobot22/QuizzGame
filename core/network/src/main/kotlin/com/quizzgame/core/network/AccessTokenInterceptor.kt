@@ -6,7 +6,10 @@ import java.io.IOException
 
 class AuthenticationRequiredException : IOException("Authentication is required")
 
-internal class AccessTokenInterceptor(private val credentialsProvider: CredentialsProvider) : Interceptor {
+internal class AccessTokenInterceptor(
+    private val credentialsProvider: CredentialsProvider,
+    private val calls: AuthCallRegistry? = null,
+) : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         val original = chain.request()
@@ -19,7 +22,14 @@ internal class AccessTokenInterceptor(private val credentialsProvider: Credentia
             val snapshot = credentialsProvider.snapshot()
             val access = snapshot.accessToken
             if (access == null && policy.auth == AuthPolicy.REQUIRED) throw AuthenticationRequiredException()
-            request.tag(RequestAuthContext::class.java, RequestAuthContext(snapshot))
+            val admitted = calls?.context(chain.call())
+            if (admitted != null && admitted.observedCredentials.sessionGeneration != snapshot.sessionGeneration) {
+                throw AuthenticationRequiredException()
+            }
+            if (admitted != null && !admitted.observedCredentials.sameVersion(snapshot)) {
+                request.tag(AuthFollowUp::class.java, AuthFollowUp())
+            }
+            request.tag(RequestAuthContext::class.java, RequestAuthContext(snapshot, admitted?.refreshAttempt))
             if (access != null) request.header(HttpHeaderNames.AUTHORIZATION, HttpHeaderValues.BEARER_PREFIX + access)
         }
         return chain.proceed(request.build())
