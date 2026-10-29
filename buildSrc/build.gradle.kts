@@ -17,6 +17,10 @@ dependencies {
 
 gradlePlugin {
     plugins {
+        register("androidInfrastructureLibrary") {
+            id = libs.plugins.quizz.android.infrastructure.library.get().pluginId
+            implementationClass = "AndroidInfrastructureLibraryConventionPlugin"
+        }
         register("kotlinJvmLibrary") {
             id = libs.plugins.quizz.kotlin.jvm.library.get().pluginId
             implementationClass = "KotlinJvmLibraryConventionPlugin"

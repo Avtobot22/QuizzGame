@@ -34,6 +34,7 @@ include(":core:ui")
 include(":core:designsystem:mobile")
 include(":core:designsystem:tv")
 include(":core:network")
+include(":core:session")
 
 val mockSdkDirectory = file("external/android-mock-server")
 check(mockSdkDirectory.resolve("settings.gradle.kts").isFile) {

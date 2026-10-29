@@ -17,8 +17,16 @@ retrofit = "2.11.0"
 serialization = "1.11.0"
 junit = "4.13.2"
 androidMock = "0.1.0-SNAPSHOT"
+coroutines = "1.11.0"
+datastore = "1.3.0"
+tink = "1.24.0"
 
 [libraries]
+tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
+androidx-datastore-tink = { module = "androidx.datastore:datastore-tink", version.ref = "datastore" }
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
 kotlin-compose-gradle-plugin = { module = "org.jetbrains.kotlin:compose-compiler-gradle-plugin", version.ref = "kotlin" }
@@ -47,6 +55,7 @@ androidmock-core = { module = "dev.androidmock:mock-core", version.ref = "androi
 androidmock-okhttp-server = { module = "dev.androidmock:mock-okhttp-server", version.ref = "androidMock" }
 
 [plugins]
+quizz-android-infrastructure-library = { id = "quizz.android.infrastructure.library" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 quizz-android-mobile-application = { id = "quizz.android.mobile.application" }
 quizz-android-tv-application = { id = "quizz.android.tv.application" }

@@ -56,6 +56,9 @@ style:
 formatting:
   active: true
   android: true
+  # Preserve when-column alignment; ktlint 0.50 has no narrow exception for it.
+  NoMultipleSpaces:
+    active: false
   MaximumLineLength:
     maxLineLength: 120
   NoWildcardImports:

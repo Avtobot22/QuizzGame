@@ -8,6 +8,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.session)
     implementation(projects.core.designsystem.tv)
     debugImplementation(projects.core.network)
     debugImplementation(libs.androidmock.core)

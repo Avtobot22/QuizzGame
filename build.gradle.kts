@@ -37,6 +37,11 @@ tasks.register("qualityCheck") {
     dependsOn(
         "detekt",
         ":core:network:check",
+        ":core:session:lint",
+        ":core:session:testDebugUnitTest",
+        ":core:session:assembleDebug",
+        ":core:session:assembleRelease",
+        ":core:session:assembleDebugAndroidTest",
         ":core:designsystem:mobile:lint",
         ":core:designsystem:mobile:testDebugUnitTest",
         ":core:designsystem:tv:lint",

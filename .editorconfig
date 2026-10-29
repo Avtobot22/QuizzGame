@@ -16,6 +16,7 @@ trim_trailing_whitespace = false
 
 [*.{kt,kts}]
 ij_kotlin_code_style_defaults = KOTLIN_OFFICIAL
+ij_kotlin_align_in_columns_case_branch = true
 max_line_length = 120
 ij_kotlin_allow_trailing_comma = true
 ij_kotlin_allow_trailing_comma_on_call_site = true
