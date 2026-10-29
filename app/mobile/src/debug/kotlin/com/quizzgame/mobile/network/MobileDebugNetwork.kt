@@ -1,6 +1,9 @@
 package com.quizzgame.mobile.network
 
 import com.quizzgame.core.network.CredentialsProvider
+import com.quizzgame.core.session.RefreshRevocationPolicy
+import com.quizzgame.core.session.SessionManager
+import com.quizzgame.core.session.api.RefreshEndpoint
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode
@@ -18,4 +21,19 @@ fun openMobileDebugNetwork(
         emptyList()
     }
     return DebugNetworkGraph.open(configuration, mockRules = rules, credentialsProvider = credentialsProvider)
+}
+
+fun openMobileDebugNetwork(
+    configuration: DebugNetworkConfiguration,
+    session: SessionManager,
+    refreshEndpoint: RefreshEndpoint,
+    bodyAssets: BodyAssetResolver? = null,
+    revocationPolicy: RefreshRevocationPolicy = RefreshRevocationPolicy.never(),
+): DebugNetworkGraph {
+    val rules = if (configuration.mode == DebugNetworkMode.MOCK) {
+        mobileMockRules(requireNotNull(bodyAssets))
+    } else {
+        emptyList()
+    }
+    return DebugNetworkGraph.openWithSession(configuration, session, refreshEndpoint, rules, revocationPolicy)
 }

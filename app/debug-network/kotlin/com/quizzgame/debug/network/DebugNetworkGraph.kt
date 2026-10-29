@@ -5,6 +5,11 @@ import com.quizzgame.core.network.CredentialsProvider
 import com.quizzgame.core.network.NetworkClient
 import com.quizzgame.core.network.NetworkClientFactory
 import com.quizzgame.core.network.NetworkConfiguration
+import com.quizzgame.core.session.RefreshRevocationPolicy
+import com.quizzgame.core.session.SessionManager
+import com.quizzgame.core.session.SessionRefreshCoordinator
+import com.quizzgame.core.session.api.RefreshClient
+import com.quizzgame.core.session.api.RefreshEndpoint
 import dev.androidmock.core.engine.RuleEngine
 import dev.androidmock.core.rule.Rule
 import dev.androidmock.okhttp.server.LoopbackMockServer
@@ -22,10 +27,12 @@ class DebugNetworkGraph private constructor(
     val refresh: DebugNetworkClient,
     private val closed: AtomicBoolean,
     private val mockServer: LoopbackMockServer?,
+    private val coordinator: SessionRefreshCoordinator?,
 ) : Closeable {
 
     override fun close() {
         if (!closed.compareAndSet(false, true)) return
+        coordinator?.close()
         mockServer.use {
             closeClient(api.httpClient)
             closeClient(refresh.httpClient)
@@ -38,6 +45,24 @@ class DebugNetworkGraph private constructor(
             configuration: DebugNetworkConfiguration,
             mockRules: List<Rule> = emptyList(),
             credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
+        ): DebugNetworkGraph = build(configuration, mockRules, credentialsProvider)
+
+        /** Borrows the session; closing the graph cancels recovery without closing the manager. */
+        fun openWithSession(
+            configuration: DebugNetworkConfiguration,
+            session: SessionManager,
+            refreshEndpoint: RefreshEndpoint,
+            mockRules: List<Rule> = emptyList(),
+            revocationPolicy: RefreshRevocationPolicy = RefreshRevocationPolicy.never(),
+        ): DebugNetworkGraph = build(configuration, mockRules, session, session, refreshEndpoint, revocationPolicy)
+
+        private fun build(
+            configuration: DebugNetworkConfiguration,
+            mockRules: List<Rule>,
+            credentialsProvider: CredentialsProvider,
+            session: SessionManager? = null,
+            refreshEndpoint: RefreshEndpoint? = null,
+            revocationPolicy: RefreshRevocationPolicy = RefreshRevocationPolicy.never(),
         ): DebugNetworkGraph {
             val server = if (configuration.mode == DebugNetworkMode.MOCK) {
                 val engine = RuleEngine()
@@ -47,22 +72,37 @@ class DebugNetworkGraph private constructor(
                 null
             }
             val clients = mutableListOf<DebugNetworkClient>()
+            var coordinator: SessionRefreshCoordinator? = null
             var acquired = false
             try {
                 val baseUrl = server?.baseUrl?.let { ApiBaseUrl.debugLoopback(it.toString()) }
                     ?: ApiBaseUrl.https(requireNotNull(configuration.realBaseUrl))
-                val factory = NetworkClientFactory(
-                    NetworkConfiguration(baseUrl, configuration.headers, configuration.timeouts),
-                    credentialsProvider,
+                val networkConfiguration = NetworkConfiguration(
+                    baseUrl,
+                    configuration.headers,
+                    configuration.timeouts,
                 )
+                val factory = NetworkClientFactory(networkConfiguration, credentialsProvider)
                 val closed = AtomicBoolean(false)
-                val api = decorate(factory.createApiClient(), closed, server != null).also(clients::add)
                 val refresh = decorate(factory.createRefreshClient(), closed, server != null).also(clients::add)
-                val graph = DebugNetworkGraph(configuration.mode, api, refresh, closed, server)
+                coordinator = session?.let {
+                    SessionRefreshCoordinator(
+                        it,
+                        RefreshClient(refresh.retrofit, requireNotNull(refreshEndpoint)),
+                        refresh.httpClient.dispatcher.executorService,
+                        revocationPolicy,
+                    )
+                }
+                val apiFactory = coordinator?.let {
+                    NetworkClientFactory(networkConfiguration, credentialsProvider, it)
+                } ?: factory
+                val api = decorate(apiFactory.createApiClient(), closed, server != null).also(clients::add)
+                val graph = DebugNetworkGraph(configuration.mode, api, refresh, closed, server, coordinator)
                 acquired = true
                 return graph
             } finally {
                 if (!acquired) {
+                    coordinator?.close()
                     clients.forEach { closeClient(it.httpClient) }
                     server?.close()
                 }
@@ -84,5 +124,5 @@ class DebugNetworkGraph private constructor(
 private fun closeClient(client: OkHttpClient) {
     client.dispatcher.cancelAll()
     client.connectionPool.evictAll()
-    client.dispatcher.executorService.shutdownNow()
+    client.dispatcher.executorService.shutdown()
 }
