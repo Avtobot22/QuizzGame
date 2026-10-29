@@ -17,10 +17,10 @@ private object AndroidConfig {
     const val JDK = 21
 }
 
-private fun CommonExtension.configureAndroid() {
+private fun CommonExtension.configureAndroid(compose: Boolean = true) {
     compileSdk = AndroidConfig.COMPILE_SDK
     defaultConfig.minSdk = AndroidConfig.MIN_SDK
-    buildFeatures.compose = true
+    buildFeatures.compose = compose
     compileOptions.apply {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -96,4 +96,15 @@ fun Project.configureAndroidLibrary() {
     configureKotlin()
     val api = configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME)
     configureCompose(api)
+}
+
+fun Project.configureAndroidInfrastructureLibrary() {
+    extensions.configure<LibraryExtension> {
+        configureAndroid(compose = false)
+        defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    configureKotlin()
+    dependencies.add("testImplementation", libs.junit)
+    dependencies.add("androidTestImplementation", libs.androidx.test.runner)
+    dependencies.add("androidTestImplementation", libs.androidx.test.junit)
 }
