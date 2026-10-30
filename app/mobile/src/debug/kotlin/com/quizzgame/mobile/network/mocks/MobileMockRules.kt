@@ -8,17 +8,17 @@ import kotlinx.serialization.json.Json
 import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
-internal fun mobileMockRules(assets: BodyAssetResolver): List<Rule> = mockRules(assets) {
+internal fun mobileMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mockRules(assets) {
     rule("mobile-transport-probe", "/debug/mobile/probe") {
         match { method("GET") }
         respond {
-            bodyJson(Json.parseToJsonElement(assets.read("mock/bodies/mobile-probe.json").decodeToString()))
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/mobile-probe.json").decodeToString()))
         }
     }
     rule("mobile-refresh-probe", "/debug/mobile/auth/refresh") {
         match { method("POST") }
         respond {
-            bodyJson(Json.parseToJsonElement(assets.read("mock/bodies/mobile-refresh.json").decodeToString()))
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/mobile-refresh.json").decodeToString()))
         }
     }
     rule("mobile-session-recovery-probe", "/debug/mobile/session") {

@@ -7,6 +7,7 @@ import com.quizzgame.core.network.NetworkClientFactory
 import com.quizzgame.core.network.NetworkConfiguration
 import com.quizzgame.core.network.PlatformHeaders
 import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.core.session.storage.DataStoreSessionStore
 import com.quizzgame.core.session.storage.testAead
 import kotlinx.coroutines.test.runTest
@@ -43,6 +44,7 @@ class SessionNetworkIntegrationTest {
                 ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
                 PlatformHeaders("test-installation", "session-tests/1", 1),
             ),
+            createNetworkJson(),
             manager,
         ).createApiClient()
         try {

@@ -6,6 +6,7 @@ import com.quizzgame.core.network.CredentialsSnapshot
 import com.quizzgame.core.network.NetworkTimeouts
 import com.quizzgame.core.network.ReplayPolicy
 import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.debug.network.DebugMockFailure
 import com.quizzgame.debug.network.DebugMockFailureInterceptor
 import com.quizzgame.debug.network.DebugMockTransportException
@@ -289,7 +290,10 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
     fun realRequiresAnExternalHTTPSURLAndMOCKRejectsAFallbackURL() {
         assertThrows(IllegalArgumentException::class.java) { DebugNetworkConfiguration(DebugNetworkMode.REAL, headers) }
         assertThrows(IllegalArgumentException::class.java) {
-            DebugNetworkGraph.open(DebugNetworkConfiguration(DebugNetworkMode.REAL, headers, "http://127.0.0.1/"))
+            DebugNetworkGraph.open(
+                DebugNetworkConfiguration(DebugNetworkMode.REAL, headers, "http://127.0.0.1/"),
+                createNetworkJson(),
+            )
         }
         assertThrows(IllegalArgumentException::class.java) {
             DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers, "https://example.invalid/")

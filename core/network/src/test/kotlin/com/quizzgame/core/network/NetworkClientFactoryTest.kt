@@ -187,6 +187,7 @@ class NetworkClientFactoryTest {
                 headers = PlatformHeaders("test-platform", "test-host/1", 1),
                 timeouts = timeouts,
             ),
+            createNetworkJson(),
         )
 
     private fun jsonResponse(body: String): MockResponse =

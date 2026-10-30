@@ -103,10 +103,13 @@ class SessionRefreshCoordinator(
         }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun runFlight(cohort: Cohort) {
         var outcome: RefreshOutcome = RefreshOutcome.Failed(RefreshFailureReason.Io)
         try {
             outcome = execute(cohort)
+        } catch (failure: Exception) {
+            outcome = RefreshOutcome.Unexpected(failure)
         } finally {
             lock.withLock {
                 cohort.outcome = outcome
@@ -194,7 +197,8 @@ private fun CredentialsSnapshot.matches(other: CredentialsSnapshot): Boolean =
         accessToken == other.accessToken
 
 private fun RefreshFailure.toReason(): RefreshFailureReason = when (this) {
-    is RefreshFailure.Http         -> RefreshFailureReason.Http(status)
+    is RefreshFailure.Http         -> RefreshFailureReason.Http(status, backend)
+    is RefreshFailure.Diagnostic   -> RefreshFailureReason.Diagnostic(failure)
     RefreshFailure.Io              -> RefreshFailureReason.Io
     RefreshFailure.Timeout         -> RefreshFailureReason.Timeout
     RefreshFailure.InvalidResponse -> RefreshFailureReason.InvalidResponse

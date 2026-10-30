@@ -9,6 +9,7 @@ import com.quizzgame.core.network.NetworkTimeouts
 import com.quizzgame.core.network.PlatformHeaders
 import com.quizzgame.core.network.ReplayPolicy
 import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.core.session.api.RefreshClient
 import com.quizzgame.core.session.api.RefreshEndpoint
 import kotlinx.coroutines.runBlocking
@@ -89,14 +90,15 @@ abstract class SessionRecoveryTestFixture {
             PlatformHeaders("recovery-test", "recovery-tests/1", 1),
             timeouts,
         )
-        val refresh = NetworkClientFactory(configuration, manager).createRefreshClient()
+        val json = createNetworkJson()
+        val refresh = NetworkClientFactory(configuration, json, manager).createRefreshClient()
         val coordinator = SessionRefreshCoordinator(
             manager,
-            RefreshClient(refresh.retrofit, RefreshEndpoint(RECOVERY_REFRESH_PATH.removePrefix("/"))),
+            RefreshClient(refresh.retrofit, RefreshEndpoint(RECOVERY_REFRESH_PATH.removePrefix("/")), refresh.results),
             refresh.httpClient.dispatcher.executorService,
             revocationPolicy,
         )
-        val api = NetworkClientFactory(configuration, manager, coordinator).createApiClient()
+        val api = NetworkClientFactory(configuration, json, manager, coordinator).createApiClient()
         return RecoveryFixture(server, store, manager, coordinator, api, refresh).also(fixtures::add)
     }
 

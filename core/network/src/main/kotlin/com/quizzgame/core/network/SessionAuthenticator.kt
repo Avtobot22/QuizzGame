@@ -10,17 +10,19 @@ import java.io.IOException
 internal class AuthFollowUp
 
 internal class SessionAuthenticator(private val credentialsProvider: CredentialsProvider) : Authenticator {
+
     override fun authenticate(route: Route?, response: Response): Request? {
         val request = response.request
         val context = eligibleContext(request) ?: return null
         val attempt = checkNotNull(context.refreshAttempt)
         response.body?.close()
         return when (val outcome = attempt.refresh()) {
-            is RefreshOutcome.Ready -> followUp(request, context, outcome.credentials)
-            is RefreshOutcome.Failed -> throw RefreshFailedException(outcome.reason)
-            RefreshOutcome.Revoked -> throw SessionRevokedException()
+            is RefreshOutcome.Ready           -> followUp(request, context, outcome.credentials)
+            is RefreshOutcome.Failed          -> throw RefreshFailedException(outcome.reason)
+            is RefreshOutcome.Unexpected      -> throw UnexpectedRefreshException(outcome.exception)
+            RefreshOutcome.Revoked            -> throw SessionRevokedException()
             RefreshOutcome.SessionUnavailable -> throw AuthenticationRequiredException()
-            RefreshOutcome.Cancelled -> throw IOException("API request was cancelled")
+            RefreshOutcome.Cancelled          -> throw IOException("API request was cancelled")
         }
     }
 
@@ -44,6 +46,7 @@ internal class SessionAuthenticator(private val credentialsProvider: Credentials
 }
 
 internal class AuthReplayGuardInterceptor(private val credentialsProvider: CredentialsProvider) : Interceptor {
+
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request()
         if (request.tag(AuthFollowUp::class.java) != null) {

@@ -4,7 +4,13 @@
 
 Проект в разработке. Готовы отдельные приложения для телефона и ТВ, темы и компоненты дизайн-системы. Игровые экраны, комнаты и авторизация пока не реализованы; при запуске приложения показывают пустой экран.
 
-Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network).
+Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network). `NetworkClient.results` возвращает `NetworkResult<T>` с технической причиной ошибки, включая отдельный сбой refresh.
+
+`createNetworkJson()` задаёт общие настройки JSON. Один экземпляр передаётся в `NetworkClientFactory` для конвертеров API/refresh и адаптеров результатов.
+
+Для Retrofit suspend-методов используй `results.call { ... }`, для `Response<T>` - `results.response { ... }`, для блокирующего `Call<T>` - `results.execute(call)`.
+
+Если endpoint допускает пустой ответ `204`, объяви suspend-метод с типом `Unit`; обязательный DTO без тела считается `InvalidResponse`. Отмена корутины распространяется как отмена.
 
 ## Сборка и запуск
 
@@ -35,7 +41,7 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 | `app/mobile` | Приложение участника на телефоне |
 | `app/tv` | Приложение ведущего на телевизоре |
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
-| `core/network` | HTTP-клиенты, JSON, общие заголовки и конфигурация транспорта |
+| `core/network` | HTTP-клиенты, JSON, политики запросов и типизированный результат сетевого вызова |
 | `core/session` | Защищённое хранение токенов, состояние сессии и ID установки |
 | `core/designsystem/mobile` | Темы и компоненты Material 3 |
 | `core/designsystem/tv` | Темы и компоненты TV Material |

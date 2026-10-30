@@ -2,6 +2,7 @@ package com.quizzgame.mobile.network
 
 import com.quizzgame.core.network.CredentialsProvider
 import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.core.session.api.RefreshEndpoint
 import com.quizzgame.core.session.api.RefreshException
 import com.quizzgame.core.session.api.RefreshFailure
@@ -52,6 +53,7 @@ class MobileRefreshClientTest {
         val calls = AtomicInteger()
         val graph = DebugNetworkGraph.open(
             configuration,
+            createNetworkJson(),
             credentialsProvider = CredentialsProvider { error("Refresh must not read access") },
             mockRules = mockRules {
                 rule("mobile-refresh", "/$DEBUG_REFRESH_PATH") {

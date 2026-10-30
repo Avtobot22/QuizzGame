@@ -6,4 +6,4 @@ import com.quizzgame.debug.network.DebugNetworkGraph
 
 /** Borrows the graph's isolated refresh transport; closing the graph cancels its calls. */
 fun DebugNetworkGraph.tvRefreshClient(): RefreshClient =
-    RefreshClient(refresh.retrofit, RefreshEndpoint("api/tv/auth/refresh"))
+    RefreshClient(refresh.retrofit, RefreshEndpoint("api/tv/auth/refresh"), refresh.results)

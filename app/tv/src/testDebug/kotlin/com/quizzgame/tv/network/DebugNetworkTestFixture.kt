@@ -3,6 +3,7 @@ package com.quizzgame.tv.network
 import com.quizzgame.core.network.CredentialsProvider
 import com.quizzgame.core.network.NetworkTimeouts
 import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode
@@ -34,7 +35,12 @@ abstract class DebugNetworkTestFixture {
             val assets = DebugMockAssets { path -> checkNotNull(javaClass.classLoader!!.getResourceAsStream(path)) }
             openTvDebugNetwork(configuration, bodyAssets = assets, credentialsProvider = credentialsProvider)
         } else {
-            DebugNetworkGraph.open(configuration, mockRules = rules, credentialsProvider = credentialsProvider)
+            DebugNetworkGraph.open(
+                configuration,
+                createNetworkJson(),
+                mockRules = rules,
+                credentialsProvider = credentialsProvider,
+            )
         }
         return graph.also(graphs::add)
     }
