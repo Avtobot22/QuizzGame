@@ -38,11 +38,11 @@ class DefaultErrorDecisionPolicy : ErrorDecisionPolicy {
                 ErrorSurface.SILENT -> emptyList()
                 ErrorSurface.BANNER,
                 ErrorSurface.TRANSIENT,
-                                    -> listOfNotNull(presentation.action, ErrorActionKind.DISMISS)
+                -> listOfNotNull(presentation.action, ErrorActionKind.DISMISS)
 
                 ErrorSurface.INLINE,
                 ErrorSurface.BLOCKING,
-                                    -> listOfNotNull(presentation.action)
+                -> listOfNotNull(presentation.action)
             },
         )
     }
@@ -51,13 +51,13 @@ class DefaultErrorDecisionPolicy : ErrorDecisionPolicy {
 private fun ErrorOperationContext.surface(): ErrorSurface = when (operation) {
     OperationKind.INITIAL_LOAD,
     OperationKind.USER_REFRESH,
-                               -> if (hasUsableContent) ErrorSurface.BANNER else ErrorSurface.BLOCKING
+    -> if (hasUsableContent) ErrorSurface.BANNER else ErrorSurface.BLOCKING
 
     OperationKind.USER_COMMAND -> ErrorSurface.TRANSIENT
     OperationKind.AUTH_FLOW    -> ErrorSurface.INLINE
     OperationKind.BACKGROUND,
     OperationKind.PREFETCH,
-                               -> ErrorSurface.SILENT
+    -> ErrorSurface.SILENT
 }
 
 internal data class FailurePresentation(val copyKey: ErrorCopyKey, val action: ErrorActionKind? = null)
@@ -74,7 +74,7 @@ internal fun AppFailure.Service.presentation(safety: RetrySafety): FailurePresen
     ServiceKind.ACCESS_DENIED -> FailurePresentation(ErrorCopyKey.ACCESS_DENIED)
     ServiceKind.CLIENT_REJECTED,
     ServiceKind.OTHER_HTTP,
-                              -> FailurePresentation(ErrorCopyKey.GENERIC_FAILURE)
+    -> FailurePresentation(ErrorCopyKey.GENERIC_FAILURE)
 }
 
 internal fun AppFailure.Connectivity.presentation(safety: RetrySafety): FailurePresentation = FailurePresentation(
