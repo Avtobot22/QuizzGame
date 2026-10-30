@@ -11,9 +11,6 @@ import java.io.IOException
 import java.io.InterruptedIOException
 import java.util.concurrent.CancellationException
 
-open class NetworkDiagnosticException(val diagnostic: NetworkFailure.MockConfiguration) :
-    IOException("Network diagnostic: $diagnostic")
-
 class NetworkResultAdapter(private val json: Json) {
 
     fun <T> execute(call: Call<T>): NetworkResult<T> {
@@ -64,7 +61,7 @@ class NetworkResultAdapter(private val json: Json) {
         request()
     } catch (failure: IOException) {
         onIoFailure(failure)
-        NetworkResult.Failure(fromIoException(failure))
+        NetworkResult.Failure(classifyIoFailure(failure))
     } catch (_: SerializationException) {
         NetworkResult.Failure(NetworkFailure.InvalidResponse)
     } catch (failure: HttpException) {
@@ -76,16 +73,6 @@ class NetworkResultAdapter(private val json: Json) {
             ?: NetworkResult.Failure(NetworkFailure.InvalidResponse)
     } else {
         NetworkResult.Failure(httpFailure(response))
-    }
-
-    private fun fromIoException(failure: IOException): NetworkFailure = when (failure) {
-        is NetworkDiagnosticException      -> failure.diagnostic
-        is UnexpectedRefreshException      -> throw failure.original
-        is RefreshFailedException          -> NetworkFailure.RefreshFailed(failure.reason)
-        is SessionRevokedException         -> NetworkFailure.SessionRevoked
-        is AuthenticationRequiredException -> NetworkFailure.AuthenticationRequired
-        is InterruptedIOException          -> NetworkFailure.Timeout
-        else                               -> NetworkFailure.Connection
     }
 
     private fun httpFailure(response: Response<*>): NetworkFailure.Http {

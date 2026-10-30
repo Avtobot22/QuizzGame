@@ -8,6 +8,8 @@
 
 `createNetworkJson()` задаёт общие настройки JSON. Один экземпляр передаётся в `NetworkClientFactory` для конвертеров API/refresh и адаптеров результатов.
 
+Отладочные ошибки mock-транспорта, refresh и классификатора компилируются только в debug-вариантах `core/network`, `core/session` и [core/error](core/error). В release их типов нет.
+
 Для Retrofit suspend-методов используй `results.call { ... }`, для `Response<T>` - `results.response { ... }`, для блокирующего `Call<T>` - `results.execute(call)`.
 
 Если endpoint допускает пустой ответ `204`, объяви suspend-метод с типом `Unit`; обязательный DTO без тела считается `InvalidResponse`. Отмена корутины распространяется как отмена.
@@ -43,6 +45,7 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
 | `core/network` | HTTP-клиенты, JSON, политики запросов и типизированный результат сетевого вызова |
 | `core/session` | Защищённое хранение токенов, состояние сессии и ID установки |
+| [core/error](core/error) | Семантическая классификация сетевых ошибок и ошибок хранилища сессии |
 | `core/designsystem/mobile` | Темы и компоненты Material 3 |
 | `core/designsystem/tv` | Темы и компоненты TV Material |
 

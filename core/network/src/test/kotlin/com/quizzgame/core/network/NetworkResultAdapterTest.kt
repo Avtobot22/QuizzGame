@@ -128,15 +128,6 @@ class NetworkResultAdapterTest {
     @Test
     fun `connection and technical boundaries retain their exact cause type`() = runTest {
         assertEquals(NetworkResult.Failure(NetworkFailure.Connection), client.results.call { throw ConnectException() })
-        val diagnostic = NetworkFailure.MockConfiguration(MockFailureReason.NO_MATCHING_RULE)
-        assertEquals(
-            NetworkResult.Failure(diagnostic),
-            client.results.call { throw NetworkDiagnosticException(diagnostic) },
-        )
-        assertEquals(
-            NetworkResult.Failure(NetworkFailure.RefreshFailed(RefreshFailureReason.Diagnostic(diagnostic))),
-            client.results.call { throw RefreshFailedException(RefreshFailureReason.Diagnostic(diagnostic)) },
-        )
         assertEquals(
             NetworkResult.Failure(NetworkFailure.SessionRevoked),
             client.results.call { throw SessionRevokedException() },
