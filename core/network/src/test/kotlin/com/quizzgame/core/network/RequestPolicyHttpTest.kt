@@ -169,6 +169,7 @@ class RequestPolicyHttpTest {
                 ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
                 PlatformHeaders("test-platform", "test-host/1", 1),
             ),
+            createNetworkJson(),
             provider,
         )
         return (if (refresh) factory.createRefreshClient() else factory.createApiClient()).also(clients::add)

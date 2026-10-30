@@ -9,4 +9,4 @@ import com.quizzgame.debug.network.DebugNetworkGraph
  * The packaged MOCK rule uses debug/mobile/auth/refresh only as a debug fixture, not as a backend contract.
  */
 fun DebugNetworkGraph.mobileRefreshClient(endpoint: RefreshEndpoint): RefreshClient =
-    RefreshClient(refresh.retrofit, endpoint)
+    RefreshClient(refresh.retrofit, endpoint, refresh.results)

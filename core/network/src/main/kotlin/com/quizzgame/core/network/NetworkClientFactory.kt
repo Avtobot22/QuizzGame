@@ -10,20 +10,15 @@ import java.util.concurrent.TimeUnit
 class NetworkClient internal constructor(
     val httpClient: OkHttpClient,
     val retrofit: Retrofit,
+    val results: NetworkResultAdapter,
 )
 
 class NetworkClientFactory(
     private val configuration: NetworkConfiguration,
+    private val json: Json,
     private val credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
     private val refreshCoordinator: RefreshCoordinator? = null,
 ) {
-
-    val json: Json = Json {
-        ignoreUnknownKeys = true
-        explicitNulls = true
-        isLenient = false
-        coerceInputValues = false
-    }
 
     fun createApiClient(): NetworkClient = create(refresh = false)
 
@@ -65,6 +60,6 @@ class NetworkClientFactory(
             .client(client)
             .addConverterFactory(json.asConverterFactory(HttpHeaderValues.APPLICATION_JSON.toMediaType()))
             .build()
-        return NetworkClient(client, retrofit)
+        return NetworkClient(client, retrofit, NetworkResultAdapter(json))
     }
 }

@@ -7,7 +7,6 @@ import com.quizzgame.core.session.TokenPair
 import com.quizzgame.core.session.api.dto.RefreshRequestDto
 import com.quizzgame.core.session.api.dto.RefreshResponseDto
 import kotlinx.coroutines.test.runTest
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.mockwebserver.MockResponse
@@ -51,7 +50,7 @@ class RefreshClientTest : RefreshTestFixture() {
         assertEquals("test-tv", request.getHeader("X-Client-Platform"))
         assertEquals("refresh-tests/1", request.getHeader("User-Agent"))
         assertEquals("1", request.getHeader("X-Endpoint-Version"))
-        val body = Json.parseToJsonElement(request.body.readUtf8()).jsonObject
+        val body = fixture.json.parseToJsonElement(request.body.readUtf8()).jsonObject
         assertEquals(setOf("refreshToken", "deviceId"), body.keys)
         assertEquals("fixture-sensitive-refresh\"\\", body["refreshToken"]!!.jsonPrimitive.content)
         assertEquals(DEVICE_ID, body["deviceId"]!!.jsonPrimitive.content)

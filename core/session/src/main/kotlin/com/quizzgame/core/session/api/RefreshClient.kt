@@ -1,26 +1,32 @@
 package com.quizzgame.core.session.api
 
+import com.quizzgame.core.network.NetworkFailure
+import com.quizzgame.core.network.NetworkResult
+import com.quizzgame.core.network.NetworkResultAdapter
 import com.quizzgame.core.session.TokenPair
 import com.quizzgame.core.session.api.dto.RefreshRequestDto
 import com.quizzgame.core.session.api.dto.RefreshResponseDto
-import kotlinx.serialization.SerializationException
 import retrofit2.Call
-import retrofit2.Response
 import retrofit2.Retrofit
-import java.io.IOException
-import java.io.InterruptedIOException
 import java.util.concurrent.CancellationException
 import java.util.concurrent.atomic.AtomicBoolean
 
-class RefreshClient(retrofit: Retrofit, private val endpoint: RefreshEndpoint) {
+class RefreshClient(
+    retrofit: Retrofit,
+    private val endpoint: RefreshEndpoint,
+    private val results: NetworkResultAdapter,
+) {
 
     private val api = retrofit.create(RefreshApi::class.java)
 
     fun newCall(refreshToken: String, deviceId: String): RefreshCall =
-        RefreshCall(api.refresh(endpoint.path, RefreshRequestDto(refreshToken, deviceId)))
+        RefreshCall(api.refresh(endpoint.path, RefreshRequestDto(refreshToken, deviceId)), results)
 }
 
-class RefreshCall internal constructor(private val call: Call<RefreshResponseDto>) {
+class RefreshCall internal constructor(
+    private val call: Call<RefreshResponseDto>,
+    private val results: NetworkResultAdapter,
+) {
     private val explicitlyCancelled = AtomicBoolean()
 
     fun cancel() {
@@ -30,27 +36,19 @@ class RefreshCall internal constructor(private val call: Call<RefreshResponseDto
 
     fun execute(): TokenPair {
         checkCancellation()
-        try {
-            return tokensFrom(call.execute())
-        } catch (_: SerializationException) {
-            fail(RefreshFailure.InvalidResponse)
-        } catch (_: IllegalArgumentException) {
-            fail(RefreshFailure.InvalidResponse)
-        } catch (failure: RefreshException) {
-            throw failure
-        } catch (_: InterruptedIOException) {
-            timeout()
-        } catch (_: IOException) {
-            fail(RefreshFailure.Io)
+        return when (val result = results.execute(call)) {
+            is NetworkResult.Success -> try {
+                checkCancellation()
+                result.value.toTokenPair()
+            } catch (_: IllegalArgumentException) {
+                fail(RefreshFailure.InvalidResponse)
+            }
+            is NetworkResult.Failure -> {
+                val failure = result.reason.toRefreshFailure()
+                if (failure == RefreshFailure.Timeout) throw RefreshException(failure)
+                fail(failure)
+            }
         }
-    }
-
-    private fun tokensFrom(response: Response<RefreshResponseDto>): TokenPair = try {
-        checkCancellation()
-        if (!response.isSuccessful) fail(RefreshFailure.Http(response.code()))
-        response.body()?.toTokenPair() ?: fail(RefreshFailure.InvalidResponse)
-    } finally {
-        response.errorBody()?.close()
     }
 
     private fun fail(failure: RefreshFailure): Nothing {
@@ -64,10 +62,17 @@ class RefreshCall internal constructor(private val call: Call<RefreshResponseDto
         }
     }
 
-    private fun timeout(): Nothing {
-        if (explicitlyCancelled.get() || Thread.currentThread().isInterrupted) {
-            throw CancellationException("Refresh request was cancelled")
+    private fun NetworkFailure.toRefreshFailure(): RefreshFailure = when (this) {
+        is NetworkFailure.Http -> RefreshFailure.Http(status, backend)
+        is NetworkFailure.MockConfiguration -> RefreshFailure.Diagnostic(this)
+        NetworkFailure.Connection -> RefreshFailure.Io
+        NetworkFailure.Timeout -> {
+            if (explicitlyCancelled.get() || Thread.currentThread().isInterrupted) {
+                throw CancellationException("Refresh request was cancelled")
+            }
+            RefreshFailure.Timeout
         }
-        throw RefreshException(RefreshFailure.Timeout)
+        NetworkFailure.InvalidResponse -> RefreshFailure.InvalidResponse
+        else -> error("Unexpected refresh transport failure")
     }
 }

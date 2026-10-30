@@ -1,6 +1,7 @@
 package com.quizzgame.tv.network
 
 import com.quizzgame.core.network.CredentialsProvider
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.core.session.RefreshRevocationPolicy
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.api.RefreshEndpoint
@@ -15,12 +16,13 @@ fun openTvDebugNetwork(
     bodyAssets: BodyAssetResolver? = null,
     credentialsProvider: CredentialsProvider = CredentialsProvider.guest(),
 ): DebugNetworkGraph {
+    val json = createNetworkJson()
     val rules = if (configuration.mode == DebugNetworkMode.MOCK) {
-        tvMockRules(requireNotNull(bodyAssets))
+        tvMockRules(requireNotNull(bodyAssets), json)
     } else {
         emptyList()
     }
-    return DebugNetworkGraph.open(configuration, mockRules = rules, credentialsProvider = credentialsProvider)
+    return DebugNetworkGraph.open(configuration, json, mockRules = rules, credentialsProvider = credentialsProvider)
 }
 
 fun openTvDebugNetwork(
@@ -29,13 +31,15 @@ fun openTvDebugNetwork(
     bodyAssets: BodyAssetResolver? = null,
     revocationPolicy: RefreshRevocationPolicy = RefreshRevocationPolicy.never(),
 ): DebugNetworkGraph {
+    val json = createNetworkJson()
     val rules = if (configuration.mode == DebugNetworkMode.MOCK) {
-        tvMockRules(requireNotNull(bodyAssets))
+        tvMockRules(requireNotNull(bodyAssets), json)
     } else {
         emptyList()
     }
     return DebugNetworkGraph.openWithSession(
         configuration,
+        json,
         session,
         RefreshEndpoint("api/tv/auth/refresh"),
         rules,

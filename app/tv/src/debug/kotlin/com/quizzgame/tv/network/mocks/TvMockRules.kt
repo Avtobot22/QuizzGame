@@ -8,17 +8,17 @@ import kotlinx.serialization.json.Json
 import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
-internal fun tvMockRules(assets: BodyAssetResolver): List<Rule> = mockRules(assets) {
+internal fun tvMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mockRules(assets) {
     rule("launch", "/api/tv/launch") {
         match { method("GET") }
         respond {
-            bodyJson(Json.parseToJsonElement(assets.read("mock/bodies/launch.json").decodeToString()))
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/launch.json").decodeToString()))
         }
     }
     rule("refresh", "/api/tv/auth/refresh") {
         match { method("POST") }
         respond {
-            bodyJson(Json.parseToJsonElement(assets.read("mock/bodies/refresh.json").decodeToString()))
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/refresh.json").decodeToString()))
         }
     }
     rule("session-recovery-probe", "/debug/tv/session") {

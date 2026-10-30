@@ -1,9 +1,11 @@
 package com.quizzgame.debug.network
 
+import com.quizzgame.core.network.MockFailureReason
+import com.quizzgame.core.network.NetworkDiagnosticException
+import com.quizzgame.core.network.NetworkFailure
 import dev.androidmock.okhttp.server.MockServerFailureProtocol
 import okhttp3.Interceptor
 import okhttp3.Response
-import java.io.IOException
 
 enum class DebugMockFailure {
     NO_MATCHING_RULE,
@@ -12,7 +14,9 @@ enum class DebugMockFailure {
     INVALID_RESPONSE,
 }
 
-class DebugMockTransportException(val failure: DebugMockFailure) : IOException("Debug mock failure: $failure")
+class DebugMockTransportException(val failure: DebugMockFailure) : NetworkDiagnosticException(
+    NetworkFailure.MockConfiguration(MockFailureReason.valueOf(failure.name)),
+)
 
 internal class DebugMockFailureInterceptor : Interceptor {
 

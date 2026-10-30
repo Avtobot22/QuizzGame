@@ -1,8 +1,13 @@
 package com.quizzgame.tv.network
 
 import com.quizzgame.core.network.AuthPolicy
+import com.quizzgame.core.network.MockFailureReason
+import com.quizzgame.core.network.NetworkFailure
+import com.quizzgame.core.network.NetworkResult
+import com.quizzgame.core.network.RefreshFailureReason
 import com.quizzgame.core.network.ReplayPolicy
 import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.createNetworkJson
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRecord
 import com.quizzgame.core.session.SessionStore
@@ -14,6 +19,7 @@ import com.quizzgame.debug.network.DebugNetworkMode
 import com.quizzgame.debug.network.mocks.DebugMockAssets
 import dev.androidmock.core.dsl.mockRules
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.JsonObject
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -21,6 +27,8 @@ import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import retrofit2.http.GET
+import retrofit2.http.Tag
 import java.io.IOException
 import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
@@ -32,6 +40,41 @@ import kotlin.time.Duration.Companion.seconds
 private const val RECOVERY_WAIT_SECONDS = 5L
 
 class TvSessionRecoveryTest : DebugNetworkTestFixture() {
+    @Test
+    fun missingSDKRulesRemainDiagnosticsOnAPIAndDuringRefresh() = runBlocking {
+        val diagnostic = NetworkFailure.MockConfiguration(MockFailureReason.NO_MATCHING_RULE)
+        val graph = openMock()
+        val api = graph.api.retrofit.create(ResultApi::class.java)
+        assertEquals(NetworkResult.Failure(diagnostic), graph.api.results.call { api.get(null) })
+        SessionManager.open(TvRecoveryStore()).use { manager ->
+            val recovering = DebugNetworkGraph.openWithSession(
+                DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers),
+                createNetworkJson(),
+                manager,
+                RefreshEndpoint("api/tv/auth/refresh"),
+                mockRules {
+                    rule("private", "/private") {
+                        respond { status(HTTP_UNAUTHORIZED) }
+                    }
+                },
+            ).also(graphs::add)
+            val protectedApi = recovering.api.retrofit.create(ResultApi::class.java)
+            val result = recovering.api.results.call {
+                protectedApi.get(RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE))
+            }
+            assertEquals(
+                NetworkResult.Failure(NetworkFailure.RefreshFailed(RefreshFailureReason.Diagnostic(diagnostic))),
+                result,
+            )
+            assertEquals("fixture-tv-access-1", manager.snapshot().accessToken)
+        }
+    }
+
+    interface ResultApi {
+        @GET("private")
+        suspend fun get(@Tag policy: RequestPolicy?): JsonObject
+    }
+
     @Test
     fun tvOptInGraphRecoversThroughPackagedSDKRulesAndBorrowsTheSession() = runBlocking {
         val store = TvRecoveryStore()
@@ -63,6 +106,7 @@ class TvSessionRecoveryTest : DebugNetworkTestFixture() {
         SessionManager.open(store).use { manager ->
             val graph = DebugNetworkGraph.openWithSession(
                 DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers),
+                createNetworkJson(),
                 manager,
                 RefreshEndpoint("api/tv/auth/refresh"),
                 mockRules {

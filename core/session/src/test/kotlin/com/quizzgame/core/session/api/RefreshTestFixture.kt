@@ -7,6 +7,8 @@ import com.quizzgame.core.network.NetworkClientFactory
 import com.quizzgame.core.network.NetworkConfiguration
 import com.quizzgame.core.network.NetworkTimeouts
 import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.createNetworkJson
+import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.Connection
 import okhttp3.EventListener
@@ -32,12 +34,14 @@ abstract class RefreshTestFixture {
     protected fun open(timeouts: NetworkTimeouts = NetworkTimeouts()): Fixture {
         val server = MockWebServer()
         server.start(InetAddress.getByName("127.0.0.1"), 0)
+        val json = createNetworkJson()
         val network = NetworkClientFactory(
             NetworkConfiguration(
                 ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
                 PlatformHeaders("test-tv", "refresh-tests/1", 1),
                 timeouts,
             ),
+            json,
             CredentialsProvider { error("Refresh must not read the access provider") },
         ).createRefreshClient()
         val released = AtomicInteger()
@@ -51,8 +55,13 @@ abstract class RefreshTestFixture {
         return Fixture(
             server,
             network,
-            RefreshClient(network.retrofit.newBuilder().client(http).build(), RefreshEndpoint(REFRESH_PATH)),
+            RefreshClient(
+                network.retrofit.newBuilder().client(http).build(),
+                RefreshEndpoint(REFRESH_PATH),
+                network.results,
+            ),
             released,
+            json,
         ).also(fixtures::add)
     }
 
@@ -61,5 +70,6 @@ abstract class RefreshTestFixture {
         val network: NetworkClient,
         val client: RefreshClient,
         val releasedConnections: AtomicInteger,
+        val json: Json,
     )
 }
