@@ -54,4 +54,25 @@ class ErrorPrivacyTest {
             )
         }
     }
+
+    @Test
+    fun `server secrets never enter presentation for direct or refresh failures`() {
+        val secret = "Bearer SECRET_TOKEN user@example.test otp=123456 https://private.test/?key=SECRET"
+        val backend = BackendErrorDetails(9001, secret, secret)
+        val policy: ErrorDecisionPolicy = DefaultErrorDecisionPolicy()
+        val failures = listOf(
+            NetworkFailure.Http(503, backend),
+            NetworkFailure.Http(401, backend),
+            NetworkFailure.RefreshFailed(RefreshFailureReason.Http(401, backend)),
+        )
+        failures.forEach { failure ->
+            OperationKind.entries.forEach { operation ->
+                val context = ErrorOperationContext(operation, true, RetrySafety.REQUIRES_CONFIRMATION)
+                val spec = policy.decide(classifier.fromNetwork(failure), context)
+                assertFalse(spec.toString().contains(secret))
+                assertFalse(spec.toString().contains("SECRET"))
+                assertFalse(spec.toString().contains("user@example.test"))
+            }
+        }
+    }
 }
