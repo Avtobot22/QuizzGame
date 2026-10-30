@@ -1,6 +1,5 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.NetworkFailure
 import com.quizzgame.core.network.NetworkResult
 import com.quizzgame.core.network.NetworkResultAdapter
 import com.quizzgame.core.session.TokenPair
@@ -44,7 +43,9 @@ class RefreshCall internal constructor(
                 fail(RefreshFailure.InvalidResponse)
             }
             is NetworkResult.Failure -> {
-                val failure = result.reason.toRefreshFailure()
+                val failure = result.reason.toRefreshFailure(
+                    explicitlyCancelled.get() || Thread.currentThread().isInterrupted,
+                )
                 if (failure == RefreshFailure.Timeout) throw RefreshException(failure)
                 fail(failure)
             }
@@ -60,19 +61,5 @@ class RefreshCall internal constructor(
         if (call.isCanceled || Thread.currentThread().isInterrupted) {
             throw CancellationException("Refresh request was cancelled")
         }
-    }
-
-    private fun NetworkFailure.toRefreshFailure(): RefreshFailure = when (this) {
-        is NetworkFailure.Http -> RefreshFailure.Http(status, backend)
-        is NetworkFailure.MockConfiguration -> RefreshFailure.Diagnostic(this)
-        NetworkFailure.Connection -> RefreshFailure.Io
-        NetworkFailure.Timeout -> {
-            if (explicitlyCancelled.get() || Thread.currentThread().isInterrupted) {
-                throw CancellationException("Refresh request was cancelled")
-            }
-            RefreshFailure.Timeout
-        }
-        NetworkFailure.InvalidResponse -> RefreshFailure.InvalidResponse
-        else -> error("Unexpected refresh transport failure")
     }
 }

@@ -1,6 +1,8 @@
 import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.dsl.LibraryExtension
+import com.android.build.api.variant.HostTestBuilder
+import com.android.build.api.variant.LibraryAndroidComponentsExtension
 import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.api.JavaVersion
 import org.gradle.api.Project
@@ -102,6 +104,11 @@ fun Project.configureAndroidInfrastructureLibrary() {
     extensions.configure<LibraryExtension> {
         configureAndroid(compose = false)
         defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+    extensions.configure<LibraryAndroidComponentsExtension> {
+        beforeVariants(selector().withBuildType("release")) { variant ->
+            variant.hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).enable = true
+        }
     }
     configureKotlin()
     dependencies.add("testImplementation", libs.junit)

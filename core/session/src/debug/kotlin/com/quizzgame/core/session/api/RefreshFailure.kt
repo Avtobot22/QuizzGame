@@ -2,7 +2,6 @@ package com.quizzgame.core.session.api
 
 import com.quizzgame.core.network.BackendErrorDetails
 import com.quizzgame.core.network.NetworkFailure
-import java.io.IOException
 
 sealed interface RefreshFailure {
     data class Http(val status: Int, val backend: BackendErrorDetails? = null) : RefreshFailure {
@@ -13,5 +12,3 @@ sealed interface RefreshFailure {
     data object Timeout : RefreshFailure
     data object InvalidResponse : RefreshFailure
 }
-
-class RefreshException(val failure: RefreshFailure) : IOException("Refresh request failed: $failure")

@@ -1,6 +1,10 @@
 plugins {
-    alias(libs.plugins.quizz.kotlin.jvm.library)
+    alias(libs.plugins.quizz.android.infrastructure.library)
     alias(libs.plugins.kotlin.serialization)
+}
+
+android {
+    namespace = "com.quizzgame.core.network"
 }
 
 dependencies {

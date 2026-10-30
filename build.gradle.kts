@@ -36,9 +36,14 @@ tasks.register("qualityCheck") {
     description = "Runs static analysis, unit tests, and builds both Android applications."
     dependsOn(
         "detekt",
-        ":core:network:check",
+        ":core:network:lint",
+        ":core:network:testDebugUnitTest",
+        ":core:network:testReleaseUnitTest",
+        ":core:network:assembleDebug",
+        ":core:network:assembleRelease",
         ":core:session:lint",
         ":core:session:testDebugUnitTest",
+        ":core:session:testReleaseUnitTest",
         ":core:session:assembleDebug",
         ":core:session:assembleRelease",
         ":core:session:assembleDebugAndroidTest",

@@ -8,7 +8,7 @@ import com.quizzgame.core.network.RefreshOutcome
 import com.quizzgame.core.session.api.RefreshCall
 import com.quizzgame.core.session.api.RefreshClient
 import com.quizzgame.core.session.api.RefreshException
-import com.quizzgame.core.session.api.RefreshFailure
+import com.quizzgame.core.session.api.toRefreshFailureReason
 import java.io.Closeable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.Executor
@@ -134,7 +134,7 @@ class SessionRefreshCoordinator(
             if (revocationPolicy.isRevoked(failure.failure)) {
                 commit(cohort, revoked = true) { manager.expireIfCurrentBlocking(cohort.observed) }
             } else {
-                RefreshOutcome.Failed(failure.failure.toReason())
+                RefreshOutcome.Failed(failure.failure.toRefreshFailureReason())
             }
         } catch (_: CancellationException) {
             RefreshOutcome.Cancelled
@@ -195,11 +195,3 @@ class SessionRefreshCoordinator(
 private fun CredentialsSnapshot.matches(other: CredentialsSnapshot): Boolean =
     sessionGeneration == other.sessionGeneration && credentialsRevision == other.credentialsRevision &&
         accessToken == other.accessToken
-
-private fun RefreshFailure.toReason(): RefreshFailureReason = when (this) {
-    is RefreshFailure.Http         -> RefreshFailureReason.Http(status, backend)
-    is RefreshFailure.Diagnostic   -> RefreshFailureReason.Diagnostic(failure)
-    RefreshFailure.Io              -> RefreshFailureReason.Io
-    RefreshFailure.Timeout         -> RefreshFailureReason.Timeout
-    RefreshFailure.InvalidResponse -> RefreshFailureReason.InvalidResponse
-}
