@@ -45,7 +45,9 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
 | `core/network` | HTTP-клиенты, JSON, политики запросов и типизированный результат сетевого вызова |
 | `core/session` | Защищённое хранение токенов, состояние сессии и ID установки |
-| [core/error](core/error) | Семантическая классификация сетевых ошибок и ошибок хранилища сессии |
+| [core/error/foundation](core/error/foundation) | Классификация ошибок, политика представления и безопасная диагностика |
+| `core/error/ui-common` | Общая база UI-адаптеров ошибок |
+| `core/error/ui-mobile`, `core/error/ui-tv` | Платформенные адаптеры ошибок и host уведомлений |
 | `core/designsystem/mobile` | Темы и компоненты Material 3 |
 | `core/designsystem/tv` | Темы и компоненты TV Material |
 

@@ -1,0 +1,19 @@
+<resources>
+    <string name="quizz_error_connection_problem">Could not connect</string>
+    <string name="quizz_error_request_timed_out">The server did not respond in time</string>
+    <string name="quizz_error_server_unavailable">The service is temporarily unavailable</string>
+    <string name="quizz_error_too_many_requests">Too many requests</string>
+    <string name="quizz_error_access_denied">Access denied</string>
+    <string name="quizz_error_sign_in_required">Sign in to continue</string>
+    <string name="quizz_error_session_expired">Sign in again</string>
+    <string name="quizz_error_unexpected_response">Could not process the server response</string>
+    <string name="quizz_error_storage_problem">Could not read or save data</string>
+    <string name="quizz_error_generic_failure">Could not complete the action</string>
+    <string name="quizz_error_action_retry">Retry</string>
+    <string name="quizz_error_action_confirm_retry">Confirm retry</string>
+    <string name="quizz_error_action_go_back">Go back</string>
+    <string name="quizz_error_action_sign_in">Sign in</string>
+    <string name="quizz_error_action_open_settings">Open settings</string>
+    <string name="quizz_error_action_dismiss">Dismiss</string>
+    <string name="quizz_error_action_exit">Exit</string>
+</resources>
