@@ -1,0 +1,4 @@
+<resources>
+    <string name="quizz_confirmation_confirm">Confirm</string>
+    <string name="quizz_confirmation_cancel">Cancel</string>
+</resources>

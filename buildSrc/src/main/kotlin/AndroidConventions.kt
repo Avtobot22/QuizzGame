@@ -23,6 +23,7 @@ private fun CommonExtension.configureAndroid(compose: Boolean = true) {
     compileSdk = AndroidConfig.COMPILE_SDK
     defaultConfig.minSdk = AndroidConfig.MIN_SDK
     buildFeatures.compose = compose
+    if (compose) defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     compileOptions.apply {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -56,7 +57,6 @@ fun Project.configureAndroidApplication() {
             targetSdk = AndroidConfig.COMPILE_SDK
             versionCode = 1
             versionName = "0.1.0"
-            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         }
         buildTypes {
             getByName("debug") {
@@ -77,15 +77,20 @@ fun Project.configureAndroidApplication() {
     }
     configureKotlin()
     val implementation = configurations.getByName(JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME)
-    val androidTestImplementation = configurations.getByName("androidTestImplementation")
-    val debugImplementation = configurations.getByName("debugImplementation")
     configureCompose(implementation)
     dependencies.add(implementation.name, libs.androidx.activity.compose)
+    configureComposeTests()
+}
+
+private fun Project.configureComposeTests() {
+    val androidTestImplementation = configurations.getByName("androidTestImplementation")
+    val debugImplementation = configurations.getByName("debugImplementation")
     dependencies.add(
         androidTestImplementation.name,
         dependencies.platform(libs.androidx.compose.bom),
     )
     dependencies.add(androidTestImplementation.name, libs.androidx.compose.ui.test.junit4)
+    dependencies.add(androidTestImplementation.name, libs.androidx.activity.compose)
     dependencies.add(androidTestImplementation.name, libs.androidx.test.junit)
     dependencies.add(androidTestImplementation.name, libs.androidx.test.runner)
     dependencies.add(androidTestImplementation.name, libs.kakao.compose)
@@ -95,9 +100,20 @@ fun Project.configureAndroidApplication() {
 
 fun Project.configureAndroidLibrary() {
     extensions.configure<LibraryExtension> { configureAndroid() }
+    enableReleaseUnitTests()
     configureKotlin()
     val api = configurations.getByName(JavaPlugin.API_CONFIGURATION_NAME)
     configureCompose(api)
+    configureComposeTests()
+    dependencies.add("testImplementation", libs.junit)
+}
+
+private fun Project.enableReleaseUnitTests() {
+    extensions.configure<LibraryAndroidComponentsExtension> {
+        beforeVariants(selector().withBuildType("release")) { variant ->
+            variant.hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).enable = true
+        }
+    }
 }
 
 fun Project.configureAndroidInfrastructureLibrary() {
@@ -105,11 +121,7 @@ fun Project.configureAndroidInfrastructureLibrary() {
         configureAndroid(compose = false)
         defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    extensions.configure<LibraryAndroidComponentsExtension> {
-        beforeVariants(selector().withBuildType("release")) { variant ->
-            variant.hostTests.getValue(HostTestBuilder.UNIT_TEST_TYPE).enable = true
-        }
-    }
+    enableReleaseUnitTests()
     configureKotlin()
     dependencies.add("testImplementation", libs.junit)
     dependencies.add("androidTestImplementation", libs.androidx.test.runner)
