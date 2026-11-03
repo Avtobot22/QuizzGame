@@ -8,12 +8,9 @@ android {
 }
 
 dependencies {
-    api(libs.okhttp)
-    api(libs.retrofit)
-    api(libs.kotlinx.serialization.json)
+    api(libs.bundles.network.api)
     implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.coroutines.core)
-    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.bundles.network.test)
     testImplementation(libs.junit)
-    testImplementation(libs.okhttp.mockwebserver)
 }

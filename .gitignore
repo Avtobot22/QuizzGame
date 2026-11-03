@@ -12,11 +12,12 @@ local.properties
 .DS_Store
 Thumbs.db
 
-# Local signing and runtime configuration
+# Local signing and deployment configuration
 *.jks
 *.keystore
 keystore.properties
 signing.properties
+/deployment.local.properties
 .env
 .env.*
 !.env.example

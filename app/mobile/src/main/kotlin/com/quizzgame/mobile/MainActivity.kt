@@ -8,15 +8,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
+import com.quizzgame.core.navigation.ProcessNavigationGuard
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        super.onCreate(ProcessNavigationGuard.restore(savedInstanceState))
         enableEdgeToEdge()
         setContent {
             QuizzMobileTheme {
-                Surface(modifier = Modifier.fillMaxSize()) {}
+                Surface(modifier = Modifier.fillMaxSize()) { MobileAppRoot() }
             }
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        ProcessNavigationGuard.save(outState)
     }
 }

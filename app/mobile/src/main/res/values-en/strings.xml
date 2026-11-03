@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_startup_loading">Preparing the app…</string>
+    <string name="app_network_configuration_required">The app is not configured to connect to a server yet.</string>
+    <string name="splash_placeholder">Splash — startup screen under development</string>
+    <string name="signin_placeholder">Sign in — screen under development</string>
+    <string name="join_room_placeholder">Join room — under development</string>
+</resources>

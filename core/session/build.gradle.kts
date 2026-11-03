@@ -18,9 +18,6 @@ configurations.matching { it.name.endsWith("UnitTestRuntimeClasspath") }.configu
 dependencies {
     api(projects.core.network)
     api(libs.kotlinx.coroutines.core)
-    implementation(libs.androidx.datastore)
-    implementation(libs.androidx.datastore.tink)
-    implementation(libs.tink.android)
-    testImplementation(libs.kotlinx.coroutines.test)
-    testImplementation(libs.okhttp.mockwebserver)
+    implementation(libs.bundles.secure.storage)
+    testImplementation(libs.bundles.network.test)
 }

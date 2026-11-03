@@ -1,0 +1,7 @@
+<resources>
+    <string name="demo_label">DEMO — local navigation only</string>
+    <string name="demo_signin">DEMO: open sign in</string>
+    <string name="demo_continue">DEMO: continue without authorization</string>
+    <string name="demo_signout">DEMO: reset to sign in</string>
+    <string name="demo_room_code">Room code - local example</string>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+    <string name="demo_label">DEMO — локальная проверка переходов</string>
+    <string name="demo_signin">DEMO: открыть вход</string>
+    <string name="demo_continue">DEMO: продолжить без авторизации</string>
+    <string name="demo_signout">DEMO: сбросить к входу</string>
+    <string name="demo_room_code">Код комнаты - локальный пример</string>
+</resources>

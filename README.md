@@ -2,8 +2,6 @@
 
 Квиз для компании друзей: ведущий запускает игру на Android TV, участники подключаются с телефонов по QR комнаты.
 
-Проект в разработке. Готовы отдельные приложения для телефона и ТВ, темы и компоненты дизайн-системы. Игровые экраны, комнаты и авторизация пока не реализованы; при запуске приложения показывают пустой экран.
-
 Сетевой транспорт OkHttp/Retrofit выделен в [core/network](core/network). `NetworkClient.results` возвращает `NetworkResult<T>` с технической причиной ошибки, включая отдельный сбой refresh.
 
 `createNetworkJson()` задаёт общие настройки JSON. Один экземпляр передаётся в `NetworkClientFactory` для конвертеров API/refresh и адаптеров результатов.
@@ -42,9 +40,12 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 |---|---|
 | `app/mobile` | Приложение участника на телефоне |
 | `app/tv` | Приложение ведущего на телевизоре |
+| `app/foundation` | Общий запуск приложений, корневая ViewModel, сборка графа сети и сессии, Hilt bindings |
+| `app/debug-support` | Mock-транспорт и сценарии сессии, подключаемые только в debug |
 | `core/ui` | Общая палитра, шрифты и UI-ресурсы |
 | `core/network` | HTTP-клиенты, JSON, политики запросов и типизированный результат сетевого вызова |
 | `core/session` | Защищённое хранение токенов, состояние сессии и ID установки |
+| `core/navigation` | Типизированные общие root keys, операции push/pop/reset и защита восстановления стека после смены процесса |
 | [core/error/foundation](core/error/foundation) | Классификация ошибок, политика представления и безопасная диагностика |
 | `core/error/ui-common` | Общая база UI-адаптеров ошибок |
 | `core/error/ui-mobile`, `core/error/ui-tv` | Платформенные адаптеры ошибок и host уведомлений |
@@ -53,6 +54,10 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 
 Код написан на Kotlin и Jetpack Compose. Общие настройки сборки находятся в `buildSrc`, версии зависимостей - в `gradle/libs.versions.toml`.
 
+`app/mobile` и `app/tv` содержат точки входа, корневые графы навигации, платформенные настройки и DI.
+Общий код подключён через зависимости Gradle-модулей. `app/debug-support` хранит реализацию в `src/debug`;
+его mock SDK и диагностические типы отсутствуют в release-зависимостях приложений.
+
 ## Проверки
 
 ```sh
@@ -60,6 +65,10 @@ APK появятся в `app/mobile/build/outputs/apk/debug/` и `app/tv/build/o
 ```
 
 Команда запускает Detekt, Android lint и unit-test tasks, собирает debug/release и APK инструментальных тестов обоих приложений. Отчёты сохраняются в `build/reports/` соответствующих модулей.
+
+Общие unit-тесты запуска выполняются в `app/foundation`, тесты mock-транспорта и отладочных сценариев - в `app/debug-support`.
+Они включены в `qualityCheck`; для запуска сценариев на подключённом устройстве используй
+`./gradlew :app:debug-support:connectedDebugAndroidTest`.
 
 Правила Kotlin-анализа заданы в [конфиге Detekt](config/detekt/detekt.yml), настройки редактора - в [.editorconfig](.editorconfig). Проверка не меняет исходники; для исправления форматирования запусти `./gradlew detekt --auto-correct`, затем проверь diff и повтори `./gradlew detekt`.
 
