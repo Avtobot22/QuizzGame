@@ -17,11 +17,17 @@ import androidx.compose.ui.test.onRoot
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
+import com.quizzgame.core.error.failure.AppFailure
+import com.quizzgame.core.error.failure.ServiceKind
+import com.quizzgame.core.error.operation.ErrorOperationContext
+import com.quizzgame.core.error.operation.OperationKind
+import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorCopyKey
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.common.R
+import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorRemote
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorScreen
 import com.quizzgame.core.error.ui.tv.testutil.captureErrorPreview
@@ -121,7 +127,7 @@ class QuizzTvErrorAdaptersTest {
     }
 
     @Test
-    fun bannerPreservesHostContentAndRemoteFocus() {
+    fun commandErrorStaysInOwnerStateAndPreservesFocusUntilRemoteAction() {
         val showBanner = mutableStateOf(false)
         var hostClicks = 0
         val errorActions = mutableListOf<ErrorActionKind>()
@@ -130,7 +136,16 @@ class QuizzTvErrorAdaptersTest {
                 Column {
                     FocusedHost(onClick = { hostClicks++ })
                     if (showBanner.value) {
-                        QuizzTvErrorBanner(spec(ErrorSurface.BANNER), onAction = errorActions::add)
+                        QuizzTvErrorBanner(
+                            TvErrorDecisionPolicy().decide(
+                                AppFailure.Service(ServiceKind.UNAVAILABLE, 503),
+                                ErrorOperationContext(OperationKind.USER_COMMAND, true, RetrySafety.SAFE_TO_REPEAT),
+                            ),
+                            onAction = {
+                                errorActions += it
+                                showBanner.value = false
+                            },
+                        )
                     }
                 }
             }
@@ -138,6 +153,7 @@ class QuizzTvErrorAdaptersTest {
 
         screen.host.assertIsFocused()
         compose.runOnIdle { showBanner.value = true }
+        compose.mainClock.advanceTimeBy(30_000)
         screen.text(copy(R.string.quizz_error_server_unavailable)).assertIsDisplayed()
         screen.host.apply {
             assertIsDisplayed()
@@ -149,6 +165,11 @@ class QuizzTvErrorAdaptersTest {
             assertEquals(1, hostClicks)
             assertEquals(emptyList<ErrorActionKind>(), errorActions)
         }
+        TvErrorRemote.press(KeyEvent.KEYCODE_DPAD_DOWN)
+        screen.action(copy(R.string.quizz_error_action_retry)).assertIsFocused()
+        TvErrorRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        screen.text(copy(R.string.quizz_error_server_unavailable)).assertDoesNotExist()
+        compose.runOnIdle { assertEquals(listOf(ErrorActionKind.RETRY), errorActions) }
     }
 
     @Test

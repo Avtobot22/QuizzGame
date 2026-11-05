@@ -8,7 +8,6 @@ import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.common.R
 
-/** Инфраструктурный маппер адаптеров; разрешает только локальные ключи, не меняя policy result. */
 class ErrorUiMapper(private val text: (Int) -> String) {
     fun map(spec: ErrorPresentationSpec): ErrorUiModel {
         val copy = errorCopyResources(spec.title)
@@ -21,16 +20,13 @@ class ErrorUiMapper(private val text: (Int) -> String) {
     }
 }
 
-/** Актуальная локализация для платформенного адаптера, без глобального кэша строк. */
 @Composable
 fun errorUiModel(spec: ErrorPresentationSpec): ErrorUiModel {
-    // Чтение configuration делает смену locale входом композиции; строки не кэшируются глобально.
     val configuration = LocalConfiguration.current
     val resources = LocalContext.current.createConfigurationContext(configuration).resources
     return ErrorUiMapper(resources::getString).map(spec)
 }
 
-/** Проверка интеграционного контракта специализированного адаптера. */
 fun requireErrorSurface(spec: ErrorPresentationSpec, expected: ErrorSurface) {
     require(spec.surface == expected) { "Error UI component requires $expected surface" }
 }

@@ -7,10 +7,10 @@ android {
 }
 
 dependencies {
+    api(libs.androidx.compose.material3)
     api(projects.core.error.uiCommon)
     implementation(projects.core.designsystem.mobile)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    androidTestImplementation(libs.androidx.lifecycle.runtime.compose)
     testImplementation(libs.kotlinx.coroutines.test)
 }
