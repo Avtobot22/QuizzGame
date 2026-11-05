@@ -36,7 +36,7 @@ abstract class ApiExecutorTestFixture {
         val store = ExecutorStore(tokens)
         val session = SessionManager.open(store)
         val configuration = NetworkConfiguration(
-            ApiBaseUrl.debugLoopback(server.url("/").toString()),
+            ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
             PlatformHeaders("feature-fixture", "FeatureFixture/1"),
             timeouts,
         )
