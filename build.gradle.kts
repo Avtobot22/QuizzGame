@@ -31,76 +31,124 @@ tasks.withType<Detekt>().configureEach {
     }
 }
 
+tasks.register("ciLint") {
+    group = "verification"
+    description = "Runs Android lint for all application and library modules."
+    dependsOn(
+        ":app:foundation:lint",
+        ":app:debug-support:lintDebug",
+        ":core:navigation:lint",
+        ":core:network:lint",
+        ":core:session:lint",
+        ":core:error:foundation:lint",
+        ":core:error:ui-common:lint",
+        ":core:error:ui-mobile:lint",
+        ":core:error:ui-tv:lint",
+        ":core:designsystem:mobile:lint",
+        ":core:designsystem:tv:lint",
+        ":core:ui:lint",
+        ":app:mobile:lint",
+        ":app:tv:lint",
+    )
+}
+
+tasks.register("ciUnitTestDebug") {
+    group = "verification"
+    description = "Runs debug JVM unit tests."
+    dependsOn(
+        ":app:foundation:testDebugUnitTest",
+        ":app:debug-support:testDebugUnitTest",
+        ":core:navigation:testDebugUnitTest",
+        ":core:network:testDebugUnitTest",
+        ":core:session:testDebugUnitTest",
+        ":core:error:foundation:testDebugUnitTest",
+        ":core:error:ui-common:testDebugUnitTest",
+        ":core:error:ui-mobile:testDebugUnitTest",
+        ":core:error:ui-tv:testDebugUnitTest",
+        ":core:designsystem:mobile:testDebugUnitTest",
+        ":core:designsystem:tv:testDebugUnitTest",
+        ":core:ui:testDebugUnitTest",
+        ":app:mobile:testDebugUnitTest",
+        ":app:tv:testDebugUnitTest",
+    )
+}
+
+tasks.register("ciUnitTestRelease") {
+    group = "verification"
+    description = "Runs release JVM unit tests."
+    dependsOn(
+        ":app:foundation:testReleaseUnitTest",
+        ":core:navigation:testReleaseUnitTest",
+        ":core:network:testReleaseUnitTest",
+        ":core:session:testReleaseUnitTest",
+        ":core:error:foundation:testReleaseUnitTest",
+        ":core:error:ui-common:testReleaseUnitTest",
+        ":core:error:ui-mobile:testReleaseUnitTest",
+        ":core:error:ui-tv:testReleaseUnitTest",
+    )
+}
+
+tasks.register("ciAssembleDebug") {
+    group = "verification"
+    description = "Builds debug applications and libraries."
+    dependsOn(
+        ":app:foundation:assembleDebug",
+        ":app:debug-support:assembleDebug",
+        ":core:navigation:assembleDebug",
+        ":core:network:assembleDebug",
+        ":core:session:assembleDebug",
+        ":core:error:foundation:assembleDebug",
+        ":core:error:ui-common:assembleDebug",
+        ":core:error:ui-mobile:assembleDebug",
+        ":core:error:ui-tv:assembleDebug",
+        ":app:mobile:assembleDebug",
+        ":app:tv:assembleDebug",
+    )
+}
+
+tasks.register("ciAssembleRelease") {
+    group = "verification"
+    description = "Builds release applications and libraries."
+    dependsOn(
+        ":app:foundation:assembleRelease",
+        ":core:navigation:assembleRelease",
+        ":core:network:assembleRelease",
+        ":core:session:assembleRelease",
+        ":core:error:foundation:assembleRelease",
+        ":core:error:ui-common:assembleRelease",
+        ":core:error:ui-mobile:assembleRelease",
+        ":core:error:ui-tv:assembleRelease",
+        ":app:mobile:assembleRelease",
+        ":app:tv:assembleRelease",
+    )
+}
+
+tasks.register("ciAssembleAndroidTest") {
+    group = "verification"
+    description = "Builds debug instrumentation test APKs without running them."
+    dependsOn(
+        ":app:debug-support:assembleDebugAndroidTest",
+        ":core:navigation:assembleDebugAndroidTest",
+        ":core:session:assembleDebugAndroidTest",
+        ":core:error:ui-mobile:assembleDebugAndroidTest",
+        ":core:error:ui-tv:assembleDebugAndroidTest",
+        ":core:designsystem:mobile:assembleDebugAndroidTest",
+        ":core:designsystem:tv:assembleDebugAndroidTest",
+        ":app:mobile:assembleDebugAndroidTest",
+        ":app:tv:assembleDebugAndroidTest",
+    )
+}
+
 tasks.register("qualityCheck") {
     group = "verification"
     description = "Runs static analysis, unit tests, and builds both Android applications."
     dependsOn(
         "detekt",
-        ":app:foundation:lint",
-        ":app:foundation:testDebugUnitTest",
-        ":app:foundation:testReleaseUnitTest",
-        ":app:foundation:assembleDebug",
-        ":app:foundation:assembleRelease",
-        ":app:debug-support:lintDebug",
-        ":app:debug-support:testDebugUnitTest",
-        ":app:debug-support:assembleDebug",
-        ":app:debug-support:assembleDebugAndroidTest",
-        ":core:navigation:lint",
-        ":core:navigation:testDebugUnitTest",
-        ":core:navigation:testReleaseUnitTest",
-        ":core:navigation:assembleDebug",
-        ":core:navigation:assembleRelease",
-        ":core:navigation:assembleDebugAndroidTest",
-        ":core:network:lint",
-        ":core:network:testDebugUnitTest",
-        ":core:network:testReleaseUnitTest",
-        ":core:network:assembleDebug",
-        ":core:network:assembleRelease",
-        ":core:session:lint",
-        ":core:session:testDebugUnitTest",
-        ":core:session:testReleaseUnitTest",
-        ":core:session:assembleDebug",
-        ":core:session:assembleRelease",
-        ":core:session:assembleDebugAndroidTest",
-        ":core:error:foundation:lint",
-        ":core:error:foundation:testDebugUnitTest",
-        ":core:error:foundation:testReleaseUnitTest",
-        ":core:error:foundation:assembleDebug",
-        ":core:error:foundation:assembleRelease",
-        ":core:error:ui-common:lint",
-        ":core:error:ui-common:testDebugUnitTest",
-        ":core:error:ui-common:testReleaseUnitTest",
-        ":core:error:ui-common:assembleDebug",
-        ":core:error:ui-common:assembleRelease",
-        ":core:error:ui-mobile:lint",
-        ":core:error:ui-mobile:testDebugUnitTest",
-        ":core:error:ui-mobile:testReleaseUnitTest",
-        ":core:error:ui-mobile:assembleDebug",
-        ":core:error:ui-mobile:assembleRelease",
-        ":core:error:ui-mobile:assembleDebugAndroidTest",
-        ":core:error:ui-tv:lint",
-        ":core:error:ui-tv:testDebugUnitTest",
-        ":core:error:ui-tv:testReleaseUnitTest",
-        ":core:error:ui-tv:assembleDebug",
-        ":core:error:ui-tv:assembleRelease",
-        ":core:error:ui-tv:assembleDebugAndroidTest",
-        ":core:designsystem:mobile:lint",
-        ":core:designsystem:mobile:testDebugUnitTest",
-        ":core:designsystem:mobile:assembleDebugAndroidTest",
-        ":core:designsystem:tv:lint",
-        ":core:designsystem:tv:testDebugUnitTest",
-        ":core:designsystem:tv:assembleDebugAndroidTest",
-        ":core:ui:lint",
-        ":core:ui:testDebugUnitTest",
-        ":app:mobile:lint",
-        ":app:mobile:testDebugUnitTest",
-        ":app:mobile:assembleDebug",
-        ":app:mobile:assembleRelease",
-        ":app:mobile:assembleDebugAndroidTest",
-        ":app:tv:lint",
-        ":app:tv:testDebugUnitTest",
-        ":app:tv:assembleDebug",
-        ":app:tv:assembleRelease",
-        ":app:tv:assembleDebugAndroidTest",
+        "ciLint",
+        "ciUnitTestDebug",
+        "ciUnitTestRelease",
+        "ciAssembleDebug",
+        "ciAssembleRelease",
+        "ciAssembleAndroidTest",
     )
 }
