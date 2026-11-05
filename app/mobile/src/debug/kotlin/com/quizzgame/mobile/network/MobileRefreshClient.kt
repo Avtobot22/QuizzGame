@@ -1,7 +1,7 @@
 package com.quizzgame.mobile.network
 
-import com.quizzgame.core.session.api.RefreshClient
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.session.refresh.api.RefreshClient
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
 import com.quizzgame.debug.network.DebugNetworkGraph
 
 /**

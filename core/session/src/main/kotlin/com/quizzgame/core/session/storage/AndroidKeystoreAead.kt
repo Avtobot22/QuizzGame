@@ -4,7 +4,7 @@ import com.google.crypto.tink.Aead
 import com.google.crypto.tink.integration.android.AndroidKeystore
 import java.security.GeneralSecurityException
 
-internal const val SESSION_KEY_ALIAS = "quizzgame.session.v1"
+internal const val SESSION_KEY_ALIAS = "quizzgame.session"
 
 internal class AndroidKeystoreAead : Aead {
 

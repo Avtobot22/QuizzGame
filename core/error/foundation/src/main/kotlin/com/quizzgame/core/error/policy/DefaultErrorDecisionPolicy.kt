@@ -1,0 +1,91 @@
+package com.quizzgame.core.error.policy
+
+import com.quizzgame.core.error.failure.AppFailure
+import com.quizzgame.core.error.failure.AuthenticationKind
+import com.quizzgame.core.error.failure.ConnectivityKind
+import com.quizzgame.core.error.failure.ServiceKind
+import com.quizzgame.core.error.operation.ErrorOperationContext
+import com.quizzgame.core.error.operation.OperationKind
+import com.quizzgame.core.error.operation.RetrySafety
+import com.quizzgame.core.error.presentation.ErrorActionKind
+import com.quizzgame.core.error.presentation.ErrorCopyKey
+import com.quizzgame.core.error.presentation.ErrorPresentationSpec
+import com.quizzgame.core.error.presentation.ErrorSurface
+
+/**
+ * INITIAL_LOAD и USER_REFRESH: BLOCKING без пригодного контента, BANNER при его наличии.
+ * USER_COMMAND: TRANSIENT на Mobile; TV использует TvErrorDecisionPolicy с постоянным представлением.
+ * AUTH_FLOW: INLINE; BACKGROUND и PREFETCH: SILENT.
+ *
+ * Повтор зависит от RetrySafety: RETRY, CONFIRM_RETRY либо отсутствие действия.
+ * Подтверждение повтора, навигацию и изменение сессии выполняет владелец операции.
+ * Сама политика не выполняет I/O и не запускает действия.
+ */
+class DefaultErrorDecisionPolicy : ErrorDecisionPolicy {
+
+    override fun decide(failure: AppFailure, context: ErrorOperationContext): ErrorPresentationSpec {
+        val surface = context.surface()
+        val presentation = failurePresentation(failure, context.retrySafety)
+        return ErrorPresentationSpec(
+            surface = surface,
+            title = presentation.copyKey,
+            actions = when (surface) {
+                ErrorSurface.SILENT -> emptyList()
+                ErrorSurface.BANNER,
+                ErrorSurface.TRANSIENT,
+                -> listOfNotNull(presentation.action, ErrorActionKind.DISMISS)
+
+                ErrorSurface.INLINE,
+                ErrorSurface.BLOCKING,
+                -> listOfNotNull(presentation.action)
+            },
+        )
+    }
+}
+
+private fun ErrorOperationContext.surface(): ErrorSurface = when (operation) {
+    OperationKind.INITIAL_LOAD,
+    OperationKind.USER_REFRESH,
+    -> if (hasUsableContent) ErrorSurface.BANNER else ErrorSurface.BLOCKING
+
+    OperationKind.USER_COMMAND -> ErrorSurface.TRANSIENT
+    OperationKind.AUTH_FLOW    -> ErrorSurface.INLINE
+    OperationKind.BACKGROUND,
+    OperationKind.PREFETCH,
+    -> ErrorSurface.SILENT
+}
+
+internal data class FailurePresentation(val copyKey: ErrorCopyKey, val action: ErrorActionKind? = null)
+
+internal fun RetrySafety.action(): ErrorActionKind? = when (this) {
+    RetrySafety.SAFE_TO_REPEAT        -> ErrorActionKind.RETRY
+    RetrySafety.REQUIRES_CONFIRMATION -> ErrorActionKind.CONFIRM_RETRY
+    RetrySafety.FORBIDDEN             -> null
+}
+
+internal fun AppFailure.Service.presentation(safety: RetrySafety): FailurePresentation = when (kind) {
+    ServiceKind.UNAVAILABLE   -> FailurePresentation(ErrorCopyKey.SERVER_UNAVAILABLE, safety.action())
+    ServiceKind.RATE_LIMITED  -> FailurePresentation(ErrorCopyKey.TOO_MANY_REQUESTS, safety.action())
+    ServiceKind.ACCESS_DENIED -> FailurePresentation(ErrorCopyKey.ACCESS_DENIED)
+    ServiceKind.CLIENT_REJECTED,
+    ServiceKind.OTHER_HTTP,
+    -> FailurePresentation(ErrorCopyKey.GENERIC_FAILURE)
+}
+
+internal fun AppFailure.Connectivity.presentation(safety: RetrySafety): FailurePresentation = FailurePresentation(
+    copyKey = when (kind) {
+        ConnectivityKind.OFFLINE_OR_UNREACHABLE -> ErrorCopyKey.CONNECTION_PROBLEM
+        ConnectivityKind.TIMEOUT                -> ErrorCopyKey.REQUEST_TIMED_OUT
+    },
+    action = safety.action(),
+)
+
+internal fun AppFailure.Authentication.presentation(): FailurePresentation = FailurePresentation(
+    copyKey = when (kind) {
+        AuthenticationKind.REQUIRED,
+        AuthenticationKind.RECOVERY_REQUIRED,
+        -> ErrorCopyKey.SIGN_IN_REQUIRED
+        AuthenticationKind.REVOKED  -> ErrorCopyKey.SESSION_EXPIRED
+    },
+    action = ErrorActionKind.SIGN_IN,
+)

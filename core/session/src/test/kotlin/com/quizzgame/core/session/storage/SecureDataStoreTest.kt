@@ -5,13 +5,12 @@ import com.google.crypto.tink.KeysetHandle
 import com.google.crypto.tink.RegistryConfiguration
 import com.google.crypto.tink.aead.AeadConfig
 import com.google.crypto.tink.aead.PredefinedAeadParameters
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionOperation
-import com.quizzgame.core.session.SessionState
-import com.quizzgame.core.session.SessionStorageException
-import com.quizzgame.core.session.SessionStorageFailure
-import com.quizzgame.core.session.SessionUnavailableException
-import com.quizzgame.core.session.TokenPair
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.lifecycle.SessionOperation
+import com.quizzgame.core.session.lifecycle.SessionRecoveryResult
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.lifecycle.SessionUnavailableException
+import com.quizzgame.core.session.model.TokenPair
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
@@ -88,7 +87,7 @@ class SecureDataStoreTest {
     fun `malformed oversized and empty existing records never become a guest by fallback`() {
         val malformed = File(temporary.root, "malformed.enc")
         malformed.writeBytes(
-            aead.encrypt("fixture-sensitive".toByteArray(), "session:${malformed.name}:v1".toByteArray()),
+            aead.encrypt("fixture-sensitive".toByteArray(), "session:${malformed.name}".toByteArray()),
         )
         val oversized = File(temporary.root, "oversized.enc").apply {
             writeBytes(ByteArray(MAX_SESSION_RECORD_BYTES + 1))
@@ -102,7 +101,7 @@ class SecureDataStoreTest {
             it.writeBoolean(false)
         }
         invalidIdentity.writeBytes(
-            aead.encrypt(plain.toByteArray(), "session:${invalidIdentity.name}:v1".toByteArray()),
+            aead.encrypt(plain.toByteArray(), "session:${invalidIdentity.name}".toByteArray()),
         )
         listOf(malformed, oversized, empty, invalidIdentity).forEach { file ->
             val before = file.readBytes()
@@ -246,7 +245,7 @@ class SecureDataStoreTest {
     }
 
     @Test
-    fun `failed initial commit exposes neither UUID nor credentials and can be retried`() = runTest {
+    fun `crypto failure stays quarantined until an explicitly new runtime owns the available key`() = runTest {
         val fail = AtomicBoolean(true)
         val failingAead = object : Aead by aead {
             override fun encrypt(plaintext: ByteArray, associatedData: ByteArray): ByteArray {
@@ -261,10 +260,14 @@ class SecureDataStoreTest {
             assertThrows(SessionUnavailableException::class.java) { manager.snapshot() }
             assertFalse(file.exists())
             fail.set(false)
-            assertEquals(SessionOperation.Applied, manager.restoreStoredSession())
-            assertEquals(SessionState.Guest, manager.state.value)
+            assertEquals(SessionRecoveryResult.NotAllowed, manager.recoverStorage())
+            assertEquals(SessionOperation.Busy, manager.restoreStoredSession())
+            assertFalse(file.exists())
+        }
+        SessionManager.open(DataStoreSessionStore(file, failingAead)).use { fresh ->
+            assertEquals(SessionState.Guest, fresh.state.value)
             assertTrue(file.isFile)
-            assertEquals(manager.deviceIdProvider.get(), UUID.fromString(manager.deviceIdProvider.get()).toString())
+            assertEquals(fresh.deviceIdProvider.get(), UUID.fromString(fresh.deviceIdProvider.get()).toString())
         }
     }
 

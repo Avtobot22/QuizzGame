@@ -1,11 +1,11 @@
 package com.quizzgame.mobile.network
 
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
-import com.quizzgame.core.session.api.RefreshEndpoint
-import com.quizzgame.core.session.api.RefreshException
-import com.quizzgame.core.session.api.RefreshFailure
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
+import com.quizzgame.core.session.refresh.api.RefreshException
+import com.quizzgame.core.session.refresh.api.RefreshFailure
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode
@@ -28,7 +28,7 @@ class MobileRefreshClientTest {
     private val graphs = mutableListOf<DebugNetworkGraph>()
     private val configuration = DebugNetworkConfiguration(
         DebugNetworkMode.MOCK,
-        PlatformHeaders("test-mobile", "mobile-refresh-tests/1", 1),
+        PlatformHeaders("test-mobile", "mobile-refresh-tests/1"),
     )
 
     @After

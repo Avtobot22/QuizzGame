@@ -6,11 +6,7 @@ import androidx.datastore.core.FileStorage
 import androidx.datastore.core.Serializer
 import androidx.datastore.tink.AeadSerializer
 import com.google.crypto.tink.Aead
-import com.quizzgame.core.session.SessionRecord
-import com.quizzgame.core.session.SessionStorageException
-import com.quizzgame.core.session.SessionStorageFailure
-import com.quizzgame.core.session.SessionStore
-import com.quizzgame.core.session.TokenPair
+import com.quizzgame.core.session.model.TokenPair
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.cancelAndJoin
@@ -32,7 +28,7 @@ internal class DataStoreSessionStore(file: File, aead: Aead) : SessionStore {
         Thread(work, "session-datastore").apply { isDaemon = true }
     }.asCoroutineDispatcher()
     private val job = SupervisorJob()
-    private val encrypted = AeadSerializer(aead, RecordSerializer, "session:${file.name}:v1".toByteArray())
+    private val encrypted = AeadSerializer(aead, RecordSerializer, "session:${file.name}".toByteArray())
     private val serializer = object : Serializer<SessionRecord?> {
         override val defaultValue = encrypted.defaultValue
         override suspend fun readFrom(input: InputStream): SessionRecord? {
@@ -57,7 +53,25 @@ internal class DataStoreSessionStore(file: File, aead: Aead) : SessionStore {
         runBlocking {
             checkNotNull(
                 dataStore.updateData { record ->
-                    SessionRecord(record?.deviceId ?: UUID.randomUUID().toString(), tokens)
+                    SessionRecord(
+                        record?.deviceId ?: UUID.randomUUID().toString(),
+                        tokens,
+                        record?.epoch ?: 1L,
+                        Math.incrementExact(record?.revision ?: 0L),
+                    )
+                },
+            )
+        }
+    }
+
+    override fun writeRecord(record: SessionRecord): SessionRecord = sanitized(SessionStorageFailure.WRITE) {
+        runBlocking {
+            checkNotNull(
+                dataStore.updateData { previous ->
+                    check(previous == null || previous.deviceId == record.deviceId) {
+                        "Session installation identity cannot change"
+                    }
+                    record
                 },
             )
         }

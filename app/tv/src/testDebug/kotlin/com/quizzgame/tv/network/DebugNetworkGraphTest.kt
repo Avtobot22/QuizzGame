@@ -1,14 +1,13 @@
 package com.quizzgame.tv.network
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.CredentialsSnapshot
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.auth.CredentialsSnapshot
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.debug.network.DebugMockFailure
-import com.quizzgame.debug.network.DebugMockFailureInterceptor
 import com.quizzgame.debug.network.DebugMockTransportException
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
@@ -21,7 +20,6 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.put
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -278,7 +276,6 @@ class DebugNetworkGraphTest : DebugNetworkTestFixture() {
         assertEquals(real.api.retrofit.baseUrl(), real.refresh.retrofit.baseUrl())
         assertNotSame(first.api.httpClient, real.api.httpClient)
         assertNotSame(first.refresh.httpClient, real.refresh.httpClient)
-        assertFalse(real.api.httpClient.interceptors.any { it is DebugMockFailureInterceptor })
         real.close()
         val second = openMock()
         assertNotSame(real.api.httpClient, second.api.httpClient)

@@ -10,14 +10,28 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import androidx.tv.material3.MaterialTheme
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
+import com.quizzgame.core.navigation.registration.FeatureEntries
+import com.quizzgame.tv.navigation.DashboardNavigationContext
+import com.quizzgame.tv.navigation.TvNavigationContext
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    internal lateinit var navigationGraphs: Set<@JvmSuppressWildcards FeatureEntries<TvNavigationContext>>
+
+    @Inject
+    internal lateinit var dashboardGraphs: Set<@JvmSuppressWildcards FeatureEntries<DashboardNavigationContext>>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             QuizzTvTheme {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background))
+                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+                    TvAppRoot(navigationGraphs, dashboardGraphs)
+                }
             }
         }
     }

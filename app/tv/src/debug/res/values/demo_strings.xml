@@ -1,0 +1,15 @@
+<resources>
+    <string name="demo_label">DEMO — локальная проверка переходов</string>
+    <string name="demo_signin">DEMO: открыть вход</string>
+    <string name="demo_continue">DEMO: продолжить без авторизации</string>
+    <string name="demo_signout">DEMO: завершить сессию</string>
+    <string name="demo_dashboard_empty">Нет доступных разделов</string>
+    <string name="demo_tab_main">Главная</string>
+    <string name="demo_tab_library">Библиотека</string>
+    <string name="demo_tab_settings">Настройки</string>
+    <string name="demo_quiz">Демо-квиз %1$d</string>
+    <string name="demo_detail">Демо-квиз: %1$s</string>
+    <string name="demo_counter">Счётчик экрана: %1$d</string>
+    <string name="demo_increment">Увеличить счётчик</string>
+    <string name="demo_back">Назад</string>
+</resources>

@@ -1,14 +1,14 @@
 package com.quizzgame.mobile.network
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionRecord
-import com.quizzgame.core.session.SessionStore
-import com.quizzgame.core.session.TokenPair
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.model.TokenPair
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
+import com.quizzgame.core.session.storage.SessionRecord
+import com.quizzgame.core.session.storage.SessionStore
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkMode
 import com.quizzgame.debug.network.mocks.DebugMockAssets
@@ -26,7 +26,7 @@ class MobileSessionRecoveryTest {
     fun mobileOptInGraphRecoversThroughItsOwnSDKEndpointAndREALUsesTheSameAuthenticator() = runBlocking {
         val store = MobileRecoveryStore()
         SessionManager.open(store).use { manager ->
-            val headers = PlatformHeaders("test-mobile", "mobile-recovery-tests/1", 1)
+            val headers = PlatformHeaders("test-mobile", "mobile-recovery-tests/1")
             openMobileDebugNetwork(
                 DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers),
                 manager,
@@ -62,6 +62,7 @@ private class MobileRecoveryStore : SessionStore {
         "f4a508be-bb66-46d3-91f6-7b4cabfc977b",
         TokenPair("fixture-mobile-access-1", "fixture-mobile-refresh-1"),
     )
+    override fun writeRecord(record: SessionRecord): SessionRecord = record.also { this.record = it }
     override fun read(): SessionRecord = record
     override fun write(tokens: TokenPair?): SessionRecord = SessionRecord(record.deviceId, tokens).also { record = it }
 }
