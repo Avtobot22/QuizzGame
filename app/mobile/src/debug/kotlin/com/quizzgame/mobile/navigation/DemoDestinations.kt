@@ -7,41 +7,47 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzRoomCodeField
+import com.quizzgame.core.navigation.GuestAccess
+import com.quizzgame.core.navigation.effect.NavigationResultEffect
+import com.quizzgame.debug.navigation.DemoSignInViewModel
 import com.quizzgame.mobile.R
 
 @Composable
-internal fun MobileSplashDestination(onSignIn: () -> Unit, onContinue: () -> Unit) {
+internal fun MobileSplashDestination(onSignIn: () -> Unit, onContinue: (GuestAccess) -> Unit) {
     DemoPlaceholder(
         R.string.splash_placeholder,
         listOf(
             R.string.demo_signin to onSignIn,
-            R.string.demo_continue to onContinue,
+            R.string.demo_continue to { onContinue(GuestAccess.ALLOWED) },
         ),
     )
 }
 
 @Composable
-internal fun MobileSignInDestination(onContinue: () -> Unit) {
-    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_continue to onContinue))
+internal fun MobileSignInDestination(
+    onContinue: (GuestAccess) -> Unit,
+    viewModel: DemoSignInViewModel = viewModel(),
+) {
+    val result by viewModel.result.collectAsStateWithLifecycle()
+    NavigationResultEffect(result, viewModel::resultHandled) { onContinue(GuestAccess.ALLOWED) }
+    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_continue to viewModel::continueAsGuest))
 }
 
 @Composable
-internal fun MobileJoinRoomDestination(onSignIn: () -> Unit) {
-    var roomCode by rememberSaveable { mutableStateOf("") }
-    DemoPlaceholder(R.string.join_room_placeholder, listOf(R.string.demo_signout to onSignIn)) {
+internal fun MobileJoinRoomDestination(roomCode: String, onRoomCodeChange: (String) -> Unit, onLogout: () -> Unit) {
+    DemoPlaceholder(R.string.join_room_placeholder, listOf(R.string.demo_signout to onLogout)) {
         QuizzRoomCodeField(
             value = roomCode,
-            onValueChange = { roomCode = it },
+            onValueChange = onRoomCodeChange,
             label = stringResource(R.string.demo_room_code),
             modifier = Modifier.testTag("demo-room-code"),
         )

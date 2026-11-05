@@ -7,9 +7,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso
-import com.quizzgame.core.navigation.ProcessNavigationGuard
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -31,12 +29,19 @@ class RootNavigationTest {
     }
 
     @Test
-    fun savedStateFromAnotherProcessIsDroppedBeforeNavigationRestores() {
-        val stale = Bundle().apply { putString("quizz.navigation.process", "previous-process") }
-        assertNull(ProcessNavigationGuard.restore(stale))
-        val current = Bundle()
-        ProcessNavigationGuard.save(current)
-        assertSame(current, ProcessNavigationGuard.restore(current))
+    fun activityRecreationRetainsSavedStateOutsideTheNavigationOwner() {
+        compose.activityRule.scenario.onActivity { activity ->
+            activity.savedStateRegistry.registerSavedStateProvider("unrelated-draft") {
+                Bundle().apply { putString("draft", "retained") }
+            }
+        }
+        compose.activityRule.scenario.recreate()
+        compose.activityRule.scenario.onActivity { activity ->
+            assertEquals(
+                "retained",
+                activity.savedStateRegistry.consumeRestoredStateForKey("unrelated-draft")?.getString("draft"),
+            )
+        }
     }
 
     private fun awaitVisible(tag: String) {

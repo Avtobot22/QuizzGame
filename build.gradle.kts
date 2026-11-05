@@ -50,6 +50,7 @@ tasks.register("qualityCheck") {
         ":core:navigation:testReleaseUnitTest",
         ":core:navigation:assembleDebug",
         ":core:navigation:assembleRelease",
+        ":core:navigation:assembleDebugAndroidTest",
         ":core:network:lint",
         ":core:network:testDebugUnitTest",
         ":core:network:testReleaseUnitTest",

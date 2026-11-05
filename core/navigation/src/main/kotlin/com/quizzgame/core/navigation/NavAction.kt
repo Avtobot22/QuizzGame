@@ -16,6 +16,3 @@ fun reduceNavigation(stack: List<NavKey>, action: NavAction): List<NavKey> {
         is NavAction.ResetTo -> listOf(action.destination)
     }
 }
-
-fun mayRestoreNavigation(savedProcessId: String?, currentProcessId: String): Boolean =
-    savedProcessId != null && savedProcessId == currentProcessId

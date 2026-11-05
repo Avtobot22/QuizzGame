@@ -8,23 +8,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
-import com.quizzgame.core.navigation.ProcessNavigationGuard
+import com.quizzgame.core.navigation.registration.FeatureEntries
+import com.quizzgame.mobile.navigation.MobileNavigationContext
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    internal lateinit var navigationGraphs: Set<@JvmSuppressWildcards FeatureEntries<MobileNavigationContext>>
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(ProcessNavigationGuard.restore(savedInstanceState))
+        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             QuizzMobileTheme {
-                Surface(modifier = Modifier.fillMaxSize()) { MobileAppRoot() }
+                Surface(modifier = Modifier.fillMaxSize()) { MobileAppRoot(navigationGraphs) }
             }
         }
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        ProcessNavigationGuard.save(outState)
     }
 }

@@ -1,9 +1,9 @@
 package com.quizzgame.core.navigation
 
+import com.quizzgame.core.navigation.routes.SignInRoute
+import com.quizzgame.core.navigation.routes.SplashRoute
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class NavigationReducerTest {
@@ -22,13 +22,6 @@ class NavigationReducerTest {
             listOf(SignInRoute),
             reduceNavigation(listOf(SplashRoute, SignInRoute, SplashRoute), NavAction.ResetTo(SignInRoute)),
         )
-    }
-
-    @Test
-    fun savedRoutesAreUntrustedAfterAProcessChange() {
-        assertTrue(mayRestoreNavigation("current", "current"))
-        assertFalse(mayRestoreNavigation("old", "current"))
-        assertFalse(mayRestoreNavigation(null, "current"))
     }
 
     @Test

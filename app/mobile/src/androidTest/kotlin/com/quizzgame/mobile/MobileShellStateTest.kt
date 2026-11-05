@@ -25,4 +25,19 @@ class MobileShellStateTest {
         compose.waitUntil(5_000) { compose.onNodeWithTag("join-room").isDisplayed() }
         compose.onNodeWithTag("demo-room-code").assertTextContains("ABC123")
     }
+
+    @Test
+    fun explicitGuestLogoutDiscardsNavigationButRetainsTheAllowedRoomDraft() {
+        compose.waitUntil(10_000) { compose.onNodeWithTag("splash").isDisplayed() }
+        compose.onNodeWithTag("demo-action-1").performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag("join-room").isDisplayed() }
+        compose.onNodeWithTag("demo-room-code").performTextInput("abc123")
+        compose.onNodeWithTag("demo-room-code").assertTextContains("ABC123")
+        compose.onNodeWithTag("demo-action-0").performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
+        compose.onNodeWithTag("join-room").assertDoesNotExist()
+        compose.onNodeWithTag("demo-action-1").performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag("join-room").isDisplayed() }
+        compose.onNodeWithTag("demo-room-code").assertTextContains("ABC123")
+    }
 }

@@ -2,7 +2,8 @@
     <string name="demo_label">DEMO — local navigation only</string>
     <string name="demo_signin">DEMO: open sign in</string>
     <string name="demo_continue">DEMO: continue without authorization</string>
-    <string name="demo_signout">DEMO: reset to sign in</string>
+    <string name="demo_signout">DEMO: end session</string>
+    <string name="demo_dashboard_empty">No sections available</string>
     <string name="demo_tab_main">Main</string>
     <string name="demo_tab_library">Library</string>
     <string name="demo_tab_settings">Settings</string>

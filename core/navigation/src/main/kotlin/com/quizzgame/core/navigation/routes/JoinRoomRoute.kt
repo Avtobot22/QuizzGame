@@ -1,7 +1,7 @@
-package com.quizzgame.tv.navigation
+package com.quizzgame.core.navigation.routes
 
 import com.quizzgame.core.navigation.RootNavKey
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object DashboardRoute : RootNavKey
+data object JoinRoomRoute : RootNavKey
