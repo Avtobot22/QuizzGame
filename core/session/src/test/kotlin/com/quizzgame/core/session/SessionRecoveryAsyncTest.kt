@@ -1,10 +1,10 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.RefreshFailedException
-import com.quizzgame.core.network.RefreshFailureReason
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.RefreshFailedException
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response

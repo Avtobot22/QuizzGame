@@ -1,8 +1,8 @@
 package com.quizzgame.mobile.di
 
 import com.quizzgame.app.network.AppNetworkSettings
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
 import com.quizzgame.core.session.api.RefreshEndpoint
 import com.quizzgame.mobile.BuildConfig
 import dagger.Module

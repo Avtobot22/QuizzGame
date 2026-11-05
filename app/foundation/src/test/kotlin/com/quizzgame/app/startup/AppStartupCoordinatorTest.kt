@@ -4,7 +4,7 @@ import com.quizzgame.app.network.ApiClientHandle
 import com.quizzgame.app.network.AppNetworkConfigurationException
 import com.quizzgame.app.network.AppNetworkGraph
 import com.quizzgame.app.network.AppNetworkGraphFactory
-import com.quizzgame.core.network.NetworkResultAdapter
+import com.quizzgame.core.network.result.NetworkResultAdapter
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRecord
 import com.quizzgame.core.session.SessionState

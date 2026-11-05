@@ -1,12 +1,12 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.RefreshFailedException
-import com.quizzgame.core.network.RefreshFailureReason
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.network.SessionRevokedException
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.RefreshFailedException
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.auth.SessionRevokedException
+import com.quizzgame.core.network.config.NetworkTimeouts
 import com.quizzgame.core.session.api.RefreshFailure
 import kotlinx.coroutines.runBlocking
 import okhttp3.Request

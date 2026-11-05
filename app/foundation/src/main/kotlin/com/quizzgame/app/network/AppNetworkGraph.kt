@@ -1,7 +1,7 @@
 package com.quizzgame.app.network
 
-import com.quizzgame.core.network.NetworkClientFactory
-import com.quizzgame.core.network.NetworkResultAdapter
+import com.quizzgame.core.network.client.NetworkClientFactory
+import com.quizzgame.core.network.result.NetworkResultAdapter
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRefreshCoordinator
 import com.quizzgame.core.session.api.RefreshClient

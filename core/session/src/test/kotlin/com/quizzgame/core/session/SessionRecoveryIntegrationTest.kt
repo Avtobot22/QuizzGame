@@ -1,7 +1,7 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.RefreshFailedException
-import com.quizzgame.core.network.RefreshFailureReason
+import com.quizzgame.core.network.auth.RefreshFailedException
+import com.quizzgame.core.network.auth.RefreshFailureReason
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response

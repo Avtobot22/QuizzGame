@@ -1,8 +1,8 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.MockFailureReason
-import com.quizzgame.core.network.NetworkFailure
-import com.quizzgame.core.network.RefreshFailureReason
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.diagnostic.MockFailureReason
+import com.quizzgame.core.network.result.NetworkFailure
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

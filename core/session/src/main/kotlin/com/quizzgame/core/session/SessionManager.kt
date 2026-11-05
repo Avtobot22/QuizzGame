@@ -1,7 +1,7 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.CredentialsSnapshot
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.auth.CredentialsSnapshot
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers

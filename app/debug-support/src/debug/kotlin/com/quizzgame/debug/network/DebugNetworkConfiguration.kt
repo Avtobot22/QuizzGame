@@ -1,7 +1,7 @@
 package com.quizzgame.debug.network
 
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
 
 enum class DebugNetworkMode {
     REAL,

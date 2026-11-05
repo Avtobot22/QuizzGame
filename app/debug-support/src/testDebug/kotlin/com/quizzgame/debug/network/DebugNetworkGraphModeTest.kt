@@ -1,7 +1,7 @@
 package com.quizzgame.debug.network
 
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

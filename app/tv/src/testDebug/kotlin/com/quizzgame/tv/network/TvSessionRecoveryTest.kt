@@ -1,13 +1,13 @@
 package com.quizzgame.tv.network
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.MockFailureReason
-import com.quizzgame.core.network.NetworkFailure
-import com.quizzgame.core.network.NetworkResult
-import com.quizzgame.core.network.RefreshFailureReason
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.config.createNetworkJson
+import com.quizzgame.core.network.diagnostic.MockFailureReason
+import com.quizzgame.core.network.result.NetworkFailure
+import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRecord
 import com.quizzgame.core.session.SessionStore

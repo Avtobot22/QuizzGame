@@ -1,9 +1,9 @@
 package com.quizzgame.app.network
 
-import com.quizzgame.core.network.ApiBaseUrl
-import com.quizzgame.core.network.NetworkConfiguration
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
+import com.quizzgame.core.network.config.ApiBaseUrl
+import com.quizzgame.core.network.config.NetworkConfiguration
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
 import com.quizzgame.core.session.api.RefreshEndpoint
 
 data class AppNetworkSettings(

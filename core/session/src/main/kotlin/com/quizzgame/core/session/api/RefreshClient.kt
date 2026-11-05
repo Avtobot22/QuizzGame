@@ -1,7 +1,7 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.NetworkResult
-import com.quizzgame.core.network.NetworkResultAdapter
+import com.quizzgame.core.network.result.NetworkResult
+import com.quizzgame.core.network.result.NetworkResultAdapter
 import com.quizzgame.core.session.TokenPair
 import com.quizzgame.core.session.api.dto.RefreshRequestDto
 import com.quizzgame.core.session.api.dto.RefreshResponseDto

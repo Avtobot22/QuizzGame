@@ -12,10 +12,10 @@ import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
-import com.quizzgame.core.error.ErrorActionKind
-import com.quizzgame.core.error.ErrorCopyKey
-import com.quizzgame.core.error.ErrorPresentationSpec
-import com.quizzgame.core.error.ErrorSurface
+import com.quizzgame.core.error.presentation.ErrorActionKind
+import com.quizzgame.core.error.presentation.ErrorCopyKey
+import com.quizzgame.core.error.presentation.ErrorPresentationSpec
+import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.session.SessionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals

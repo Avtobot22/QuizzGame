@@ -1,12 +1,12 @@
 package com.quizzgame.tv.network
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.CredentialsSnapshot
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.auth.CredentialsSnapshot
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.debug.network.DebugMockFailure
 import com.quizzgame.debug.network.DebugMockTransportException
 import com.quizzgame.debug.network.DebugNetworkConfiguration

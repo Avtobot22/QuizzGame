@@ -1,7 +1,7 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.BackendErrorDetails
-import com.quizzgame.core.network.NetworkFailure
+import com.quizzgame.core.network.result.BackendErrorDetails
+import com.quizzgame.core.network.result.NetworkFailure
 
 sealed interface RefreshFailure {
     data class Http(val status: Int, val backend: BackendErrorDetails? = null) : RefreshFailure {

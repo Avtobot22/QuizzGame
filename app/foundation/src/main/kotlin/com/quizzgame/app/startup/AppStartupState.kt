@@ -1,6 +1,6 @@
 package com.quizzgame.app.startup
 
-import com.quizzgame.core.error.ErrorPresentationSpec
+import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 
 sealed interface AppStartupState {
     data object Idle : AppStartupState

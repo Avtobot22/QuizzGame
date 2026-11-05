@@ -1,7 +1,7 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.NetworkFailure
-import com.quizzgame.core.network.RefreshFailureReason
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.result.NetworkFailure
 import java.util.concurrent.CancellationException
 
 internal fun NetworkFailure.toRefreshFailure(cancelled: Boolean): RefreshFailure = when (this) {

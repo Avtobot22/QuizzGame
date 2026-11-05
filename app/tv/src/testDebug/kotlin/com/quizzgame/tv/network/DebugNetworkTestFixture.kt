@@ -1,9 +1,9 @@
 package com.quizzgame.tv.network
 
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode

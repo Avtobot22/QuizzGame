@@ -5,9 +5,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.quizzgame.app.network.AppNetworkSettings
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.SessionState
 import com.quizzgame.core.session.api.RefreshEndpoint
 import com.quizzgame.debug.network.debugAppNetworkFactory

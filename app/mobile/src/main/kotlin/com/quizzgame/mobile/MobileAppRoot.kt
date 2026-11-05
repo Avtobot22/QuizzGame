@@ -14,7 +14,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartupState
-import com.quizzgame.core.error.ui.mobile.QuizzMobileErrorFullScreen
+import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorFullScreen
 import com.quizzgame.mobile.navigation.MobileRootGraph
 
 @Composable

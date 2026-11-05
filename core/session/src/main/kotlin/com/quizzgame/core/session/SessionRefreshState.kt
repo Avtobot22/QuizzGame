@@ -1,6 +1,6 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.CredentialsSnapshot
+import com.quizzgame.core.network.auth.CredentialsSnapshot
 
 internal class SessionRefreshState(
     val credentials: CredentialsSnapshot,

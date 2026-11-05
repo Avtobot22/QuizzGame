@@ -1,6 +1,6 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.NetworkTimeouts
+import com.quizzgame.core.network.config.NetworkTimeouts
 import com.quizzgame.core.session.FakeSessionStore
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.TokenPair

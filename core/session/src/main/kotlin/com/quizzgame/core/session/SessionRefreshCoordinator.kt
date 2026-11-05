@@ -1,10 +1,10 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.CredentialsSnapshot
-import com.quizzgame.core.network.RefreshAttempt
-import com.quizzgame.core.network.RefreshCoordinator
-import com.quizzgame.core.network.RefreshFailureReason
-import com.quizzgame.core.network.RefreshOutcome
+import com.quizzgame.core.network.auth.CredentialsSnapshot
+import com.quizzgame.core.network.auth.RefreshAttempt
+import com.quizzgame.core.network.auth.RefreshCoordinator
+import com.quizzgame.core.network.auth.RefreshFailureReason
+import com.quizzgame.core.network.auth.RefreshOutcome
 import com.quizzgame.core.session.api.RefreshCall
 import com.quizzgame.core.session.api.RefreshClient
 import com.quizzgame.core.session.api.RefreshException

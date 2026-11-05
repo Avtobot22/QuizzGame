@@ -1,15 +1,15 @@
 package com.quizzgame.core.session
 
-import com.quizzgame.core.network.ApiBaseUrl
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.NetworkClient
-import com.quizzgame.core.network.NetworkClientFactory
-import com.quizzgame.core.network.NetworkConfiguration
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.client.NetworkClient
+import com.quizzgame.core.network.client.NetworkClientFactory
+import com.quizzgame.core.network.config.ApiBaseUrl
+import com.quizzgame.core.network.config.NetworkConfiguration
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.api.RefreshClient
 import com.quizzgame.core.session.api.RefreshEndpoint
 import kotlinx.coroutines.runBlocking

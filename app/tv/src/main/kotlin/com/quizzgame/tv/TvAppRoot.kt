@@ -14,7 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Text
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartupState
-import com.quizzgame.core.error.ui.tv.QuizzTvErrorFullScreen
+import com.quizzgame.core.error.ui.tv.components.QuizzTvErrorFullScreen
 import com.quizzgame.tv.navigation.TvRootGraph
 
 @Composable

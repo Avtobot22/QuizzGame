@@ -1,13 +1,13 @@
 package com.quizzgame.core.session.api
 
-import com.quizzgame.core.network.ApiBaseUrl
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.NetworkClient
-import com.quizzgame.core.network.NetworkClientFactory
-import com.quizzgame.core.network.NetworkConfiguration
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.client.NetworkClient
+import com.quizzgame.core.network.client.NetworkClientFactory
+import com.quizzgame.core.network.config.ApiBaseUrl
+import com.quizzgame.core.network.config.NetworkConfiguration
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.Connection

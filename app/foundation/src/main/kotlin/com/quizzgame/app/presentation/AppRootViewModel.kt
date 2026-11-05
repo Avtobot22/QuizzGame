@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.app.startup.startupFailureState
-import com.quizzgame.core.error.DefaultErrorClassifier
-import com.quizzgame.core.error.ErrorActionKind
+import com.quizzgame.core.error.classification.DefaultErrorClassifier
+import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.session.SessionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted

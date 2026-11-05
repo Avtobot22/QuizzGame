@@ -1,8 +1,8 @@
 package com.quizzgame.app.network
 
-import com.quizzgame.core.network.NetworkTimeouts
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.config.NetworkTimeouts
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRecord
 import com.quizzgame.core.session.SessionState

@@ -1,6 +1,6 @@
 package com.quizzgame.tv.network
 
-import com.quizzgame.core.network.CredentialsProvider
+import com.quizzgame.core.network.auth.CredentialsProvider
 import com.quizzgame.core.session.api.RefreshException
 import com.quizzgame.core.session.api.RefreshFailure
 import dev.androidmock.core.dsl.mockRules

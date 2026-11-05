@@ -1,8 +1,8 @@
 package com.quizzgame.mobile.network
 
-import com.quizzgame.core.network.CredentialsProvider
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.createNetworkJson
+import com.quizzgame.core.network.auth.CredentialsProvider
+import com.quizzgame.core.network.config.PlatformHeaders
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.api.RefreshEndpoint
 import com.quizzgame.core.session.api.RefreshException
 import com.quizzgame.core.session.api.RefreshFailure

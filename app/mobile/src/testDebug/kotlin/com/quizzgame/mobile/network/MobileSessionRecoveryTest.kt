@@ -1,9 +1,9 @@
 package com.quizzgame.mobile.network
 
-import com.quizzgame.core.network.AuthPolicy
-import com.quizzgame.core.network.PlatformHeaders
-import com.quizzgame.core.network.ReplayPolicy
-import com.quizzgame.core.network.RequestPolicy
+import com.quizzgame.core.network.auth.AuthPolicy
+import com.quizzgame.core.network.auth.ReplayPolicy
+import com.quizzgame.core.network.auth.RequestPolicy
+import com.quizzgame.core.network.config.PlatformHeaders
 import com.quizzgame.core.session.SessionManager
 import com.quizzgame.core.session.SessionRecord
 import com.quizzgame.core.session.SessionStore
