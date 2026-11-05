@@ -8,17 +8,21 @@ import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.network.diagnostic.MockFailureReason
 import com.quizzgame.core.network.result.NetworkFailure
 import com.quizzgame.core.network.result.NetworkResult
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionRecord
-import com.quizzgame.core.session.SessionStore
-import com.quizzgame.core.session.TokenPair
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.lifecycle.SessionRecoveryAction
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.model.TokenPair
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
+import com.quizzgame.core.session.storage.SessionRecord
+import com.quizzgame.core.session.storage.SessionStore
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode
 import com.quizzgame.debug.network.mocks.DebugMockAssets
 import dev.androidmock.core.dsl.mockRules
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import okhttp3.Call
 import okhttp3.Callback
@@ -137,7 +141,10 @@ class TvSessionRecoveryTest : DebugNetworkTestFixture() {
             assertTrue(done.await(RECOVERY_WAIT_SECONDS, TimeUnit.SECONDS))
             assertEquals(1, gets.get())
             assertEquals(1, refreshes.get())
-            assertEquals("fixture-tv-access-1", manager.snapshot().accessToken)
+            withTimeout(RECOVERY_WAIT_SECONDS.seconds.inWholeMilliseconds) {
+                manager.state.first { it is SessionState.Blocked }
+            }
+            assertEquals(SessionRecoveryAction.REAUTHENTICATE, manager.recoveryAction.value)
             assertEquals("fixture-tv-refresh-1", store.record.tokens!!.refresh)
         }
     }
@@ -148,6 +155,7 @@ private class TvRecoveryStore : SessionStore {
         "e4a508be-bb66-46d3-91f6-7b4cabfc977b",
         TokenPair("fixture-tv-access-1", "fixture-tv-refresh-1"),
     )
+    override fun writeRecord(record: SessionRecord): SessionRecord = record.also { this.record = it }
     override fun read(): SessionRecord = record
     override fun write(tokens: TokenPair?): SessionRecord = SessionRecord(record.deviceId, tokens).also { record = it }
 }

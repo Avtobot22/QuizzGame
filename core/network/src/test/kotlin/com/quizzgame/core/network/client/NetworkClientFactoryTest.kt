@@ -64,7 +64,7 @@ class NetworkClientFactoryTest {
         assertEquals("GET", request.method)
         assertEquals(0L, request.bodySize)
         assertEquals("application/json", request.getHeader("Accept"))
-        assertEquals("1", request.getHeader("X-Endpoint-Version"))
+        assertNull(request.getHeader("X-Endpoint-Version"))
         assertEquals("test-platform", request.getHeader("X-Client-Platform"))
         assertEquals("test-host/1", request.getHeader("User-Agent"))
         assertNull(request.getHeader("Authorization"))
@@ -105,7 +105,7 @@ class NetworkClientFactoryTest {
         assertEquals("application/json", request.getHeader("Accept"))
         assertEquals("application/json; charset=utf-8", request.getHeader("Content-Type"))
         assertEquals("test-platform", request.getHeader("X-Client-Platform"))
-        assertEquals("1", request.getHeader("X-Endpoint-Version"))
+        assertNull(request.getHeader("X-Endpoint-Version"))
         assertEquals("test-host/1", request.getHeader("User-Agent"))
         assertEquals("""{"value":"test","nullable":null}""", request.body.readUtf8())
         assertEquals(1, server.requestCount)
@@ -189,7 +189,7 @@ class NetworkClientFactoryTest {
                 baseUrl = ApiBaseUrl.debugLoopback(
                     server.url("/prefix/").newBuilder().host("127.0.0.1").build().toString(),
                 ),
-                headers = PlatformHeaders("test-platform", "test-host/1", 1),
+                headers = PlatformHeaders("test-platform", "test-host/1"),
                 timeouts = timeouts,
             ),
             createNetworkJson(),

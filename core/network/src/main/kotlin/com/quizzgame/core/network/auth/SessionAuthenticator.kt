@@ -21,6 +21,11 @@ internal class SessionAuthenticator(private val credentialsProvider: Credentials
         return when (val outcome = attempt.refresh()) {
             is RefreshOutcome.Ready           -> followUp(request, context, outcome.credentials)
             is RefreshOutcome.Failed          -> throw RefreshFailedException(outcome.reason)
+            is RefreshOutcome.UnknownOutcome  -> throw RefreshUncertainException(outcome.reason)
+            RefreshOutcome.PersistencePending -> throw CredentialUnavailableException(
+                CredentialUnavailableKind.STORAGE_UNAVAILABLE,
+            )
+            is RefreshOutcome.CredentialsUnavailable -> throw CredentialUnavailableException(outcome.kind)
             is RefreshOutcome.Unexpected      -> throw UnexpectedRefreshException(outcome.exception)
             RefreshOutcome.Revoked            -> throw SessionRevokedException()
             RefreshOutcome.SessionUnavailable -> throw AuthenticationRequiredException()

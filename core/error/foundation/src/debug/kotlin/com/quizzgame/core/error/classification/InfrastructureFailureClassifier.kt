@@ -20,6 +20,8 @@ internal fun classifyNetworkFailure(failure: NetworkFailure): AppFailure = when 
     NetworkFailure.AuthenticationRequired -> AppFailure.Authentication(AuthenticationKind.REQUIRED)
     NetworkFailure.SessionRevoked         -> AppFailure.Authentication(AuthenticationKind.REVOKED)
     is NetworkFailure.RefreshFailed       -> classifyRefreshFailure(failure.reason)
+    is NetworkFailure.RefreshUncertain    -> AppFailure.Authentication(AuthenticationKind.RECOVERY_REQUIRED)
+    is NetworkFailure.CredentialsUnavailable -> classifyCredentialFailure(failure.kind)
     is NetworkFailure.MockConfiguration   -> classifyDiagnosticFailure(failure.reason)
 }
 

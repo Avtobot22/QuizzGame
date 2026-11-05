@@ -9,7 +9,7 @@ import org.junit.Test
 class DebugNetworkGraphModeTest {
     @Test
     fun mockDiagnosticsAreInstalledOnlyForTheLocalMockTransport() {
-        val headers = PlatformHeaders("fixture-platform", "Fixture/1", 1)
+        val headers = PlatformHeaders("fixture-platform", "Fixture/1")
         val json = createNetworkJson()
         DebugNetworkGraph.open(DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers), json).use { graph ->
             assertTrue(graph.api.httpClient.interceptors.any { it is DebugMockFailureInterceptor })

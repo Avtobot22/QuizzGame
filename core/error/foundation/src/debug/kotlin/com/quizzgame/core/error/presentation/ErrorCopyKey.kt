@@ -1,6 +1,5 @@
 package com.quizzgame.core.error.presentation
 
-/** Стабильные ключи локального текста для адаптеров Mobile/TV; backend-сообщения здесь не используются. */
 enum class ErrorCopyKey {
     CONNECTION_PROBLEM,
     REQUEST_TIMED_OUT,

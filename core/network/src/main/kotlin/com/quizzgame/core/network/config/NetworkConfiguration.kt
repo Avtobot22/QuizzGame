@@ -8,11 +8,9 @@ import kotlin.time.Duration.Companion.seconds
 data class PlatformHeaders(
     val clientPlatform: String,
     val userAgent: String,
-    val apiVersion: Int,
 ) {
 
     init {
-        require(apiVersion > 0) { "API version must be positive" }
         require(clientPlatform.isNotBlank() && userAgent.isNotBlank()) { "Platform headers must not be blank" }
         Headers.Builder()
             .add(HttpHeaderNames.X_CLIENT_PLATFORM, clientPlatform)

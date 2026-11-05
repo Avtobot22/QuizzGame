@@ -12,4 +12,6 @@ dependencies {
     api(libs.androidx.lifecycle.viewmodel)
 
     testImplementation(libs.bundles.unit.test)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.kotlinx.serialization.json)
 }

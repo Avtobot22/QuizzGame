@@ -59,6 +59,7 @@ class ErrorDiagnosticTest {
     fun `authentication requirement and proven revocation remain distinct`() {
         val cases = mapOf(
             AuthenticationKind.REQUIRED to ErrorDiagnosticCategory.AUTHENTICATION_REQUIRED,
+            AuthenticationKind.RECOVERY_REQUIRED to ErrorDiagnosticCategory.AUTHENTICATION_REQUIRED,
             AuthenticationKind.REVOKED to ErrorDiagnosticCategory.SESSION_REVOKED,
         )
         assertEquals(AuthenticationKind.entries.toSet(), cases.keys)

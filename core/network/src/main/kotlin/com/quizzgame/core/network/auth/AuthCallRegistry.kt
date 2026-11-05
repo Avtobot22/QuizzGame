@@ -24,8 +24,8 @@ internal class AuthCallRegistry(
                         val snapshot = credentialsProvider.snapshot()
                         val attempt = if (snapshot.accessToken != null) coordinator.register(snapshot) else null
                         context.attach(RequestAuthContext(snapshot, attempt))
-                    } catch (_: IOException) {
-                        context.unavailable = true
+                    } catch (failure: IOException) {
+                        context.unavailable = failure
                     }
                 }
             }
@@ -43,7 +43,7 @@ internal class AuthCallRegistry(
 
     fun context(call: Call): RequestAuthContext? {
         val context = active[call]
-        if (context?.unavailable == true) throw IOException("Session credentials were unavailable at call start")
+        context?.unavailable?.let { throw it }
         return context?.auth
     }
 }
@@ -54,7 +54,7 @@ private class AuthCallContext {
     private var finished = false
 
     @Volatile
-    var unavailable = false
+    var unavailable: IOException? = null
 
     @Volatile
     var auth: RequestAuthContext? = null

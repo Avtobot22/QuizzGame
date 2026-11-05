@@ -236,7 +236,7 @@ class NetworkResultAdapterTest {
     private fun createClient(timeouts: NetworkTimeouts = NetworkTimeouts()): NetworkClient = NetworkClientFactory(
         NetworkConfiguration(
             ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
-            PlatformHeaders("test", "network-result-tests/1", 1),
+            PlatformHeaders("test", "network-result-tests/1"),
             timeouts,
         ),
         createNetworkJson(),

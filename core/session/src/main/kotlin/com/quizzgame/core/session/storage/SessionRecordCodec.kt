@@ -1,7 +1,6 @@
 package com.quizzgame.core.session.storage
 
-import com.quizzgame.core.session.SessionRecord
-import com.quizzgame.core.session.TokenPair
+import com.quizzgame.core.session.model.TokenPair
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.DataInputStream
@@ -10,8 +9,10 @@ import java.io.DataOutputStream
 internal object SessionRecordCodec {
     fun encode(record: SessionRecord): ByteArray = ByteArrayOutputStream().use { bytes ->
         DataOutputStream(bytes).use { output ->
-            output.writeByte(1)
             output.writeUTF(record.deviceId)
+            output.writeLong(record.epoch)
+            output.writeLong(record.revision)
+            output.writeByte(record.intent.ordinal)
             output.writeBoolean(record.tokens != null)
             record.tokens?.let { tokens ->
                 output.writeUTF(tokens.access)
@@ -22,14 +23,16 @@ internal object SessionRecordCodec {
     }
 
     fun decode(bytes: ByteArray): SessionRecord = DataInputStream(ByteArrayInputStream(bytes)).use { input ->
-        check(input.readUnsignedByte() == 1) { "Unsupported session record version" }
         val id = input.readUTF()
+        val epoch = input.readLong()
+        val revision = input.readLong()
+        val intent = SessionIntent.entries.getOrNull(input.readUnsignedByte()) ?: error("Invalid session intent")
         val tokens = when (input.readUnsignedByte()) {
             0 -> null
             1 -> TokenPair(input.readUTF(), input.readUTF())
             else -> error("Invalid session record")
         }
         check(input.read() == -1) { "Invalid session record" }
-        SessionRecord(id, tokens)
+        SessionRecord(id, tokens, epoch, revision, intent)
     }
 }

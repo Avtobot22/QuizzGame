@@ -22,7 +22,8 @@ class NetworkResultAdapter(private val json: Json) {
                 }
             },
         ) {
-            fromResponse(call.execute())
+            val response = call.execute()
+            fromResponse(response)
         }
     }
 

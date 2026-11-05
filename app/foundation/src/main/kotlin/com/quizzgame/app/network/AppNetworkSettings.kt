@@ -4,7 +4,7 @@ import com.quizzgame.core.network.config.ApiBaseUrl
 import com.quizzgame.core.network.config.NetworkConfiguration
 import com.quizzgame.core.network.config.NetworkTimeouts
 import com.quizzgame.core.network.config.PlatformHeaders
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
 
 data class AppNetworkSettings(
     val apiBaseUrl: String,

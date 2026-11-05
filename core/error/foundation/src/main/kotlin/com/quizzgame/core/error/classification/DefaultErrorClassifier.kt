@@ -3,8 +3,8 @@ package com.quizzgame.core.error.classification
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.network.result.NetworkFailure
-import com.quizzgame.core.session.SessionState
-import com.quizzgame.core.session.SessionStorageFailure
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.storage.SessionStorageFailure
 
 class DefaultErrorClassifier : ErrorClassifier {
 

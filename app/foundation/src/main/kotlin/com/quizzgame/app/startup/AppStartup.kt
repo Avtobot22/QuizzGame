@@ -1,7 +1,7 @@
 package com.quizzgame.app.startup
 
-import com.quizzgame.app.graph.AppGraph
-import com.quizzgame.core.session.SessionState
+import com.quizzgame.core.session.lifecycle.SessionOperation
+import com.quizzgame.core.session.lifecycle.SessionState
 import kotlinx.coroutines.flow.StateFlow
 
 interface AppStartup {
@@ -9,5 +9,6 @@ interface AppStartup {
     val sessionState: StateFlow<SessionState>
     suspend fun ensureStarted()
     suspend fun retryInitialization()
-    suspend fun awaitGraph(): AppGraph
+    suspend fun accessGraph(): GraphAccessResult
+    suspend fun logout(): SessionOperation
 }

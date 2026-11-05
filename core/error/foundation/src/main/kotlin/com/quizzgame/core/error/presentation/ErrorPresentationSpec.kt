@@ -1,13 +1,5 @@
 package com.quizzgame.core.error.presentation
 
-/**
- * Решение без привязки к UI-платформе. Адаптер Mobile/TV разрешает локальные ключи текста,
- * а feature обрабатывает действия. [message] заполняется, если нужен отдельный поясняющий текст.
- *
- * SILENT не содержит действий. Действия уникальны: RETRY несовместим с CONFIRM_RETRY,
- * а SIGN_IN не совмещается с повтором исходной операции. Backend-тексты, данные запросов,
- * обработчики и состояние навигации в модель не входят.
- */
 data class ErrorPresentationSpec(
     val surface: ErrorSurface,
     val title: ErrorCopyKey,

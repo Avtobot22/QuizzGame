@@ -18,7 +18,7 @@ import kotlin.time.Duration
 abstract class DebugNetworkTestFixture {
 
     protected val graphs = mutableListOf<DebugNetworkGraph>()
-    protected val headers = PlatformHeaders("test-tv", "test-host/1", 1)
+    protected val headers = PlatformHeaders("test-tv", "test-host/1")
 
     @After
     fun closeGraphs() {

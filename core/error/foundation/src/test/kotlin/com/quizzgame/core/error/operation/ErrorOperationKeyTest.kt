@@ -39,7 +39,6 @@ class ErrorOperationKeyTest {
         FEATURE_LOAD,
     }
 
-    // Некорректные имена проверяют отказ валидатора ключей; исключение ограничено этим enum.
     @Suppress("EnumNaming", "EnumEntryNameCase")
     private enum class Unsafe {
         lowercase,

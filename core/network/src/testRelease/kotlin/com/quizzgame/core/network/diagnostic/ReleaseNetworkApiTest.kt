@@ -8,13 +8,13 @@ class ReleaseNetworkApiTest {
     @Test
     fun releaseNetworkClasspathExcludesDebugTransportDiagnostics() {
         listOf(
-            "NetworkFailure\$MockConfiguration",
-            "MockFailureReason",
-            "NetworkDiagnosticException",
-            "RefreshFailureReason\$Diagnostic",
+            "com.quizzgame.core.network.result.NetworkFailure\$MockConfiguration",
+            "com.quizzgame.core.network.diagnostic.MockFailureReason",
+            "com.quizzgame.core.network.diagnostic.NetworkDiagnosticException",
+            "com.quizzgame.core.network.auth.RefreshFailureReason\$Diagnostic",
         ).forEach { name ->
             assertThrows(ClassNotFoundException::class.java) {
-                Class.forName("com.quizzgame.core.network.$name")
+                Class.forName(name)
             }
         }
     }

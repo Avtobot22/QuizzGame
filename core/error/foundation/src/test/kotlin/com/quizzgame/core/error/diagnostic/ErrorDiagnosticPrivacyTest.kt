@@ -10,8 +10,8 @@ import com.quizzgame.core.error.policy.DefaultErrorDecisionPolicy
 import com.quizzgame.core.network.auth.RefreshFailureReason
 import com.quizzgame.core.network.result.BackendErrorDetails
 import com.quizzgame.core.network.result.NetworkFailure
-import com.quizzgame.core.session.SessionState
-import com.quizzgame.core.session.SessionStorageFailure
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.storage.SessionStorageFailure
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test

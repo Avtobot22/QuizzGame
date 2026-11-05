@@ -13,30 +13,13 @@ import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 
 /**
- * Правила представления инфраструктурных ошибок без отрисовки и выполнения действий.
+ * INITIAL_LOAD и USER_REFRESH: BLOCKING без пригодного контента, BANNER при его наличии.
+ * USER_COMMAND: TRANSIENT на Mobile; TV использует TvErrorDecisionPolicy с постоянным представлением.
+ * AUTH_FLOW: INLINE; BACKGROUND и PREFETCH: SILENT.
  *
- * INITIAL_LOAD и USER_REFRESH выбирают BLOCKING без пригодного контента и BANNER при его наличии.
- * USER_COMMAND выбирает TRANSIENT, AUTH_FLOW - INLINE, сохраняя экран и введённые данные.
- * Необязательные BACKGROUND/PREFETCH выбирают SILENT с пустым списком действий независимо от контента.
- * Критичную фоновую работу и доступность навигации определяет отдельная политика feature.
- *
- * Ошибки соединения, таймаут, недоступность сервера и rate limit допускают ручное восстановление:
- * SAFE_TO_REPEAT даёт RETRY, REQUIRES_CONFIRMATION - только CONFIRM_RETRY, FORBIDDEN - ни одно из них.
- * Подтверждение и повтор выполняет feature. Отказ доступа, отклонённый запрос, неизвестный HTTP,
- * некорректные данные и ошибка хранилища не получают повтор по умолчанию.
- * В debug ошибка конфигурации допускает повтор после её исправления с учётом тех же правил безопасности.
- *
- * Ошибка авторизации предлагает SIGN_IN вместо повтора, но не вызывает вход и не меняет сессию.
- * BANNER/TRANSIENT дополнительно допускают DISMISS; INLINE/BLOCKING содержат только восстановительное
- * действие, если оно доступно. Политика не обещает GO_BACK, EXIT или OPEN_SETTINGS без контекста feature.
- *
- * ```
- * val policy: ErrorDecisionPolicy = DefaultErrorDecisionPolicy()
- * val decision = policy.decide(
- *     AppFailure.Service(ServiceKind.UNAVAILABLE, 503),
- *     ErrorOperationContext(OperationKind.USER_REFRESH, true, RetrySafety.SAFE_TO_REPEAT),
- * ) // BANNER, SERVER_UNAVAILABLE, действия RETRY и DISMISS
- * ```
+ * Повтор зависит от RetrySafety: RETRY, CONFIRM_RETRY либо отсутствие действия.
+ * Подтверждение повтора, навигацию и изменение сессии выполняет владелец операции.
+ * Сама политика не выполняет I/O и не запускает действия.
  */
 class DefaultErrorDecisionPolicy : ErrorDecisionPolicy {
 
@@ -99,7 +82,9 @@ internal fun AppFailure.Connectivity.presentation(safety: RetrySafety): FailureP
 
 internal fun AppFailure.Authentication.presentation(): FailurePresentation = FailurePresentation(
     copyKey = when (kind) {
-        AuthenticationKind.REQUIRED -> ErrorCopyKey.SIGN_IN_REQUIRED
+        AuthenticationKind.REQUIRED,
+        AuthenticationKind.RECOVERY_REQUIRED,
+        -> ErrorCopyKey.SIGN_IN_REQUIRED
         AuthenticationKind.REVOKED  -> ErrorCopyKey.SESSION_EXPIRED
     },
     action = ErrorActionKind.SIGN_IN,

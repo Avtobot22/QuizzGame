@@ -15,7 +15,7 @@ class ReleaseDiagnosticClassifierTest {
             "com.quizzgame.core.network.diagnostic.MockFailureReason",
             "com.quizzgame.core.network.diagnostic.NetworkDiagnosticException",
             "com.quizzgame.core.network.auth.RefreshFailureReason\$Diagnostic",
-            "com.quizzgame.core.session.api.RefreshFailure\$Diagnostic",
+            "com.quizzgame.core.session.refresh.api.RefreshFailure\$Diagnostic",
         ).forEach { name ->
             assertThrows(ClassNotFoundException::class.java) { Class.forName(name) }
         }

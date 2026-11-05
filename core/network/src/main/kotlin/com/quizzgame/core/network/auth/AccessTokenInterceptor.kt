@@ -34,7 +34,20 @@ internal class AccessTokenInterceptor(
             request.tag(RequestAuthContext::class.java, RequestAuthContext(snapshot, admitted?.refreshAttempt))
             if (access != null) request.header(HttpHeaderNames.AUTHORIZATION, HttpHeaderValues.BEARER_PREFIX + access)
         }
-        return chain.proceed(request.build())
+        val outgoing = request.build()
+        val response = chain.proceed(outgoing)
+        val observed = outgoing.tag(RequestAuthContext::class.java)?.observedCredentials
+        if (observed != null) {
+            try {
+                if (credentialsProvider.snapshot().sessionGeneration != observed.sessionGeneration) {
+                    throw AuthenticationRequiredException()
+                }
+            } catch (failure: IOException) {
+                response.close()
+                throw failure
+            }
+        }
+        return response
     }
 }
 

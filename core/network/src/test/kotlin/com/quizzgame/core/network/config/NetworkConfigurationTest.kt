@@ -32,9 +32,8 @@ class NetworkConfigurationTest {
 
     @Test
     fun `invalid header configuration fails before any request`() {
-        assertThrows(IllegalArgumentException::class.java) { PlatformHeaders("test", "agent", 0) }
-        assertThrows(IllegalArgumentException::class.java) { PlatformHeaders("", "agent", 1) }
-        assertThrows(IllegalArgumentException::class.java) { PlatformHeaders("test\nunsafe", "agent", 1) }
+        assertThrows(IllegalArgumentException::class.java) { PlatformHeaders("", "agent") }
+        assertThrows(IllegalArgumentException::class.java) { PlatformHeaders("test\nunsafe", "agent") }
     }
 
     @Test

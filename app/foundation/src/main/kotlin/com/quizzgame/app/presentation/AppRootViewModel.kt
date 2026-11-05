@@ -3,28 +3,22 @@ package com.quizzgame.app.presentation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.quizzgame.app.startup.AppStartup
-import com.quizzgame.app.startup.AppStartupState
-import com.quizzgame.app.startup.startupFailureState
-import com.quizzgame.core.error.classification.DefaultErrorClassifier
 import com.quizzgame.core.error.presentation.ErrorActionKind
-import com.quizzgame.core.session.SessionState
+import com.quizzgame.core.session.lifecycle.SessionOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AppRootViewModel @Inject constructor(private val startup: AppStartup) : ViewModel() {
     val sessionState = startup.sessionState
-    val state = combine(startup.state, sessionState) { state, session ->
-        if (state == AppStartupState.Ready && session is SessionState.Unavailable) {
-            startupFailureState(DefaultErrorClassifier().fromSession(session), storageRetry = true)
-        } else {
-            state
-        }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), startup.state.value)
+    val state = startup.state
+    private val mutableLogoutRevision = MutableStateFlow(0L)
+    val logoutRevision = mutableLogoutRevision.asStateFlow()
+    private var logoutJob: Job? = null
 
     init {
         viewModelScope.launch { startup.ensureStarted() }
@@ -33,11 +27,16 @@ class AppRootViewModel @Inject constructor(private val startup: AppStartup) : Vi
     fun onAction(action: ErrorActionKind) {
         if (action == ErrorActionKind.RETRY) {
             viewModelScope.launch {
-                if (startup.state.value == AppStartupState.Ready) {
-                    startup.awaitGraph().session.restoreStoredSession()
-                } else {
-                    startup.retryInitialization()
-                }
+                startup.retryInitialization()
+            }
+        }
+    }
+
+    fun logout() {
+        if (logoutJob?.isActive == true) return
+        logoutJob = viewModelScope.launch {
+            if (startup.logout() == SessionOperation.Applied) {
+                mutableLogoutRevision.value = Math.incrementExact(mutableLogoutRevision.value)
             }
         }
     }

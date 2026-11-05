@@ -50,7 +50,7 @@ class RequestPolicyHttpTest {
     }
 
     @Test
-    fun `six auth cases enforce bearer policy and read one snapshot only when needed`() {
+    fun `six auth cases enforce bearer policy and recheck admission after HTTP`() {
         val cases = AuthPolicy.entries.flatMap { auth -> listOf(false, true).map { auth to it } }
         cases.forEach { (auth, available) ->
             val reads = AtomicInteger()
@@ -88,7 +88,12 @@ class RequestPolicyHttpTest {
                 }
                 assertEquals(previousRequests + 1, server.requestCount)
             }
-            assertEquals(if (auth == AuthPolicy.NONE) 0 else 1, reads.get())
+            val expectedReads = when {
+                auth == AuthPolicy.NONE -> 0
+                auth == AuthPolicy.REQUIRED && !available -> 1
+                else -> 2
+            }
+            assertEquals(expectedReads, reads.get())
         }
     }
 
@@ -160,10 +165,8 @@ class RequestPolicyHttpTest {
         }.build()
         val api = base.retrofit.newBuilder().client(client).build().create(PolicyApi::class.java)
         server.enqueue(MockResponse().setResponseCode(401))
-        val response = api.get(requested).execute()
-        response.errorBody()?.close()
-        assertEquals(401, response.code())
-        assertEquals(1, reads.get())
+        assertThrows(AuthenticationRequiredException::class.java) { api.get(requested).execute() }
+        assertEquals(2, reads.get())
         val recorded = server.takeRequest(1, TimeUnit.SECONDS)!!
         assertEquals("Bearer observed-fixture", recorded.getHeader("Authorization"))
         assertFalse(recorded.headers.names().any { it.contains("Policy") || it.contains("Generation") })
@@ -173,7 +176,7 @@ class RequestPolicyHttpTest {
         val factory = NetworkClientFactory(
             NetworkConfiguration(
                 ApiBaseUrl.debugLoopback(server.url("/").newBuilder().host("127.0.0.1").build().toString()),
-                PlatformHeaders("test-platform", "test-host/1", 1),
+                PlatformHeaders("test-platform", "test-host/1"),
             ),
             createNetworkJson(),
             provider,

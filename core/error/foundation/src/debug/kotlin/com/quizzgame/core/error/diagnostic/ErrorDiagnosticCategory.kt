@@ -1,6 +1,5 @@
 package com.quizzgame.core.error.diagnostic
 
-/** Стабильные семантические коды диагностики. MOCK-коды доступны только в debug-варианте. */
 enum class ErrorDiagnosticCategory {
     OFFLINE_OR_UNREACHABLE,
     TIMEOUT,

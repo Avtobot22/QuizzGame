@@ -7,7 +7,6 @@ internal object HttpHeaderNames {
     const val RETRY_AFTER = "Retry-After"
     const val USER_AGENT = "User-Agent"
     const val X_CLIENT_PLATFORM = "X-Client-Platform"
-    const val X_ENDPOINT_VERSION = "X-Endpoint-Version"
 }
 
 internal object HttpHeaderValues {

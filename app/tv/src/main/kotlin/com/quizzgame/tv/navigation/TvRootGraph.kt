@@ -15,7 +15,7 @@ import com.quizzgame.core.navigation.NavAction
 import com.quizzgame.core.navigation.SignInRoute
 import com.quizzgame.core.navigation.SplashRoute
 import com.quizzgame.core.navigation.dispatch
-import com.quizzgame.core.session.SessionState
+import com.quizzgame.core.session.lifecycle.SessionState
 
 @Composable
 internal fun TvRootGraph(sessionState: SessionState) {

@@ -4,8 +4,8 @@ import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.network.result.BackendErrorDetails
 import com.quizzgame.core.network.result.NetworkFailure
 import com.quizzgame.core.network.result.NetworkResult
-import com.quizzgame.core.session.api.RefreshException
-import com.quizzgame.core.session.api.RefreshFailure
+import com.quizzgame.core.session.refresh.api.RefreshException
+import com.quizzgame.core.session.refresh.api.RefreshFailure
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode

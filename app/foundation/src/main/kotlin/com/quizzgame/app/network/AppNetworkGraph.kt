@@ -1,20 +1,20 @@
 package com.quizzgame.app.network
 
+import com.quizzgame.core.network.api.ApiRuntime
 import com.quizzgame.core.network.client.NetworkClientFactory
-import com.quizzgame.core.network.result.NetworkResultAdapter
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionRefreshCoordinator
-import com.quizzgame.core.session.api.RefreshClient
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
+import com.quizzgame.core.session.refresh.SessionRefreshCoordinator
+import com.quizzgame.core.session.refresh.api.RefreshClient
 import kotlinx.serialization.json.Json
 import okhttp3.OkHttpClient
-import retrofit2.Retrofit
 import java.io.Closeable
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ApiClientHandle(val retrofit: Retrofit, val results: NetworkResultAdapter)
-
-class AppNetworkGraph(val api: ApiClientHandle, private val resources: Closeable) : Closeable {
+class AppNetworkGraph(val api: ApiRuntime, private val resources: Closeable) : Closeable {
     private val closed = AtomicBoolean(false)
+    internal val isClosed: Boolean get() = closed.get()
+
     override fun close() {
         if (closed.compareAndSet(false, true)) resources.close()
     }
@@ -24,10 +24,18 @@ fun interface AppNetworkGraphFactory {
     fun open(session: SessionManager, json: Json): AppNetworkGraph
 }
 
-fun realAppNetworkFactory(settings: AppNetworkSettings): AppNetworkGraphFactory =
-    AppNetworkGraphFactory { session, json -> openRealAppNetwork(settings, session, json) }
+fun realAppNetworkFactory(
+    settings: AppNetworkSettings,
+    revocationPolicy: RefreshRevocationPolicy,
+): AppNetworkGraphFactory =
+    AppNetworkGraphFactory { session, json -> openRealAppNetwork(settings, session, json, revocationPolicy) }
 
-internal fun openRealAppNetwork(settings: AppNetworkSettings, session: SessionManager, json: Json): AppNetworkGraph {
+internal fun openRealAppNetwork(
+    settings: AppNetworkSettings,
+    session: SessionManager,
+    json: Json,
+    revocationPolicy: RefreshRevocationPolicy,
+): AppNetworkGraph {
     check(settings.networkMode == "REAL")
     val configuration = settings.realNetworkConfiguration()
     val refresh = NetworkClientFactory(configuration, json).createRefreshClient()
@@ -39,11 +47,12 @@ internal fun openRealAppNetwork(settings: AppNetworkSettings, session: SessionMa
             session,
             RefreshClient(refresh.retrofit, settings.refreshEndpoint, refresh.results),
             refresh.httpClient.dispatcher.executorService,
+            revocationPolicy,
         )
         val client = NetworkClientFactory(configuration, json, session, coordinator).createApiClient()
         api = client.httpClient
         val owner = requireNotNull(coordinator)
-        val graph = AppNetworkGraph(ApiClientHandle(client.retrofit, client.results)) {
+        val graph = AppNetworkGraph(ApiRuntime(client.retrofit, client.results)) {
             owner.close()
             closeHttpClient(client.httpClient)
             closeHttpClient(refresh.httpClient)

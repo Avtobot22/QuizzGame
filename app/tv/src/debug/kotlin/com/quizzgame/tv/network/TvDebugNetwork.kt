@@ -2,9 +2,9 @@ package com.quizzgame.tv.network
 
 import com.quizzgame.core.network.auth.CredentialsProvider
 import com.quizzgame.core.network.config.createNetworkJson
-import com.quizzgame.core.session.RefreshRevocationPolicy
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
 import com.quizzgame.debug.network.DebugNetworkConfiguration
 import com.quizzgame.debug.network.DebugNetworkGraph
 import com.quizzgame.debug.network.DebugNetworkMode

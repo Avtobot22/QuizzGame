@@ -93,7 +93,7 @@ class MobileDebugNetworkTest {
     ): DebugNetworkGraph = openMobileDebugNetwork(
         DebugNetworkConfiguration(
             DebugNetworkMode.MOCK,
-            PlatformHeaders("test-mobile", "mobile-debug-tests/1", 1),
+            PlatformHeaders("test-mobile", "mobile-debug-tests/1"),
         ),
         bodyAssets = DebugMockAssets { path ->
             fixture?.let { ByteArrayInputStream(it.toByteArray()) }

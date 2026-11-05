@@ -9,15 +9,9 @@ import com.quizzgame.core.error.operation.ErrorOperationKey
 import java.util.UUID
 
 /**
- * Диагностический конверт с ограниченным набором безопасных полей.
- *
- * [operationKey] задаётся статическим enum вызывающей feature; [category] выбирается из закрытого набора.
- * [status] и [reasonCode] сохраняют только числовые данные классифицированной ошибки, включая неизвестные коды.
- * [diagnosticId] необязателен: вызывающий код создаёт UUID вне чистой политики и передаёт готовое значение.
- * UUID не используется как пользовательский текст и не влияет на решение о представлении ошибки.
- *
- * Конверт не хранит исходную ошибку, исключение, состояние сессии, заголовки, URL, тело или backend-тексты.
- * Чтобы получить его из типизированной ошибки, используй [from].
+ * В диагностику передаём только статический ключ операции, категорию и числовые коды.
+ * Исходные исключения, backend-тексты, URL и данные сессии сюда не попадают.
+ * Необязательный diagnosticId создаёт вызывающий код; он не влияет на показ ошибки.
  */
 data class ErrorDiagnostic(
     val operationKey: ErrorOperationKey,
@@ -27,10 +21,7 @@ data class ErrorDiagnostic(
     val diagnosticId: UUID? = null,
 ) {
     companion object {
-        /**
-         * Чисто проецирует [AppFailure] в разрешённые поля, без `toString()`, I/O и генерации ID.
-         * Неизвестный backend reasonCode сохраняется числом и не подменяет семантическую категорию.
-         */
+
         fun from(
             failure: AppFailure,
             operationKey: ErrorOperationKey,
@@ -69,7 +60,8 @@ internal fun AppFailure.Service.diagnosticFields(): DiagnosticFields = Diagnosti
 
 internal fun AppFailure.Authentication.diagnosticFields(): DiagnosticFields = DiagnosticFields(
     category = when (kind) {
-        AuthenticationKind.REQUIRED -> ErrorDiagnosticCategory.AUTHENTICATION_REQUIRED
+        AuthenticationKind.REQUIRED, AuthenticationKind.RECOVERY_REQUIRED ->
+            ErrorDiagnosticCategory.AUTHENTICATION_REQUIRED
         AuthenticationKind.REVOKED  -> ErrorDiagnosticCategory.SESSION_REVOKED
     },
     status = httpStatus,

@@ -7,16 +7,19 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import com.quizzgame.app.graph.AppGraph
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
+import com.quizzgame.app.startup.AppStartupFailure
 import com.quizzgame.app.startup.AppStartupState
+import com.quizzgame.app.startup.GraphAccessResult
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorCopyKey
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
-import com.quizzgame.core.session.SessionState
+import com.quizzgame.core.session.lifecycle.SessionOperation
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.storage.SessionStorageFailure
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -63,14 +66,16 @@ private class FailingAppStartup : AppStartup {
                 ErrorCopyKey.STORAGE_PROBLEM,
                 actions = listOf(ErrorActionKind.RETRY),
             ),
+            AppStartupFailure.Storage(SessionStorageFailure.READ),
         ),
     )
     override val sessionState = MutableStateFlow<SessionState>(SessionState.Guest)
     var retries = 0
+    override suspend fun logout(): SessionOperation = SessionOperation.Applied
     override suspend fun ensureStarted() = Unit
     override suspend fun retryInitialization() {
         retries++
         state.value = AppStartupState.Ready
     }
-    override suspend fun awaitGraph(): AppGraph = error("UI must not request the application graph")
+    override suspend fun accessGraph(): GraphAccessResult = error("UI must not request the application graph")
 }

@@ -1,10 +1,11 @@
 package com.quizzgame.debug.network
 
 import android.content.Context
-import com.quizzgame.app.network.ApiClientHandle
 import com.quizzgame.app.network.AppNetworkGraph
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.AppNetworkSettings
+import com.quizzgame.core.network.api.ApiRuntime
+import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import com.quizzgame.debug.network.mocks.DebugMockAssets
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.mockRules
@@ -18,6 +19,7 @@ fun debugAppNetworkFactory(
     settings: AppNetworkSettings,
     refreshFixture: String,
     failNetworkOnce: Boolean,
+    revocationPolicy: RefreshRevocationPolicy,
     platformRules: (BodyAssetResolver, Json) -> List<Rule>,
 ): AppNetworkGraphFactory {
     val failOnce = AtomicBoolean(failNetworkOnce)
@@ -42,8 +44,9 @@ fun debugAppNetworkFactory(
             session,
             settings.refreshEndpoint,
             rules,
+            revocationPolicy,
         )
-        AppNetworkGraph(ApiClientHandle(graph.api.retrofit, graph.api.results), graph)
+        AppNetworkGraph(ApiRuntime(graph.api.retrofit, graph.api.results), graph)
     }
 }
 

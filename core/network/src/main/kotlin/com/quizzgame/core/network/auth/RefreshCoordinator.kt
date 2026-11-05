@@ -24,12 +24,17 @@ sealed interface RefreshOutcome {
     data object Revoked : RefreshOutcome
     data object Cancelled : RefreshOutcome
     data class Failed(val reason: RefreshFailureReason) : RefreshOutcome
+    data class UnknownOutcome(val reason: RefreshFailureReason) : RefreshOutcome
+    data object PersistencePending : RefreshOutcome
+    data class CredentialsUnavailable(val kind: CredentialUnavailableKind) : RefreshOutcome
     class Unexpected(val exception: Exception) : RefreshOutcome {
         override fun toString(): String = "Unexpected(<redacted>)"
     }
 }
 
 class RefreshFailedException(val reason: RefreshFailureReason) : IOException("Session refresh failed: $reason")
+
+class RefreshUncertainException(val reason: RefreshFailureReason) : IOException("Session refresh outcome is uncertain")
 
 class UnexpectedRefreshException internal constructor(internal val original: Exception) :
     IOException("Unexpected session refresh failure")

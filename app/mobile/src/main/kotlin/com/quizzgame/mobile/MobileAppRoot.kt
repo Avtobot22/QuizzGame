@@ -23,6 +23,7 @@ internal fun MobileAppRoot(viewModel: AppRootViewModel = hiltViewModel()) {
     val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
+            AppStartupState.Closed -> Unit
             AppStartupState.Idle, AppStartupState.Loading ->
                 Text(stringResource(R.string.app_startup_loading), Modifier.testTag("app-startup-loading"))
             is AppStartupState.Failed -> Column(Modifier.fillMaxSize().testTag("app-startup-failed")) {

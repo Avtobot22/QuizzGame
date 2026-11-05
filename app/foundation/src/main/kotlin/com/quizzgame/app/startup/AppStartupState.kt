@@ -6,5 +6,8 @@ sealed interface AppStartupState {
     data object Idle : AppStartupState
     data object Loading : AppStartupState
     data object Ready : AppStartupState
-    data class Failed(val error: ErrorPresentationSpec, val configurationRequired: Boolean = false) : AppStartupState
+    data object Closed : AppStartupState
+    data class Failed(val error: ErrorPresentationSpec, val reason: AppStartupFailure) : AppStartupState {
+        val configurationRequired: Boolean get() = reason == AppStartupFailure.NetworkConfiguration
+    }
 }

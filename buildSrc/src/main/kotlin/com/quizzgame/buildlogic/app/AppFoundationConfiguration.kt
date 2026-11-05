@@ -42,7 +42,6 @@ private fun ApplicationExtension.configureNetwork(network: NetworkBuildSettings,
         buildConfigField("String", "API_BASE_URL", baseUrl.javaString())
         buildConfigField("String", "CLIENT_PLATFORM", network.clientPlatform.get().headerValue("clientPlatform"))
         buildConfigField("String", "USER_AGENT", network.userAgent.get().headerValue("userAgent"))
-        buildConfigField("int", "API_VERSION", network.apiVersion.get().positive("apiVersion"))
         buildConfigField("int", "CONNECT_TIMEOUT_MS", network.connectTimeoutMs.get().positive("connectTimeoutMs"))
         buildConfigField("int", "READ_TIMEOUT_MS", network.readTimeoutMs.get().positive("readTimeoutMs"))
         buildConfigField("int", "WRITE_TIMEOUT_MS", network.writeTimeoutMs.get().positive("writeTimeoutMs"))

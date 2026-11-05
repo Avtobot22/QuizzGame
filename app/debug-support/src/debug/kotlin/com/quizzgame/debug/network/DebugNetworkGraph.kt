@@ -6,11 +6,11 @@ import com.quizzgame.core.network.client.NetworkClientFactory
 import com.quizzgame.core.network.config.ApiBaseUrl
 import com.quizzgame.core.network.config.NetworkConfiguration
 import com.quizzgame.core.network.result.NetworkResultAdapter
-import com.quizzgame.core.session.RefreshRevocationPolicy
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionRefreshCoordinator
-import com.quizzgame.core.session.api.RefreshClient
-import com.quizzgame.core.session.api.RefreshEndpoint
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
+import com.quizzgame.core.session.refresh.SessionRefreshCoordinator
+import com.quizzgame.core.session.refresh.api.RefreshClient
+import com.quizzgame.core.session.refresh.api.RefreshEndpoint
 import dev.androidmock.core.engine.RuleEngine
 import dev.androidmock.core.rule.Rule
 import dev.androidmock.okhttp.server.LoopbackMockServer

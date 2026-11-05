@@ -5,7 +5,8 @@ import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.AppNetworkSettings
 import com.quizzgame.app.network.realAppNetworkFactory
 import com.quizzgame.app.session.SessionManagerFactory
-import com.quizzgame.core.session.AndroidSession
+import com.quizzgame.core.session.platform.AndroidSession
+import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +21,8 @@ object AppServicesModule {
         SessionManagerFactory { AndroidSession.open(context) }
 
     @Provides
-    fun networkFactory(settings: AppNetworkSettings): AppNetworkGraphFactory =
-        realAppNetworkFactory(settings)
+    fun networkFactory(
+        settings: AppNetworkSettings,
+        revocationPolicy: RefreshRevocationPolicy,
+    ): AppNetworkGraphFactory = realAppNetworkFactory(settings, revocationPolicy)
 }

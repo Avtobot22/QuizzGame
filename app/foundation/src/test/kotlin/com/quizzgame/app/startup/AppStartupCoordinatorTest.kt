@@ -1,15 +1,10 @@
 package com.quizzgame.app.startup
 
-import com.quizzgame.app.network.ApiClientHandle
 import com.quizzgame.app.network.AppNetworkConfigurationException
-import com.quizzgame.app.network.AppNetworkGraph
 import com.quizzgame.app.network.AppNetworkGraphFactory
-import com.quizzgame.core.network.result.NetworkResultAdapter
-import com.quizzgame.core.session.SessionManager
-import com.quizzgame.core.session.SessionRecord
-import com.quizzgame.core.session.SessionState
-import com.quizzgame.core.session.SessionStore
-import com.quizzgame.core.session.TokenPair
+import com.quizzgame.core.error.presentation.ErrorCopyKey
+import com.quizzgame.core.session.lifecycle.SessionManager
+import com.quizzgame.core.session.lifecycle.SessionState
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,7 +16,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import retrofit2.Retrofit
 import java.io.IOException
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -52,7 +46,7 @@ class AppStartupCoordinatorTest {
         gate.complete(Unit)
         second.join()
         assertEquals(AppStartupState.Ready, coordinator.state.value)
-        assertSame(manager, coordinator.awaitGraph().session)
+        assertSame(manager, (coordinator.accessGraph() as GraphAccessResult.Ready).graph.session)
         coordinator.ensureStarted()
         coordinator.retryInitialization()
         assertEquals(1, opens)
@@ -87,7 +81,10 @@ class AppStartupCoordinatorTest {
         store.failRead = false
         coordinator.retryInitialization()
         assertEquals(AppStartupState.Ready, coordinator.state.value)
-        assertEquals(SessionState.Guest, coordinator.awaitGraph().session.state.value)
+        assertEquals(
+            SessionState.Guest,
+            (coordinator.accessGraph() as GraphAccessResult.Ready).graph.session.state.value,
+        )
         assertEquals(1, opens)
         assertEquals(2, store.reads)
         assertEquals(1, networks)
@@ -109,10 +106,14 @@ class AppStartupCoordinatorTest {
             dispatcher = dispatcher,
         )
         coordinator.ensureStarted()
-        assertTrue(coordinator.state.value is AppStartupState.Failed)
+        val failed = coordinator.state.value as AppStartupState.Failed
+        assertEquals(AppStartupFailure.Transport, failed.reason)
+        assertEquals(ErrorCopyKey.GENERIC_FAILURE, failed.error.title)
+        assertEquals(1, store.reads)
         coordinator.retryInitialization()
         assertEquals(AppStartupState.Ready, coordinator.state.value)
         assertEquals(2, attempts)
+        assertEquals(1, store.reads)
         coordinator.shutdown()
     }
 
@@ -169,25 +170,4 @@ class AppStartupCoordinatorTest {
         assertTrue(coordinator.state.value !is AppStartupState.Failed)
         coordinator.shutdown()
     }
-}
-
-private fun fakeNetworkFactory(onClose: () -> Unit = {}): AppNetworkGraphFactory =
-    AppNetworkGraphFactory { _, json ->
-        AppNetworkGraph(
-            ApiClientHandle(Retrofit.Builder().baseUrl("https://example.test/").build(), NetworkResultAdapter(json)),
-            onClose,
-        )
-    }
-
-private class StartupTestStore(private val events: MutableList<String> = mutableListOf()) : SessionStore {
-    var failRead = false
-    var reads = 0
-    override fun read(): SessionRecord {
-        reads++
-        if (failRead) throw IOException("Unreadable local store")
-        return SessionRecord("123e4567-e89b-12d3-a456-426614174000", null)
-    }
-
-    override fun write(tokens: TokenPair?): SessionRecord = error("Startup must not write credentials")
-    override fun close() { events += "session-close" }
 }
