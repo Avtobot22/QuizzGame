@@ -1,0 +1,75 @@
+name: Android check
+description: Set up the Android toolchain, run a Gradle check, and collect its artifacts.
+
+inputs:
+  task:
+    description: Root Gradle task to run.
+    required: true
+  report-name:
+    description: Unique artifact name for this check's reports.
+    required: true
+  application-variant:
+    description: Application APK variant to upload, or empty for checks without applications.
+    default: ''
+  instrumentation-apks:
+    description: Whether to upload compiled instrumentation APKs.
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Set up JDK
+      uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+      with:
+        distribution: temurin
+        java-version: |
+          17
+          21
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+      with:
+        packages: platform-tools
+        log-accepted-android-sdk-licenses: false
+    - name: Install Android SDK packages
+      shell: bash
+      run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
+    - name: Set up Gradle and validate wrapper
+      uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+      with:
+        cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+    - name: Run Gradle check
+      shell: bash
+      env:
+        GRADLE_TASK: ${{ inputs.task }}
+      run: ./gradlew "$GRADLE_TASK" --continue --stacktrace
+    - name: Upload reports and test results
+      if: always()
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: ${{ inputs.report-name }}
+        retention-days: 14
+        if-no-files-found: warn
+        path: |
+          build/reports/
+          app/*/build/reports/
+          app/*/build/test-results/
+          core/**/build/reports/
+          core/**/build/test-results/
+    - name: Upload applications
+      if: success() && inputs.application-variant != ''
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: ${{ inputs.application-variant }}-applications
+        retention-days: 7
+        if-no-files-found: error
+        path: app/*/build/outputs/apk/${{ inputs.application-variant }}/*.apk
+    - name: Upload instrumentation APKs
+      if: success() && inputs.instrumentation-apks == 'true'
+      uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+      with:
+        name: instrumentation-apks
+        retention-days: 7
+        if-no-files-found: error
+        path: |
+          app/*/build/outputs/apk/androidTest/debug/*.apk
+          core/**/build/outputs/apk/androidTest/debug/*.apk

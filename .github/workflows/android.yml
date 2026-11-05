@@ -14,8 +14,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  android:
-    name: repository-check
+  detekt:
+    name: Detekt
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - uses: ./.github/actions/android-check
+        with:
+          task: detekt
+          report-name: reports-detekt
+
+  lint:
+    name: Android lint
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -24,41 +39,80 @@ jobs:
         with:
           persist-credentials: false
           submodules: recursive
-      - name: Set up JDK
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+      - uses: ./.github/actions/android-check
         with:
-          distribution: temurin
-          java-version: |
-            17
-            21
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4.0.4
+          task: ciLint
+          report-name: reports-lint
+
+  unit-tests:
+    name: Unit tests (${{ matrix.variant }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [Debug, Release]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          packages: platform-tools
-          log-accepted-android-sdk-licenses: false
-      - name: Install Android SDK packages
-        run: sdkmanager 'platforms;android-37.0' 'build-tools;36.0.0'
-      - name: Set up Gradle and validate wrapper
-        uses: gradle/actions/setup-gradle@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
+          persist-credentials: false
+          submodules: recursive
+      - uses: ./.github/actions/android-check
         with:
-          cache-read-only: ${{ github.event_name == 'pull_request' }}
-      - name: Check and build phone and TV
-        run: ./gradlew qualityCheck --stacktrace
-      - name: Upload reports
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+          task: ciUnitTest${{ matrix.variant }}
+          report-name: reports-unit-tests-${{ matrix.variant }}
+
+  build:
+    name: Build (${{ matrix.variant }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - variant: Debug
+            artifact-variant: debug
+          - variant: Release
+            artifact-variant: release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: quality-reports
-          retention-days: 14
-          if-no-files-found: warn
-          path: |
-            build/reports/
-            app/*/build/reports/
-            core/**/build/reports/
-      - name: Upload debug applications
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+          persist-credentials: false
+          submodules: recursive
+      - uses: ./.github/actions/android-check
         with:
-          name: debug-applications
-          retention-days: 7
-          if-no-files-found: error
-          path: app/*/build/outputs/apk/debug/*.apk
+          task: ciAssemble${{ matrix.variant }}
+          report-name: reports-build-${{ matrix.variant }}
+          application-variant: ${{ matrix.artifact-variant }}
+
+  instrumentation:
+    name: Instrumentation APKs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          submodules: recursive
+      - uses: ./.github/actions/android-check
+        with:
+          task: ciAssembleAndroidTest
+          report-name: reports-instrumentation
+          instrumentation-apks: 'true'
+
+  repository-check:
+    name: repository-check
+    if: always()
+    needs: [detekt, lint, unit-tests, build, instrumentation]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require every check to succeed
+        env:
+          JOB_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$JOB_RESULTS" | jq -r 'to_entries[] | "\(.key): \(.value.result)"'
+          echo "$JOB_RESULTS" | jq -e 'all(.[]; .result == "success")'
