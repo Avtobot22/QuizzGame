@@ -54,7 +54,7 @@ class TvSplashViewModelTest {
         }
         advanceUntilIdle()
         vm.onIntent(TvSplashIntent.NavigationHandled)
-        assertTrue(vm.state.value is TvSplashUiState.Failed)
+        assertTrue(vm.state.value is TvSplashUiState.Error)
         vm.onIntent(TvSplashIntent.SignIn)
         assertEquals(TvSplashDestination.SIGN_IN, (vm.state.value as TvSplashUiState.NavigationPending).destination)
         vm.onIntent(TvSplashIntent.NavigationHandled)
@@ -90,7 +90,7 @@ class TvSplashViewModelTest {
             }
         }
         advanceUntilIdle()
-        assertTrue(vm.state.value is TvSplashUiState.Failed)
+        assertTrue(vm.state.value is TvSplashUiState.Error)
         vm.onIntent(TvSplashIntent.Retry)
         vm.onIntent(TvSplashIntent.Retry)
         advanceUntilIdle()
@@ -108,8 +108,8 @@ class TvSplashViewModelTest {
             if (calls == 1) SplashOutcome.Failed(AppFailure.OperationInterrupted) else SplashOutcome.Continue
         }
         advanceUntilIdle()
-        val failed = vm.state.value as TvSplashUiState.Failed
-        assertTrue(ErrorActionKind.RETRY in failed.spec.actions)
+        val error = vm.state.value as TvSplashUiState.Error
+        assertTrue(ErrorActionKind.RETRY in error.spec.actions)
         vm.onIntent(TvSplashIntent.Retry)
         advanceUntilIdle()
         assertEquals(2, calls)
@@ -121,8 +121,8 @@ class TvSplashViewModelTest {
         listOf(AppFailure.Configuration, AppFailure.Storage(StorageKind.READ)).forEach { failure ->
             val vm = createViewModel { SplashOutcome.Failed(failure) }
             advanceUntilIdle()
-            val failed = vm.state.value as TvSplashUiState.Failed
-            assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
+            val error = vm.state.value as TvSplashUiState.Error
+            assertTrue(ErrorActionKind.RETRY !in error.spec.actions)
         }
     }
 

@@ -67,7 +67,7 @@ private fun TvSplashContent(
     }
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
-            is TvSplashUiState.Failed -> QuizzTvErrorFullScreen(
+            is TvSplashUiState.Error -> QuizzTvErrorFullScreen(
                 current.spec,
                 onAction = { action ->
                     when (action) {

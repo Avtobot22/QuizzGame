@@ -66,7 +66,7 @@ private fun MobileSplashContent(
     }
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (state) {
-            is MobileSplashUiState.Failed -> QuizzMobileErrorFullScreen(
+            is MobileSplashUiState.Error -> QuizzMobileErrorFullScreen(
                 state.spec,
                 onAction = { action ->
                     when (action) {

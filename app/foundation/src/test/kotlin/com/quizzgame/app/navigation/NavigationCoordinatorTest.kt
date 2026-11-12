@@ -160,7 +160,7 @@ class NavigationCoordinatorTest {
         Key.SPLASH,
         Key.AUTH,
         { session },
-        NavigationPolicy { destination ->
+        { destination ->
             when (destination) {
                 Key.HOME, Key.PUBLIC_DETAIL -> DestinationAccess.PUBLIC
                 Key.ROOM, Key.SECOND_ROOM -> DestinationAccess.AUTHENTICATED

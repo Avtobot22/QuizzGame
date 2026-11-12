@@ -28,7 +28,7 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
 
     override fun handleIntent(intent: MobileSplashIntent) {
         when (intent) {
-            MobileSplashIntent.Retry             -> if (state.value is MobileSplashUiState.Failed) start()
+            MobileSplashIntent.Retry             -> if (state.value is MobileSplashUiState.Error) start()
             MobileSplashIntent.NavigationHandled -> updateState { current ->
                 if (current is MobileSplashUiState.NavigationPending) {
                     MobileSplashUiState.NavigationComplete
@@ -37,7 +37,7 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
                 }
             }
 
-            MobileSplashIntent.SignIn            -> if (state.value is MobileSplashUiState.Failed) {
+            MobileSplashIntent.SignIn            -> if (state.value is MobileSplashUiState.Error) {
                 updateState { MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN) }
             }
         }
@@ -50,7 +50,7 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
             val next = when (val outcome = startSplash()) {
                 SplashOutcome.Continue  -> MobileSplashUiState.NavigationPending(MobileSplashDestination.JOIN_ROOM)
                 SplashOutcome.SignIn    -> MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN)
-                is SplashOutcome.Failed -> MobileSplashUiState.Failed(
+                is SplashOutcome.Failed -> MobileSplashUiState.Error(
                     DefaultErrorDecisionPolicy().decide(
                         outcome.failure,
                         ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT),

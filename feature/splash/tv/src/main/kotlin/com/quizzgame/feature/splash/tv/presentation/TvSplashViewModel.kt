@@ -27,7 +27,7 @@ internal class TvSplashViewModel @Inject constructor(private val startSplash: St
 
     override fun handleIntent(intent: TvSplashIntent) {
         when (intent) {
-            TvSplashIntent.Retry             -> if (state.value is TvSplashUiState.Failed) start()
+            TvSplashIntent.Retry             -> if (state.value is TvSplashUiState.Error) start()
             TvSplashIntent.NavigationHandled -> updateState { current ->
                 if (current is TvSplashUiState.NavigationPending) {
                     TvSplashUiState.NavigationComplete
@@ -36,7 +36,7 @@ internal class TvSplashViewModel @Inject constructor(private val startSplash: St
                 }
             }
 
-            TvSplashIntent.SignIn            -> if (state.value is TvSplashUiState.Failed) {
+            TvSplashIntent.SignIn            -> if (state.value is TvSplashUiState.Error) {
                 updateState { TvSplashUiState.NavigationPending(TvSplashDestination.SIGN_IN) }
             }
         }
@@ -49,7 +49,7 @@ internal class TvSplashViewModel @Inject constructor(private val startSplash: St
             val next = when (val outcome = startSplash()) {
                 SplashOutcome.Continue  -> TvSplashUiState.NavigationPending(TvSplashDestination.DASHBOARD)
                 SplashOutcome.SignIn    -> TvSplashUiState.NavigationPending(TvSplashDestination.SIGN_IN)
-                is SplashOutcome.Failed -> TvSplashUiState.Failed(
+                is SplashOutcome.Failed -> TvSplashUiState.Error(
                     TvErrorDecisionPolicy().decide(
                         outcome.failure,
                         ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT),

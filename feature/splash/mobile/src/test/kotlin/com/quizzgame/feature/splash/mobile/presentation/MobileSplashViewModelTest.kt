@@ -54,7 +54,7 @@ class MobileSplashViewModelTest {
         }
         advanceUntilIdle()
         vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertTrue(vm.state.value is MobileSplashUiState.Failed)
+        assertTrue(vm.state.value is MobileSplashUiState.Error)
         vm.onIntent(MobileSplashIntent.SignIn)
         assertEquals(
             MobileSplashDestination.SIGN_IN,
@@ -93,7 +93,7 @@ class MobileSplashViewModelTest {
             }
         }
         advanceUntilIdle()
-        assertTrue(vm.state.value is MobileSplashUiState.Failed)
+        assertTrue(vm.state.value is MobileSplashUiState.Error)
         vm.onIntent(MobileSplashIntent.Retry)
         vm.onIntent(MobileSplashIntent.Retry)
         advanceUntilIdle()
@@ -111,8 +111,8 @@ class MobileSplashViewModelTest {
             if (calls == 1) SplashOutcome.Failed(AppFailure.OperationInterrupted) else SplashOutcome.Continue
         }
         advanceUntilIdle()
-        val failed = vm.state.value as MobileSplashUiState.Failed
-        assertTrue(ErrorActionKind.RETRY in failed.spec.actions)
+        val error = vm.state.value as MobileSplashUiState.Error
+        assertTrue(ErrorActionKind.RETRY in error.spec.actions)
         vm.onIntent(MobileSplashIntent.Retry)
         advanceUntilIdle()
         assertEquals(2, calls)
@@ -124,8 +124,8 @@ class MobileSplashViewModelTest {
         listOf(AppFailure.Configuration, AppFailure.Storage(StorageKind.READ)).forEach { failure ->
             val vm = createViewModel { SplashOutcome.Failed(failure) }
             advanceUntilIdle()
-            val failed = vm.state.value as MobileSplashUiState.Failed
-            assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
+            val error = vm.state.value as MobileSplashUiState.Error
+            assertTrue(ErrorActionKind.RETRY !in error.spec.actions)
         }
     }
 
