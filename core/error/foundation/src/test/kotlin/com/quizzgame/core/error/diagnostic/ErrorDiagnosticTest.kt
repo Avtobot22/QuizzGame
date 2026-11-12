@@ -22,6 +22,8 @@ class ErrorDiagnosticTest {
                 ErrorDiagnosticCategory.OFFLINE_OR_UNREACHABLE,
             AppFailure.Connectivity(ConnectivityKind.TIMEOUT) to ErrorDiagnosticCategory.TIMEOUT,
             AppFailure.InvalidServerData to ErrorDiagnosticCategory.INVALID_SERVER_DATA,
+            AppFailure.Configuration to ErrorDiagnosticCategory.CONFIGURATION,
+            AppFailure.OperationInterrupted to ErrorDiagnosticCategory.OPERATION_INTERRUPTED,
             AppFailure.Storage(StorageKind.READ) to ErrorDiagnosticCategory.STORAGE_READ,
             AppFailure.Storage(StorageKind.WRITE) to ErrorDiagnosticCategory.STORAGE_WRITE,
             AppFailure.Storage(StorageKind.CRYPTO) to ErrorDiagnosticCategory.STORAGE_CRYPTO,

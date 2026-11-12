@@ -16,6 +16,7 @@ internal class CommonHeadersInterceptor(
         val headers = configuration.headers
         val request = chain.request().newBuilder()
             .header(HttpHeaderNames.ACCEPT, HttpHeaderValues.APPLICATION_JSON)
+            .header(HttpHeaderNames.X_ENDPOINT_VERSION, HttpHeaderValues.ENDPOINT_VERSION)
             .header(HttpHeaderNames.X_CLIENT_PLATFORM, headers.clientPlatform)
             .header(HttpHeaderNames.USER_AGENT, headers.userAgent)
         return chain.proceed(request.build())

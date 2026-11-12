@@ -5,9 +5,11 @@ import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.presentation.ErrorCopyKey
 
 internal fun failurePresentation(failure: AppFailure, safety: RetrySafety): FailurePresentation = when (failure) {
-    is AppFailure.Connectivity   -> failure.presentation(safety)
-    is AppFailure.Service        -> failure.presentation(safety)
-    is AppFailure.Authentication -> failure.presentation()
-    AppFailure.InvalidServerData -> FailurePresentation(ErrorCopyKey.UNEXPECTED_RESPONSE)
-    is AppFailure.Storage        -> FailurePresentation(ErrorCopyKey.STORAGE_PROBLEM)
+    is AppFailure.Connectivity      -> failure.presentation(safety)
+    is AppFailure.Service           -> failure.presentation(safety)
+    is AppFailure.Authentication    -> failure.presentation()
+    AppFailure.InvalidServerData    -> FailurePresentation(ErrorCopyKey.UNEXPECTED_RESPONSE)
+    is AppFailure.Storage           -> FailurePresentation(ErrorCopyKey.STORAGE_PROBLEM)
+    AppFailure.Configuration        -> FailurePresentation(ErrorCopyKey.GENERIC_FAILURE)
+    AppFailure.OperationInterrupted -> FailurePresentation(ErrorCopyKey.GENERIC_FAILURE, safety.action())
 }

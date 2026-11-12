@@ -11,7 +11,7 @@ import org.junit.Assert.assertEquals
 
 internal class TvErrorScreen(private val provider: SemanticsNodeInteractionsProvider) :
     ComposeScreen<TvErrorScreen>(provider) {
-    val error = KNode(provider) { hasTestTag("error") }
+    val error = KNode(provider) { hasTestTag(TvErrorTags.ROOT) }
     val host = KNode(provider) { hasText("Saved host content") }
 
     fun text(value: String): KNode = KNode(provider) { hasText(value) }
@@ -22,7 +22,7 @@ internal class TvErrorScreen(private val provider: SemanticsNodeInteractionsProv
     }
 
     fun assertPanelHorizontallyCentered() {
-        val parent = provider.onNodeWithTag("error").fetchSemanticsNode().boundsInRoot
+        val parent = provider.onNodeWithTag(TvErrorTags.ROOT).fetchSemanticsNode().boundsInRoot
         val body = provider.onNode(
             SemanticsMatcher.expectValue(SemanticsProperties.LiveRegion, LiveRegionMode.Polite),
             useUnmergedTree = true,

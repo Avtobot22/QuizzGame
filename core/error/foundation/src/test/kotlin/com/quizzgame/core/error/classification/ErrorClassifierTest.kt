@@ -4,6 +4,8 @@ import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.AuthenticationKind
 import com.quizzgame.core.error.failure.ConnectivityKind
 import com.quizzgame.core.error.failure.ServiceKind
+import com.quizzgame.core.error.failure.StorageKind
+import com.quizzgame.core.network.api.ApiUnavailableReason
 import com.quizzgame.core.network.result.BackendErrorDetails
 import com.quizzgame.core.network.result.NetworkFailure
 import org.junit.Assert.assertEquals
@@ -12,6 +14,13 @@ import org.junit.Test
 class ErrorClassifierTest {
 
     private val classifier: ErrorClassifier = DefaultErrorClassifier()
+
+    @Test
+    fun `runtime preparation failures do not masquerade as HTTP or offline failures`() {
+        assertEquals(AppFailure.Configuration, classifyApiUnavailable(ApiUnavailableReason.CONFIGURATION))
+        assertEquals(AppFailure.OperationInterrupted, classifyApiUnavailable(ApiUnavailableReason.TRANSPORT))
+        assertEquals(AppFailure.Storage(StorageKind.UNKNOWN), classifyApiUnavailable(ApiUnavailableReason.STORAGE))
+    }
 
     @Test
     fun `connection timeout and invalid response have distinct semantics`() {
