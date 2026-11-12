@@ -33,10 +33,15 @@ internal class SplashRepositoryImpl @Inject constructor(
 
     override suspend fun loadUser(expectedGeneration: Long): AppFailure? {
         val response = remote.currentUser()
-        response.failure()?.let { return it }
-        if (session.current() != SessionState.Authenticated(expectedGeneration)) return AppFailure.OperationInterrupted
-        val user = ((response as ApiCallResult.Executed).result as NetworkResult.Success).value
-        return if (users.replace(expectedGeneration, user)) null else AppFailure.OperationInterrupted
+        val failure = response.failure()
+        return when {
+            failure != null -> failure
+            session.current() != SessionState.Authenticated(expectedGeneration) -> AppFailure.OperationInterrupted
+            else -> {
+                val user = ((response as ApiCallResult.Executed).result as NetworkResult.Success).value
+                if (users.replace(expectedGeneration, user)) null else AppFailure.OperationInterrupted
+            }
+        }
     }
 
     override fun guestAllowed(): Boolean = flags.guestAllowed()

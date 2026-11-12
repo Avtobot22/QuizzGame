@@ -7,7 +7,6 @@ import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import dagger.hilt.android.lifecycle.HiltViewModel
-import javax.inject.Inject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
 class AppRootViewModel @Inject constructor(private val startup: AppStartup) : ViewModel() {

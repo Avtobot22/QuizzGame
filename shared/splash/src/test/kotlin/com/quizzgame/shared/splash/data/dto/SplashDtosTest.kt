@@ -3,12 +3,12 @@ package com.quizzgame.shared.splash.data.dto
 import com.quizzgame.shared.splash.data.mapper.instant
 import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.data.mapper.validated
-import java.time.Instant
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertThrows
 import org.junit.Test
+import java.time.Instant
 
 class SplashDtosTest {
     private val json = Json { ignoreUnknownKeys = true }

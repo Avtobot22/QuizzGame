@@ -4,10 +4,10 @@ import com.quizzgame.shared.splash.data.dto.AccountDto
 import com.quizzgame.shared.splash.data.dto.LaunchDto
 import com.quizzgame.shared.splash.data.dto.UserDto
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
+import kotlinx.serialization.SerializationException
 import java.time.Instant
 import java.time.format.DateTimeParseException
 import java.util.UUID
-import kotlinx.serialization.SerializationException
 
 fun LaunchDto.validated(): UUID = parseId(id)
 

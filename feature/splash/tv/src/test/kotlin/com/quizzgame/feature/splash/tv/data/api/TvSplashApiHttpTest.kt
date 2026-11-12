@@ -13,7 +13,6 @@ import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.feature.splash.tv.data.TvSplashRemoteDataSource
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
-import java.net.InetAddress
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -23,6 +22,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import retrofit2.Response
+import java.net.InetAddress
 
 class TvSplashApiHttpTest {
     private val server = MockWebServer()

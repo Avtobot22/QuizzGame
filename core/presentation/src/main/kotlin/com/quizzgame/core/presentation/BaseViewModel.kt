@@ -14,10 +14,10 @@ private const val EVENT_BUFFER_CAPACITY = 64
 
 abstract class BaseViewModel<State : Any, Intent : Any, Event : Any> : ViewModel() {
 
-    private val _state = MutableStateFlow(createInitialState())
+    private val _state by lazy { MutableStateFlow(createInitialState()) }
     private val eventChannel = Channel<Event>(capacity = EVENT_BUFFER_CAPACITY)
 
-    val state: StateFlow<State> = _state.asStateFlow()
+    val state: StateFlow<State> by lazy { _state.asStateFlow() }
 
     val events: Flow<Event> = eventChannel.receiveAsFlow()
 
@@ -37,5 +37,9 @@ abstract class BaseViewModel<State : Any, Intent : Any, Event : Any> : ViewModel
 
     protected suspend fun emitEvent(event: Event) {
         eventChannel.send(event)
+    }
+
+    override fun onCleared() {
+        eventChannel.cancel()
     }
 }

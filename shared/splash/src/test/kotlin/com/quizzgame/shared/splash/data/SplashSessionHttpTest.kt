@@ -33,8 +33,6 @@ import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 import com.quizzgame.shared.splash.domain.entity.SplashOutcome
 import io.github.avtobot22.featureflags.FeatureFlagsSource
-import java.io.Closeable
-import java.net.InetAddress
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.mockwebserver.MockResponse
@@ -47,6 +45,8 @@ import org.junit.Test
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Tag
+import java.io.Closeable
+import java.net.InetAddress
 
 class SplashSessionHttpTest {
     @Test

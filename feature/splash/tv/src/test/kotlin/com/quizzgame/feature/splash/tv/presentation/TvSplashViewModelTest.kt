@@ -143,5 +143,4 @@ class TvSplashViewModelTest {
         }
         return TvSplashViewModel(StartSplashUseCase(repository))
     }
-
 }

@@ -8,8 +8,8 @@ import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
+import com.quizzgame.shared.splash.domain.entity.SplashOutcome
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

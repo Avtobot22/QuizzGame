@@ -143,5 +143,4 @@ class MobileSplashViewModelTest {
         }
         return MobileSplashViewModel(StartSplashUseCase(repository))
     }
-
 }

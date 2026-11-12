@@ -25,6 +25,7 @@ hilt = "2.60.1"
 ksp = "2.3.13"
 navigation3 = "1.2.1"
 androidxHilt = "1.4.0"
+androidxAnnotationExperimental = "1.6.0"
 
 [libraries]
 featureflags-core = { module = "local.featureflags:core" }
@@ -38,6 +39,7 @@ androidx-navigation3-runtime = { module = "androidx.navigation3:navigation3-runt
 androidx-navigation3-ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
 androidx-lifecycle-viewmodel-navigation3 = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3", version.ref = "lifecycle" }
 androidx-hilt-lifecycle-viewmodel-compose = { module = "androidx.hilt:hilt-lifecycle-viewmodel-compose", version.ref = "androidxHilt" }
+androidx-annotation-experimental = { module = "androidx.annotation:annotation-experimental", version.ref = "androidxAnnotationExperimental" }
 tink-android = { module = "com.google.crypto.tink:tink-android", version.ref = "tink" }
 androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 androidx-datastore-tink = { module = "androidx.datastore:datastore-tink", version.ref = "datastore" }

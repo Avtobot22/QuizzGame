@@ -83,10 +83,16 @@ fun QuizzBrandLoading(
         }
     }
 
-    val padding = if (expanded) QuizzBrandLoadingDimensions.expandedPadding
-        else QuizzBrandLoadingDimensions.compactPadding
-    val gap = if (expanded) QuizzBrandLoadingDimensions.expandedGap
-        else QuizzBrandLoadingDimensions.compactGap
+    val padding = if (expanded) {
+        QuizzBrandLoadingDimensions.expandedPadding
+    } else {
+        QuizzBrandLoadingDimensions.compactPadding
+    }
+    val gap = if (expanded) {
+        QuizzBrandLoadingDimensions.expandedGap
+    } else {
+        QuizzBrandLoadingDimensions.compactGap
+    }
 
     BoxWithConstraints(
         modifier.fillMaxSize().padding(padding.dp).semantics(mergeDescendants = true) {
@@ -95,8 +101,11 @@ fun QuizzBrandLoading(
         },
         contentAlignment = Alignment.Center,
     ) {
-        val maxMark = if (expanded) QuizzBrandLoadingDimensions.expandedMark
-            else QuizzBrandLoadingDimensions.compactMark
+        val maxMark = if (expanded) {
+            QuizzBrandLoadingDimensions.expandedMark
+        } else {
+            QuizzBrandLoadingDimensions.compactMark
+        }
         val markSize = minOf(maxMark.dp, maxHeight * 0.44f, maxWidth * 0.68f)
 
         Column(
@@ -147,41 +156,7 @@ private fun BrandMark(primary: Color, accent: Color, phase: State<Float>, modifi
     }
 
     Box(modifier, contentAlignment = Alignment.Center) {
-        Canvas(Modifier.fillMaxSize()) {
-            val orbit = size.minDimension * ORBIT_RADIUS_FRACTION
-            val bounds = Rect(center - Offset(orbit, orbit), center + Offset(orbit, orbit))
-            val track = Path().apply { addOval(bounds) }
-            // A closed anti-aliased VECTOR path, not a polygonal ring or a raster bitmap.
-            drawPath(track, primary.copy(alpha = 0.16f), style = Stroke(width = 1.05.dp.toPx()))
-
-            val headAngle = phase.value * 360f - 90f
-            val tailAngle = headAngle - TRAIL_SWEEP_DEGREES
-            val trail = Path().apply { addArc(bounds, tailAngle, TRAIL_SWEEP_DEGREES) }
-            val head = orbitPoint(center, orbit, headAngle)
-            val tail = orbitPoint(center, orbit, tailAngle)
-
-            // One path per pass: no abrupt join between separately drawn arc segments.
-            drawPath(
-                path = trail,
-                brush = Brush.linearGradient(
-                    colors = listOf(primary.copy(alpha = 0.0f), primary.copy(alpha = 0.16f)),
-                    start = tail,
-                    end = head,
-                ),
-                style = Stroke(width = 9.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
-            )
-            drawPath(
-                path = trail,
-                brush = Brush.linearGradient(
-                    colors = listOf(primary.copy(alpha = 0.06f), primary.copy(alpha = 0.98f)),
-                    start = tail,
-                    end = head,
-                ),
-                style = Stroke(width = 2.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
-            )
-            drawCircle(accent.copy(alpha = 0.20f), radius = 5.5.dp.toPx(), center = head)
-            drawCircle(accent, radius = 2.6.dp.toPx(), center = head)
-        }
+        BrandOrbit(primary, accent, phase)
 
         // Android 12+: the vector is rasterized by Compose at display resolution and
         // blurred only for its static neon halo. This is NOT a pre-rendered bitmap GIF.
@@ -205,16 +180,7 @@ private fun BrandMark(primary: Color, accent: Color, phase: State<Float>, modifi
         } else {
             // Older Android: three translucent vector outlines simulate a soft halo
             // without relying on the unsupported pre-31 RenderEffect blur.
-            Canvas(Modifier.fillMaxSize()) {
-                val factor = size.minDimension / VECTOR_VIEWPORT
-                withTransform({ scale(factor, factor, pivot = Offset.Zero) }) {
-                    for (path in logoPaths) {
-                        drawPath(path, primary.copy(alpha = 0.075f), style = Stroke(width = 11f, join = StrokeJoin.Round))
-                        drawPath(path, primary.copy(alpha = 0.105f), style = Stroke(width = 6f, join = StrokeJoin.Round))
-                        drawPath(path, primary.copy(alpha = 0.14f), style = Stroke(width = 2.5f, join = StrokeJoin.Round))
-                    }
-                }
-            }
+            LegacyBrandHalo(primary, logoPaths)
         }
 
         Image(
@@ -226,8 +192,73 @@ private fun BrandMark(primary: Color, accent: Color, phase: State<Float>, modifi
     }
 }
 
+@Composable
+private fun LegacyBrandHalo(primary: Color, logoPaths: List<Path>) {
+    Canvas(Modifier.fillMaxSize()) {
+        val factor = size.minDimension / VECTOR_VIEWPORT
+        withTransform({ scale(factor, factor, pivot = Offset.Zero) }) {
+            for (path in logoPaths) {
+                drawPath(
+                    path,
+                    primary.copy(alpha = 0.075f),
+                    style = Stroke(width = 11f, join = StrokeJoin.Round),
+                )
+                drawPath(
+                    path,
+                    primary.copy(alpha = 0.105f),
+                    style = Stroke(width = 6f, join = StrokeJoin.Round),
+                )
+                drawPath(
+                    path,
+                    primary.copy(alpha = 0.14f),
+                    style = Stroke(width = 2.5f, join = StrokeJoin.Round),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun BrandOrbit(primary: Color, accent: Color, phase: State<Float>) {
+    Canvas(Modifier.fillMaxSize()) {
+        val orbit = size.minDimension * ORBIT_RADIUS_FRACTION
+        val bounds = Rect(center - Offset(orbit, orbit), center + Offset(orbit, orbit))
+        val track = Path().apply { addOval(bounds) }
+        // A closed anti-aliased VECTOR path, not a polygonal ring or a raster bitmap.
+        drawPath(track, primary.copy(alpha = 0.16f), style = Stroke(width = 1.05.dp.toPx()))
+
+        val headAngle = phase.value * 360f - 90f
+        val tailAngle = headAngle - TRAIL_SWEEP_DEGREES
+        val trail = Path().apply { addArc(bounds, tailAngle, TRAIL_SWEEP_DEGREES) }
+        val head = orbitPoint(center, orbit, headAngle)
+        val tail = orbitPoint(center, orbit, tailAngle)
+
+        // One path per pass: no abrupt join between separately drawn arc segments.
+        drawPath(
+            path = trail,
+            brush = Brush.linearGradient(
+                colors = listOf(primary.copy(alpha = 0.0f), primary.copy(alpha = 0.16f)),
+                start = tail,
+                end = head,
+            ),
+            style = Stroke(width = 9.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+        drawPath(
+            path = trail,
+            brush = Brush.linearGradient(
+                colors = listOf(primary.copy(alpha = 0.06f), primary.copy(alpha = 0.98f)),
+                start = tail,
+                end = head,
+            ),
+            style = Stroke(width = 2.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
+        )
+        drawCircle(accent.copy(alpha = 0.20f), radius = 5.5.dp.toPx(), center = head)
+        drawCircle(accent, radius = 2.6.dp.toPx(), center = head)
+    }
+}
+
 private fun orbitPoint(center: Offset, radius: Float, angleDegrees: Float): Offset {
-    val radians = angleDegrees * PI / 180.0
+    val radians = angleDegrees * PI / HALF_TURN_DEGREES
     return center + Offset(cos(radians).toFloat(), sin(radians).toFloat()) * radius
 }
 
@@ -246,7 +277,11 @@ private fun LoadingDots(color: Color) {
 }
 
 // Keep these paths in sync with ic_quizz(_monochrome).xml and design/logo-q.svg.
-private const val Q_RING_PATH = "M54,26 C69.46397,26 82,38.53603 82,54 C82,69.46397 69.46397,82 54,82 C38.53603,82 26,69.46397 26,54 C26,38.53603 38.53603,26 54,26 Z M54,38 C45.16344,38 38,45.16344 38,54 C38,62.83656 45.16344,70 54,70 C62.83656,70 70,62.83656 70,54 C70,45.16344 62.83656,38 54,38 Z"
+private const val Q_RING_PATH =
+    "M54,26 C69.46397,26 82,38.53603 82,54 C82,69.46397 69.46397,82 54,82 C38.53603,82 " +
+        "26,69.46397 26,54 C26,38.53603 38.53603,26 54,26 Z M54,38 C45.16344,38 38,45.16344 " +
+        "38,54 C38,62.83656 45.16344,70 54,70 C62.83656,70 70,62.83656 70,54 C70,45.16344 " +
+        "62.83656,38 54,38 Z"
 private const val Q_TAIL_PATH = "M64,68 L73,61 L84,76 L75,83 Z"
 private const val VECTOR_VIEWPORT = 108f
 private const val ORBIT_RADIUS_FRACTION = 0.385f
@@ -254,3 +289,5 @@ private const val TRAIL_SWEEP_DEGREES = 66f
 private const val ENTRANCE_MS = 620
 private const val MOBILE_CYCLE_MS = 4800
 private const val TV_CYCLE_MS = 6500
+
+private const val HALF_TURN_DEGREES = 180.0
