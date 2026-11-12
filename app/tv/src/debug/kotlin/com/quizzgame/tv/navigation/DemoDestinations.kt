@@ -27,7 +27,7 @@ import com.quizzgame.tv.dashboard.demo.DemoDashboard
 
 @Composable
 internal fun TvSignInDestination(
-    onContinue: () -> Unit,
+    onContinue: () -> Boolean,
     viewModel: DemoSignInViewModel = viewModel(),
 ) {
     val result by viewModel.result.collectAsStateWithLifecycle()

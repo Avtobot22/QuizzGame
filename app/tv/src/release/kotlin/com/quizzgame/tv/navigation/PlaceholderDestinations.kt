@@ -8,7 +8,7 @@ import com.quizzgame.tv.R
 
 @Composable
 @Suppress("UnusedParameter")
-internal fun TvSignInDestination(onContinue: () -> Unit) {
+internal fun TvSignInDestination(onContinue: () -> Boolean) {
     Text(stringResource(R.string.signin_placeholder))
 }
 

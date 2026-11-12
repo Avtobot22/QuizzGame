@@ -29,8 +29,8 @@ import com.quizzgame.core.ui.R as UiR
 
 @Composable
 fun TvSplashScreen(
-    onDashboard: () -> Unit,
-    onSignIn: () -> Unit,
+    onDashboard: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,15 +50,15 @@ fun TvSplashScreen(
 private fun TvSplashContent(
     state: TvSplashUiState,
     onIntent: (TvSplashIntent) -> Unit,
-    onDashboard: () -> Unit,
-    onSignIn: () -> Unit,
+    onDashboard: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier,
 ) {
     val result = state as? TvSplashUiState.NavigationPending
     NavigationResultEffect(
         result,
-        onHandled = { onIntent(NavigationHandled) },
+        onHandled = { onIntent(NavigationHandled(it.requestId)) },
     ) {
         when (it.destination) {
             TvSplashDestination.DASHBOARD -> onDashboard()

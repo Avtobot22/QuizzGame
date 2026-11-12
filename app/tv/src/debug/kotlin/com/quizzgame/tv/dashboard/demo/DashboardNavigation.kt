@@ -2,46 +2,44 @@ package com.quizzgame.tv.dashboard.demo
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.navigation3.runtime.NavBackStack
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
-import com.quizzgame.core.navigation.NavAction
-import com.quizzgame.core.navigation.dispatch
+import androidx.compose.runtime.remember
+import com.quizzgame.core.navigation.AppNavigator
+import com.quizzgame.core.navigation.NavigationState
+import com.quizzgame.core.navigation.rememberNavigationState
 
 @Composable
 internal fun rememberDashboardNavigation(descriptors: List<DashboardTabDescriptor>): DashboardNavigation {
     val tabs = resolveDashboardTabs(descriptors)
-    var savedTab by rememberSaveable { mutableStateOf<DashboardTabId?>(null) }
-    val selected = selectedDashboardTab(savedTab, tabs)
-    val stacks = tabs.associate { tab ->
-        tab.id to key(tab.id) { rememberNavBackStack(DashboardDestination.TabRoot(tab.id)) }
+    val roots = tabs.map { DashboardDestination.TabRoot(it.id) }
+        .ifEmpty { listOf(DashboardDestination.TabRoot(DashboardTabId.MAIN)) }
+    val primary = tabs.firstOrNull { it.id == DashboardTabId.MAIN && it.isEnabled }?.id
+        ?: tabs.firstOrNull { it.isEnabled }?.id ?: tabs.firstOrNull()?.id ?: DashboardTabId.MAIN
+    val state = key(tabs.isEmpty()) { rememberNavigationState(DashboardDestination.TabRoot(primary), roots) }
+    val navigator = remember(state) { AppNavigator(state) }
+    val selected = (state.snapshot.active as DashboardDestination.TabRoot).tab
+    LaunchedEffect(tabs, selected) {
+        val enabled = selectedDashboardTab(selected, tabs)
+        if (enabled != null && enabled != selected) navigator.switchTopLevel(DashboardDestination.TabRoot(enabled))
     }
-    LaunchedEffect(selected) { savedTab = selected }
-    return DashboardNavigation(tabs, selected, stacks) { savedTab = it }
+    return DashboardNavigation(tabs, state, navigator)
 }
 
 internal class DashboardNavigation(
     val tabs: List<DashboardTab>,
-    val selectedTab: DashboardTabId?,
-    val stacks: Map<DashboardTabId, NavBackStack<NavKey>>,
-    private val onSelect: (DashboardTabId) -> Unit,
+    val state: NavigationState,
+    val navigator: AppNavigator,
 ) {
-    val canPop: Boolean get() = selectedTab?.let { stacks.getValue(it).size > 1 } == true
+    val selectedTab: DashboardTabId?
+        get() = selectedDashboardTab((state.snapshot.active as DashboardDestination.TabRoot).tab, tabs)
+    val canPop: Boolean get() = state.snapshot.activeEntries.size > 1
+    val canGoBack: Boolean get() = state.snapshot.canGoBack
 
     fun select(tab: DashboardTabId) {
-        if (tabs.any { it.id == tab && it.isEnabled }) onSelect(tab)
+        if (tabs.any { it.id == tab && it.isEnabled }) navigator.switchTopLevel(DashboardDestination.TabRoot(tab))
     }
 
-    fun open(destination: NavKey) {
-        selectedTab?.let { stacks.getValue(it).dispatch(NavAction.Push(destination)) }
-    }
+    fun open(destination: androidx.navigation3.runtime.NavKey) { navigator.navigate(destination) }
 
-    fun pop() {
-        selectedTab?.let { stacks.getValue(it).dispatch(NavAction.Pop) }
-    }
+    fun pop() { navigator.back() }
 }

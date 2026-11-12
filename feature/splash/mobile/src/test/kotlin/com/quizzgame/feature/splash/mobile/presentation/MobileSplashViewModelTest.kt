@@ -40,24 +40,35 @@ class MobileSplashViewModelTest {
         destinations.forEach { (outcome, destination) ->
             val vm = createViewModel { outcome }
             advanceUntilIdle()
-            assertEquals(MobileSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as MobileSplashUiState.NavigationPending).destination)
             runCurrent()
-            assertEquals(MobileSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as MobileSplashUiState.NavigationPending).destination)
         }
     }
 
     @Test
-    fun signInActionChoosesItsDestinationAndPayloadFreeAcknowledgementConsumesIt() = runTest(dispatcher) {
+    fun signInActionChoosesItsDestinationAndMatchingAcknowledgementConsumesIt() = runTest(dispatcher) {
         val vm = createViewModel {
             SplashOutcome.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
         }
         advanceUntilIdle()
-        vm.onIntent(MobileSplashIntent.NavigationHandled)
+        vm.onIntent(
+            MobileSplashIntent.NavigationHandled(
+                (vm.state.value as? MobileSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
         assertTrue(vm.state.value is MobileSplashUiState.Failed)
         vm.onIntent(MobileSplashIntent.SignIn)
-        assertEquals(MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN), vm.state.value)
-        vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertEquals(MobileSplashUiState.Loading, vm.state.value)
+        assertEquals(
+            MobileSplashDestination.SIGN_IN,
+            (vm.state.value as MobileSplashUiState.NavigationPending).destination,
+        )
+        vm.onIntent(
+            MobileSplashIntent.NavigationHandled(
+                (vm.state.value as? MobileSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
+        assertEquals(MobileSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -95,8 +106,12 @@ class MobileSplashViewModelTest {
         advanceUntilIdle()
         assertEquals(2, calls)
         assertTrue(vm.state.value is MobileSplashUiState.NavigationPending)
-        vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertEquals(MobileSplashUiState.Loading, vm.state.value)
+        vm.onIntent(
+            MobileSplashIntent.NavigationHandled(
+                (vm.state.value as? MobileSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
+        assertEquals(MobileSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -123,6 +138,18 @@ class MobileSplashViewModelTest {
             val failed = vm.state.value as MobileSplashUiState.Failed
             assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
         }
+    }
+
+    @Test
+    fun staleAcknowledgementDoesNotConsumeANewResultAndNoCollectorIsRequired() = runTest(dispatcher) {
+        val vm = createViewModel { SplashOutcome.Continue }
+        advanceUntilIdle()
+        val pending = vm.state.value as MobileSplashUiState.NavigationPending
+        vm.onIntent(MobileSplashIntent.NavigationHandled("previous-attempt"))
+        assertEquals(pending, vm.state.value)
+        vm.onIntent(MobileSplashIntent.NavigationHandled(pending.requestId))
+        vm.onIntent(MobileSplashIntent.NavigationHandled(pending.requestId))
+        assertEquals(MobileSplashUiState.NavigationComplete, vm.state.value)
     }
 
     private fun createViewModel(outcome: suspend () -> SplashOutcome): MobileSplashViewModel {

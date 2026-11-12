@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -26,14 +25,10 @@ import androidx.compose.ui.semantics.selected
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberDecoratedNavEntries
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
+import com.quizzgame.core.navigation.decoratedEntries
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.rememberFeatureEntryProvider
 import com.quizzgame.tv.R
@@ -50,13 +45,11 @@ internal fun DemoDashboard(
     val current = rememberDashboardNavigation(tabs)
     var contentFocused by rememberSaveable { mutableStateOf(false) }
     val tabFocus = remember { DashboardTabId.entries.associateWith { FocusRequester() } }
-    val entries = dashboardEntries(
-        current,
-        requestFocus = contentFocused,
-        graphs = graphs,
-        open = current::open,
-        back = current::pop,
+    val provider = rememberFeatureEntryProvider(
+        graphs,
+        DashboardNavigationContext(contentFocused, current::open, current::pop),
     )
+    val entries = current.state.decoratedEntries(provider)
     Column(Modifier.fillMaxSize().padding(48.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(stringResource(R.string.demo_label))
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
@@ -64,10 +57,8 @@ internal fun DemoDashboard(
                 val tab = descriptor.id
                 QuizzTvButton(
                     onClick = {
-                        if (current.selectedTab != tab) {
-                            current.select(tab)
-                            contentFocused = true
-                        }
+                        current.select(tab)
+                        contentFocused = true
                     },
                     enabled = descriptor.isEnabled,
                     modifier = Modifier.testTag(DemoDashboardTags.tab(tab)).focusRequester(tabFocus.getValue(tab))
@@ -87,7 +78,7 @@ internal fun DemoDashboard(
         val selected = current.selectedTab
         if (selected != null) {
             Box(Modifier.weight(1f).onFocusChanged { if (it.hasFocus) contentFocused = true }.focusGroup()) {
-                NavDisplay(entries = entries.getValue(selected), onBack = { current.pop() })
+                NavDisplay(entries = entries, onBack = { current.pop() })
             }
         } else {
             Text(stringResource(R.string.demo_dashboard_empty), Modifier.testTag(DemoDashboardTags.EMPTY))
@@ -96,31 +87,11 @@ internal fun DemoDashboard(
     LaunchedEffect(current.selectedTab, current.tabs) {
         if (!contentFocused) current.selectedTab?.let { tabFocus.getValue(it).requestFocus() }
     }
-    BackHandler(enabled = current.selectedTab != null && (current.canPop || contentFocused)) {
-        if (current.canPop) current.pop() else current.selectedTab?.let { tabFocus.getValue(it).requestFocus() }
-    }
-}
-
-@Composable
-private fun dashboardEntries(
-    state: DashboardNavigation,
-    graphs: Set<FeatureEntries<DashboardNavigationContext>>,
-    requestFocus: Boolean,
-    open: (NavKey) -> Unit,
-    back: () -> Unit,
-): Map<DashboardTabId, List<NavEntry<NavKey>>> {
-    val provider = rememberFeatureEntryProvider(graphs, DashboardNavigationContext(requestFocus, open, back))
-    // Existing tabs retain their decorators; a removed tab disposes its entire private subtree.
-    return state.tabs.map { it.id }.associateWith { tab ->
-        key(tab) {
-            rememberDecoratedNavEntries(
-                backStack = state.stacks.getValue(tab),
-                entryDecorators = listOf(
-                    rememberSaveableStateHolderNavEntryDecorator(),
-                    rememberViewModelStoreNavEntryDecorator(),
-                ),
-                entryProvider = provider,
-            )
+    BackHandler(enabled = current.selectedTab != null && (current.canGoBack || contentFocused)) {
+        when {
+            current.canPop -> current.pop()
+            contentFocused -> current.selectedTab?.let { tabFocus.getValue(it).requestFocus() }
+            else -> current.pop()
         }
     }
 }

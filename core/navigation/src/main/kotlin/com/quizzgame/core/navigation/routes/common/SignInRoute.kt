@@ -1,4 +1,4 @@
-package com.quizzgame.app.routes
+package com.quizzgame.core.navigation.routes.common
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable

@@ -40,24 +40,32 @@ class TvSplashViewModelTest {
         destinations.forEach { (outcome, destination) ->
             val vm = createViewModel { outcome }
             advanceUntilIdle()
-            assertEquals(TvSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as TvSplashUiState.NavigationPending).destination)
             runCurrent()
-            assertEquals(TvSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as TvSplashUiState.NavigationPending).destination)
         }
     }
 
     @Test
-    fun signInActionChoosesItsDestinationAndPayloadFreeAcknowledgementConsumesIt() = runTest(dispatcher) {
+    fun signInActionChoosesItsDestinationAndMatchingAcknowledgementConsumesIt() = runTest(dispatcher) {
         val vm = createViewModel {
             SplashOutcome.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
         }
         advanceUntilIdle()
-        vm.onIntent(TvSplashIntent.NavigationHandled)
+        vm.onIntent(
+            TvSplashIntent.NavigationHandled(
+                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
         assertTrue(vm.state.value is TvSplashUiState.Failed)
         vm.onIntent(TvSplashIntent.SignIn)
-        assertEquals(TvSplashUiState.NavigationPending(TvSplashDestination.SIGN_IN), vm.state.value)
-        vm.onIntent(TvSplashIntent.NavigationHandled)
-        assertEquals(TvSplashUiState.Loading, vm.state.value)
+        assertEquals(TvSplashDestination.SIGN_IN, (vm.state.value as TvSplashUiState.NavigationPending).destination)
+        vm.onIntent(
+            TvSplashIntent.NavigationHandled(
+                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
+        assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -95,8 +103,12 @@ class TvSplashViewModelTest {
         advanceUntilIdle()
         assertEquals(2, calls)
         assertTrue(vm.state.value is TvSplashUiState.NavigationPending)
-        vm.onIntent(TvSplashIntent.NavigationHandled)
-        assertEquals(TvSplashUiState.Loading, vm.state.value)
+        vm.onIntent(
+            TvSplashIntent.NavigationHandled(
+                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
+            ),
+        )
+        assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -123,6 +135,18 @@ class TvSplashViewModelTest {
             val failed = vm.state.value as TvSplashUiState.Failed
             assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
         }
+    }
+
+    @Test
+    fun staleAcknowledgementDoesNotConsumeANewResultAndNoCollectorIsRequired() = runTest(dispatcher) {
+        val vm = createViewModel { SplashOutcome.Continue }
+        advanceUntilIdle()
+        val pending = vm.state.value as TvSplashUiState.NavigationPending
+        vm.onIntent(TvSplashIntent.NavigationHandled("previous-attempt"))
+        assertEquals(pending, vm.state.value)
+        vm.onIntent(TvSplashIntent.NavigationHandled(pending.requestId))
+        vm.onIntent(TvSplashIntent.NavigationHandled(pending.requestId))
+        assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
     private fun createViewModel(outcome: suspend () -> SplashOutcome): TvSplashViewModel {

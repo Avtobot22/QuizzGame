@@ -11,7 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 fun <T : Any> NavigationResultEffect(
     result: T?,
     onHandled: (T) -> Unit,
-    onNavigate: (T) -> Unit,
+    onNavigate: (T) -> Boolean,
 ) {
     val owner = LocalLifecycleOwner.current
     val navigate = rememberUpdatedState(onNavigate)
@@ -21,9 +21,10 @@ fun <T : Any> NavigationResultEffect(
             var consumed = false
             owner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 if (!consumed) {
-                    navigate.value(result)
-                    consumed = true
-                    handled.value(result)
+                    if (navigate.value(result)) {
+                        consumed = true
+                        handled.value(result)
+                    }
                 }
             }
         }

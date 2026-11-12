@@ -22,7 +22,7 @@ import com.quizzgame.mobile.R
 
 @Composable
 internal fun MobileSignInDestination(
-    onContinue: () -> Unit,
+    onContinue: () -> Boolean,
     viewModel: DemoSignInViewModel = viewModel(),
 ) {
     val result by viewModel.result.collectAsStateWithLifecycle()

@@ -6,6 +6,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.lifecycle.SavedStateHandle
 import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
@@ -41,7 +42,7 @@ class AppStartupUiTest {
     @Test
     fun blockingStartupErrorRetriesItsOwnerAndThenShowsSplash() {
         val startup = FailingAppStartup()
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -62,7 +63,7 @@ class AppStartupUiTest {
     @Test
     fun confirmedExpiryDropsThePreviousRootAndShowsSignIn() {
         val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -84,7 +85,7 @@ class AppStartupUiTest {
     @Test
     fun signInPlaceholderRestartsSplashWithoutGrantingContent() {
         val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -108,7 +109,7 @@ class AppStartupUiTest {
             state.value = AppStartupState.Ready
             sessionState.value = SessionState.Closed
         }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -130,7 +131,7 @@ class AppStartupUiTest {
             sessionState.value = SessionState.Authenticated(1)
             logoutResult = SessionOperation.Failed(SessionStorageFailure.WRITE)
         }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(

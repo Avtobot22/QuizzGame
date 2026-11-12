@@ -13,6 +13,16 @@ fun interface FeatureEntries<in C> {
     fun register(scope: EntryProviderScope<NavKey>, context: State<C>)
 }
 
+fun <C, F> FeatureEntries<F>.withContext(transform: (C) -> F): FeatureEntries<C> =
+    FeatureEntries { scope, context ->
+        register(
+            scope,
+            object : State<F> {
+                override val value: F get() = transform(context.value)
+            },
+        )
+    }
+
 internal fun <C> featureEntryProvider(
     graphs: Collection<FeatureEntries<C>>,
     context: State<C>,

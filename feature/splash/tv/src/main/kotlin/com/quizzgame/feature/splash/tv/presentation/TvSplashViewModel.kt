@@ -27,8 +27,12 @@ internal class TvSplashViewModel @Inject constructor(private val startSplash: St
     override fun handleIntent(intent: TvSplashIntent) {
         when (intent) {
             TvSplashIntent.Retry             -> if (state.value is TvSplashUiState.Failed) start()
-            TvSplashIntent.NavigationHandled -> updateState { current ->
-                if (current is TvSplashUiState.NavigationPending) TvSplashUiState.Loading else current
+            is TvSplashIntent.NavigationHandled -> updateState { current ->
+                if (current is TvSplashUiState.NavigationPending && current.requestId == intent.requestId) {
+                    TvSplashUiState.NavigationComplete
+                } else {
+                    current
+                }
             }
 
             TvSplashIntent.SignIn            -> if (state.value is TvSplashUiState.Failed) {

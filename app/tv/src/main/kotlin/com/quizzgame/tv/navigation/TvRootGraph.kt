@@ -1,45 +1,58 @@
 package com.quizzgame.tv.navigation
 
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
-import androidx.navigation3.ui.NavDisplay
-import com.quizzgame.core.navigation.NavAction
-import com.quizzgame.core.navigation.dispatch
+import com.quizzgame.app.navigation.AppNavigationConfiguration
+import com.quizzgame.app.navigation.AppNavigationEnvironment
+import com.quizzgame.app.navigation.AppNavigationGraph
+import com.quizzgame.core.navigation.policy.DestinationAccess
+import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
-import com.quizzgame.core.navigation.registration.rememberFeatureEntryProvider
+import com.quizzgame.core.navigation.request.NavigationRequest
+import com.quizzgame.core.navigation.routes.common.SignInRoute
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.feature.splash.tv.navigation.TvSplashRoute
+import com.quizzgame.tv.navigation.routes.DashboardRoute
 
 @Composable
 internal fun TvRootGraph(
     graphs: Set<FeatureEntries<TvNavigationContext>>,
-    dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     initialDestination: NavKey,
     isCurrentGraph: () -> Boolean,
+    dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     onLogout: () -> Unit,
+    policies: Set<NavigationPolicy> = emptySet(),
+    externalRequest: NavigationRequest? = null,
+    onRequestHandled: (NavigationRequest) -> Unit = {},
+    environment: AppNavigationEnvironment = AppNavigationEnvironment("test", "test", { SessionState.Guest }),
 ) {
-    val stack = rememberNavBackStack(initialDestination)
-    val navigate: (NavAction) -> Unit = { action ->
-        if (isCurrentGraph()) stack.dispatch(action)
-    }
-    NavDisplay(
-        modifier = Modifier.fillMaxSize(),
-        backStack = stack,
-        onBack = { stack.dispatch(NavAction.Pop) },
-        entryDecorators = listOf(
-            rememberSaveableStateHolderNavEntryDecorator(),
-            rememberViewModelStoreNavEntryDecorator(),
+    AppNavigationGraph(
+        configuration = AppNavigationConfiguration(
+            DashboardRoute,
+            TvSplashRoute,
+            SignInRoute,
+            policy = NavigationPolicy { destination ->
+                if (destination == DashboardRoute) {
+                    DestinationAccess.PUBLIC
+                } else {
+                    policies.map { it.access(destination) }.filter { it != DestinationAccess.DENIED }
+                        .distinct().singleOrNull() ?: DestinationAccess.DENIED
+                }
+            },
         ),
-        entryProvider = rememberFeatureEntryProvider(
-            graphs,
+        environment = environment,
+        initialDestination = initialDestination,
+        graphs = graphs,
+        externalRequest = externalRequest,
+        onRequestHandled = onRequestHandled,
+        context = { coordinator ->
             TvNavigationContext(
                 dashboardGraphs,
-                navigate = navigate,
+                onContentReady = { isCurrentGraph() && coordinator.splashCompleted() },
+                onSignIn = { isCurrentGraph() && coordinator.requireSignIn() },
+                onRestartSplash = { isCurrentGraph() && coordinator.restartSplash() },
                 onLogout = onLogout,
-            ),
-        ),
+            )
+        },
     )
 }

@@ -28,8 +28,8 @@ import com.quizzgame.core.ui.R as UiR
 
 @Composable
 fun MobileSplashScreen(
-    onJoinRoom: () -> Unit,
-    onSignIn: () -> Unit,
+    onJoinRoom: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,15 +49,15 @@ fun MobileSplashScreen(
 private fun MobileSplashContent(
     state: MobileSplashUiState,
     onIntent: (MobileSplashIntent) -> Unit,
-    onJoinRoom: () -> Unit,
-    onSignIn: () -> Unit,
+    onJoinRoom: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier,
 ) {
     val result = state as? MobileSplashUiState.NavigationPending
     NavigationResultEffect(
         result,
-        onHandled = { onIntent(NavigationHandled) },
+        onHandled = { onIntent(NavigationHandled(it.requestId)) },
     ) {
         when (it.destination) {
             MobileSplashDestination.JOIN_ROOM -> onJoinRoom()

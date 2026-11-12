@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.quizz.android.infrastructure.library)
+    alias(libs.plugins.quizz.android.shared.library)
     alias(libs.plugins.quizz.android.hilt)
     alias(libs.plugins.kotlin.serialization)
 }
@@ -13,6 +13,9 @@ dependencies {
     api(projects.core.error.foundation)
     api(libs.androidx.lifecycle.viewmodel)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.bundles.navigation3)
+    implementation(libs.androidx.activity.compose)
 
     testImplementation(libs.bundles.unit.test)
     testImplementation(libs.okhttp.mockwebserver)

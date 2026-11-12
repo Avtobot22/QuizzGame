@@ -7,7 +7,7 @@ import com.quizzgame.mobile.R
 
 @Composable
 @Suppress("UnusedParameter")
-internal fun MobileSignInDestination(onContinue: () -> Unit) {
+internal fun MobileSignInDestination(onContinue: () -> Boolean) {
     Text(stringResource(R.string.signin_placeholder))
 }
 

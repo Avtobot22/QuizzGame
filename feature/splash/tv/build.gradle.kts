@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.quizz.android.tv.library)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.quizz.android.hilt)
 }
 
@@ -9,6 +10,8 @@ dependencies {
     implementation(projects.core.presentation)
     implementation(projects.shared.splash)
     implementation(projects.core.navigation)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.kotlinx.serialization.core)
     implementation(projects.core.error.uiTv)
     implementation(projects.core.designsystem.tv)
     implementation(libs.androidx.lifecycle.runtime.compose)

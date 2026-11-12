@@ -28,8 +28,12 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
     override fun handleIntent(intent: MobileSplashIntent) {
         when (intent) {
             MobileSplashIntent.Retry             -> if (state.value is MobileSplashUiState.Failed) start()
-            MobileSplashIntent.NavigationHandled -> updateState { current ->
-                if (current is MobileSplashUiState.NavigationPending) MobileSplashUiState.Loading else current
+            is MobileSplashIntent.NavigationHandled -> updateState { current ->
+                if (current is MobileSplashUiState.NavigationPending && current.requestId == intent.requestId) {
+                    MobileSplashUiState.NavigationComplete
+                } else {
+                    current
+                }
             }
 
             MobileSplashIntent.SignIn            -> if (state.value is MobileSplashUiState.Failed) {
