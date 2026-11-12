@@ -45,6 +45,9 @@ internal fun TvRootGraph(
         graphs = graphs,
         externalRequest = externalRequest,
         onRequestHandled = onRequestHandled,
+        mainContent = { state, navigator, entries, onBack ->
+            TvMainContent(state, navigator, entries, onBack)
+        },
         context = { coordinator ->
             TvNavigationContext(
                 dashboardGraphs,

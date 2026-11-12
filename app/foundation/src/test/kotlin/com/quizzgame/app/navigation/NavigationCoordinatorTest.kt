@@ -6,7 +6,6 @@ import com.quizzgame.core.navigation.AppNavigator
 import com.quizzgame.core.navigation.NavigationSnapshot
 import com.quizzgame.core.navigation.NavigationState
 import com.quizzgame.core.navigation.policy.DestinationAccess
-import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.request.NavigationRequest
 import com.quizzgame.core.session.lifecycle.SessionState
 import kotlinx.serialization.Serializable

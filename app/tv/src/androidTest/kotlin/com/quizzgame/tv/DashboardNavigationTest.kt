@@ -2,8 +2,10 @@ package com.quizzgame.tv
 
 import android.view.KeyEvent
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
+import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import com.quizzgame.tv.dashboard.demo.DashboardTabId
 import com.quizzgame.tv.dashboard.demo.DemoDashboardTags
@@ -25,6 +27,7 @@ class DashboardNavigationTest {
         screen.tag(DemoDashboardTags.quiz(DashboardTabId.MAIN, 0)).assertIsFocused()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         awaitVisible(DemoDashboardTags.DETAIL)
+        compose.onAllNodesWithTag(TvNavigationTags.NAVIGATION_BAR).assertCountEquals(1)
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         screen.tag(DemoDashboardTags.COUNTER).assertTextEquals(compose.activity.getString(R.string.demo_counter, 1))
         TvRemote.press(KeyEvent.KEYCODE_DPAD_UP)
@@ -41,6 +44,7 @@ class DashboardNavigationTest {
         screen.tag(DemoDashboardTags.COUNTER).assertTextEquals(compose.activity.getString(R.string.demo_counter, 1))
         TvRemote.press(KeyEvent.KEYCODE_BACK)
         awaitVisible(DemoDashboardTags.tabContent(DashboardTabId.MAIN))
+        compose.awaitFocused(DemoDashboardTags.quiz(DashboardTabId.MAIN, 0))
         screen.tag(DemoDashboardTags.quiz(DashboardTabId.MAIN, 0)).assertIsFocused()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         awaitVisible(DemoDashboardTags.DETAIL)
@@ -56,6 +60,7 @@ class DashboardNavigationTest {
         awaitVisible(DemoDashboardTags.DETAIL)
         TvRemote.press(KeyEvent.KEYCODE_BACK)
         awaitVisible(DemoDashboardTags.tabContent(DashboardTabId.MAIN))
+        compose.awaitFocused(DemoDashboardTags.quiz(DashboardTabId.MAIN, 6))
         screen.tag(DemoDashboardTags.quiz(DashboardTabId.MAIN, 6)).assertIsFocused()
         TvRemote.press(KeyEvent.KEYCODE_BACK)
         screen.tag(DemoDashboardTags.tab(DashboardTabId.MAIN)).assertIsFocused()

@@ -19,6 +19,7 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageFailure
+import com.quizzgame.mobile.navigation.MobileChromeTags
 import com.quizzgame.mobile.navigation.MobileDemoTags
 import com.quizzgame.mobile.navigation.MobileNavigationModule
 import com.quizzgame.mobile.navigation.MobileNavigationTags
@@ -50,6 +51,8 @@ class AppStartupUiTest {
         screen.tag(AppRootTags.STARTUP_FAILED).assertIsDisplayed()
         screen.text(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileNavigationTags.SPLASH).assertIsDisplayed()
         compose.runOnIdle { assertEquals(1, startup.retries) }
     }
@@ -67,10 +70,14 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileDemoTags.action(1)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
     }
 
@@ -87,10 +94,16 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileDemoTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileDemoTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
     }
 
@@ -131,6 +144,8 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileDemoTags.action(1)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
         screen.tag(MobileDemoTags.action(0)).performClick()

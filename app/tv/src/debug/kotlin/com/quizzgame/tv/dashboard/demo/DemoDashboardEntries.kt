@@ -1,5 +1,7 @@
 package com.quizzgame.tv.dashboard.demo
 
+import com.quizzgame.core.navigation.chrome.NavigationChromePolicy
+import com.quizzgame.core.navigation.chrome.navigationChrome
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.tv.navigation.DashboardNavigationContext
 import dagger.Module
@@ -23,6 +25,10 @@ internal object DemoDashboardEntries {
     @Provides
     @IntoSet
     fun details(): FeatureEntries<DashboardNavigationContext> = FeatureEntries { scope, context ->
-        scope.entry<DashboardDestination.QuizDetail> { route -> DemoQuizDetail(route.quizId, context.value.back) }
+        scope.entry<DashboardDestination.QuizDetail>(
+            metadata = navigationChrome(
+                NavigationChromePolicy.VISIBLE,
+            ),
+        ) { route -> DemoQuizDetail(route.quizId, context.value.back) }
     }
 }

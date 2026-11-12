@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import com.quizzgame.core.navigation.chrome.TOP_LEVEL_ROOT
 
 @Composable
 fun NavigationState.decoratedEntries(provider: (NavKey) -> NavEntry<NavKey>): List<NavEntry<NavKey>> {
@@ -14,7 +15,12 @@ fun NavigationState.decoratedEntries(provider: (NavKey) -> NavEntry<NavKey>): Li
     return key(current.generation) {
         val branches = current.branches.associate { branch ->
             branch.root to key(branch.root) {
-                decoratedStack(branch.entries, "section:${branch.root}:${branch.root::class.java.name}", provider)
+                decoratedStack(
+                    branch.entries,
+                    "section:${branch.root}:${branch.root::class.java.name}",
+                    provider,
+                    branch.root,
+                )
             }
         }
         val flow = key("application-flow") { decoratedStack(current.flow, "flow", provider) }
@@ -27,6 +33,7 @@ private fun decoratedStack(
     entries: List<NavKey>,
     scope: String,
     provider: (NavKey) -> NavEntry<NavKey>,
+    root: NavKey? = null,
 ): List<NavEntry<NavKey>> =
     rememberDecoratedNavEntries(
         backStack = entries,
@@ -36,6 +43,10 @@ private fun decoratedStack(
         ),
         entryProvider = { route ->
             val entry = provider(route)
-            NavEntry(route, contentKey = "$scope:${entry.contentKey}", metadata = entry.metadata) { entry.Content() }
+            NavEntry(
+                route,
+                contentKey = "$scope:${entry.contentKey}",
+                metadata = entry.metadata + (TOP_LEVEL_ROOT to (route == root)),
+            ) { entry.Content() }
         },
     )

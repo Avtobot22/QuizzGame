@@ -7,6 +7,7 @@ android { namespace = "com.quizzgame.core.navigation" }
 
 dependencies {
     api(libs.androidx.navigation3.runtime)
+    api(libs.androidx.navigation3.ui)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.kotlinx.serialization.core)
     implementation(libs.androidx.lifecycle.viewmodel.navigation3)

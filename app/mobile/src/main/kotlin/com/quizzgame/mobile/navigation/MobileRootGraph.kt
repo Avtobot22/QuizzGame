@@ -32,6 +32,7 @@ internal fun MobileRootGraph(
             JoinRoomRoute,
             MobileSplashRoute,
             SignInRoute,
+            topLevels = MobileTopLevelItems.map { it.route },
             policy = NavigationPolicy { destination ->
                 if (destination == JoinRoomRoute) {
                     DestinationAccess.PUBLIC
@@ -46,6 +47,9 @@ internal fun MobileRootGraph(
         graphs = graphs,
         externalRequest = externalRequest,
         onRequestHandled = onRequestHandled,
+        mainContent = { state, navigator, entries, onBack ->
+            MobileMainNavigationHost(state, navigator, entries, onBack)
+        },
         context = { coordinator ->
             MobileNavigationContext(
                 roomCode,

@@ -1,8 +1,11 @@
 package com.quizzgame.tv.navigation
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.tv.material3.Text
+import com.quizzgame.core.designsystem.tv.QuizzTvScreenScaffold
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.tv.R
 
@@ -18,5 +21,5 @@ internal fun TvDashboardDestination(
     onLogout: () -> Unit,
     graphs: Set<FeatureEntries<DashboardNavigationContext>>,
 ) {
-    Text(stringResource(R.string.dashboard_placeholder))
+    QuizzTvScreenScaffold { padding -> Text(stringResource(R.string.dashboard_placeholder), Modifier.padding(padding)) }
 }
