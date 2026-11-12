@@ -1,32 +1,27 @@
 package com.quizzgame.core.navigation
 
-import com.quizzgame.core.navigation.routes.SignInRoute
-import com.quizzgame.core.navigation.routes.SplashRoute
-import kotlinx.serialization.json.Json
+import androidx.navigation3.runtime.NavKey
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class NavigationReducerTest {
     @Test
     fun duplicatePushIsIgnoredAndBackNeverRemovesTheRoot() {
-        val root = listOf(SplashRoute)
+        val root = listOf(First)
         assertEquals(root, reduceNavigation(root, NavAction.Pop))
-        val signIn = reduceNavigation(root, NavAction.Push(SignInRoute))
-        assertEquals(signIn, reduceNavigation(signIn, NavAction.Push(SignInRoute)))
-        assertEquals(root, reduceNavigation(signIn, NavAction.Pop))
+        val pushed = reduceNavigation(root, NavAction.Push(Second))
+        assertEquals(pushed, reduceNavigation(pushed, NavAction.Push(Second)))
+        assertEquals(root, reduceNavigation(pushed, NavAction.Pop))
     }
 
     @Test
     fun rootResetDropsAllPreviousHistory() {
         assertEquals(
-            listOf(SignInRoute),
-            reduceNavigation(listOf(SplashRoute, SignInRoute, SplashRoute), NavAction.ResetTo(SignInRoute)),
+            listOf(Second),
+            reduceNavigation(listOf(First, Second, First), NavAction.ResetTo(Second)),
         )
     }
 
-    @Test
-    fun sharedRootKeysHaveGeneratedSerializers() {
-        assertEquals(SplashRoute, Json.decodeFromString<SplashRoute>(Json.encodeToString(SplashRoute)))
-        assertEquals(SignInRoute, Json.decodeFromString<SignInRoute>(Json.encodeToString(SignInRoute)))
-    }
+    private data object First : NavKey
+    private data object Second : NavKey
 }

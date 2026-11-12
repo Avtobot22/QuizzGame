@@ -10,8 +10,10 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
 import com.quizzgame.tv.dashboard.demo.DashboardTabDescriptor
+import com.quizzgame.tv.dashboard.demo.DashboardTabId
 import com.quizzgame.tv.dashboard.demo.DemoDashboard
 import com.quizzgame.tv.dashboard.demo.DemoDashboardEntries
+import com.quizzgame.tv.dashboard.demo.DemoDashboardTags
 import org.junit.Rule
 import org.junit.Test
 
@@ -31,15 +33,15 @@ class DashboardConfigurationTest {
                 )
             }
         }
-        compose.onNodeWithTag("tab-content-MAIN").assertIsDisplayed()
+        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.MAIN)).assertIsDisplayed()
         compose.runOnIdle {
             tabs = listOf(DashboardTabDescriptor("main", false), DashboardTabDescriptor("settings"))
         }
-        compose.onNodeWithTag("tab-MAIN").assertIsNotEnabled()
-        compose.onNodeWithTag("tab-LIBRARY").assertDoesNotExist()
-        compose.onNodeWithTag("tab-content-SETTINGS").assertIsDisplayed()
+        compose.onNodeWithTag(DemoDashboardTags.tab(DashboardTabId.MAIN)).assertIsNotEnabled()
+        compose.onNodeWithTag(DemoDashboardTags.tab(DashboardTabId.LIBRARY)).assertDoesNotExist()
+        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertIsDisplayed()
         compose.runOnIdle { tabs = emptyList() }
-        compose.onNodeWithTag("dashboard-empty").assertIsDisplayed()
-        compose.onNodeWithTag("tab-content-SETTINGS").assertDoesNotExist()
+        compose.onNodeWithTag(DemoDashboardTags.EMPTY).assertIsDisplayed()
+        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertDoesNotExist()
     }
 }

@@ -36,6 +36,11 @@ include(":core:ui")
 include(":core:designsystem:mobile")
 include(":core:designsystem:tv")
 include(":core:network")
+include(":core:presentation")
+include(":core:feature-flags")
+include(":feature:splash:tv")
+include(":feature:splash:mobile")
+include(":shared:splash")
 include(":core:session")
 include(":core:navigation")
 include(":core:error:foundation")
@@ -51,5 +56,18 @@ includeBuild(mockSdkDirectory) {
     dependencySubstitution {
         substitute(module("dev.androidmock:mock-core")).using(project(":mock-core"))
         substitute(module("dev.androidmock:mock-okhttp-server")).using(project(":mock-okhttp-server"))
+    }
+}
+
+val flagsSdkDirectory = file("external/feature-flags")
+check(flagsSdkDirectory.resolve("settings.gradle.kts").isFile) {
+    "Initialize the pinned feature flags SDK: git submodule update --init --recursive"
+}
+includeBuild(flagsSdkDirectory) {
+    dependencySubstitution {
+        substitute(module("local.featureflags:core")).using(project(":feature-flags-core"))
+        substitute(module("local.featureflags:json")).using(project(":feature-flags-json"))
+        substitute(module("local.featureflags:android")).using(project(":feature-flags-android"))
+        substitute(module("local.featureflags:retrofit")).using(project(":feature-flags-retrofit"))
     }
 }

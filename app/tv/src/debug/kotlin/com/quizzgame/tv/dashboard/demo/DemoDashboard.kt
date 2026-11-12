@@ -70,7 +70,7 @@ internal fun DemoDashboard(
                         }
                     },
                     enabled = descriptor.isEnabled,
-                    modifier = Modifier.testTag("tab-$tab").focusRequester(tabFocus.getValue(tab))
+                    modifier = Modifier.testTag(DemoDashboardTags.tab(tab)).focusRequester(tabFocus.getValue(tab))
                         .onFocusChanged { if (it.isFocused) contentFocused = false }
                         .semantics { selected = current.selectedTab == tab },
                 ) {
@@ -80,7 +80,7 @@ internal fun DemoDashboard(
                     )
                 }
             }
-            QuizzTvButton(onLogout, Modifier.testTag("dashboard-signin")) {
+            QuizzTvButton(onLogout, Modifier.testTag(DemoDashboardTags.SIGN_OUT)) {
                 Text(stringResource(R.string.demo_signout))
             }
         }
@@ -90,7 +90,7 @@ internal fun DemoDashboard(
                 NavDisplay(entries = entries.getValue(selected), onBack = { current.pop() })
             }
         } else {
-            Text(stringResource(R.string.demo_dashboard_empty), Modifier.testTag("dashboard-empty"))
+            Text(stringResource(R.string.demo_dashboard_empty), Modifier.testTag(DemoDashboardTags.EMPTY))
         }
     }
     LaunchedEffect(current.selectedTab, current.tabs) {

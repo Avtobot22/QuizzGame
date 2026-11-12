@@ -16,12 +16,15 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.quizzgame.app.presentation.AppEntryScreen
+import com.quizzgame.app.presentation.AppEntryState
+import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
+import com.quizzgame.app.routes.SignInRoute
+import com.quizzgame.app.routes.SplashRoute
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorFullScreen
-import com.quizzgame.core.navigation.ProcessNavigationGuard
 import com.quizzgame.core.navigation.registration.FeatureEntries
-import com.quizzgame.core.navigation.sessionNavigationEpoch
 import com.quizzgame.mobile.navigation.MobileNavigationContext
 import com.quizzgame.mobile.navigation.MobileRootGraph
 
@@ -31,24 +34,37 @@ internal fun MobileAppRoot(
     viewModel: AppRootViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
-    val logoutRevision by viewModel.logoutRevision.collectAsStateWithLifecycle()
+    val entryState by viewModel.entryState.collectAsStateWithLifecycle()
     var roomCode by rememberSaveable { mutableStateOf("") }
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
             AppStartupState.Closed -> Unit
             AppStartupState.Idle, AppStartupState.Loading ->
-                Text(stringResource(R.string.app_startup_loading), Modifier.testTag("app-startup-loading"))
-            is AppStartupState.Failed -> Column(Modifier.fillMaxSize().testTag("app-startup-failed")) {
+                Text(stringResource(R.string.app_startup_loading), Modifier.testTag(AppRootTags.STARTUP_LOADING))
+            is AppStartupState.Failed -> Column(Modifier.fillMaxSize().testTag(AppRootTags.STARTUP_FAILED)) {
                 if (current.configurationRequired) Text(stringResource(R.string.app_network_configuration_required))
                 QuizzMobileErrorFullScreen(current.error, viewModel::onAction, Modifier.weight(1f))
             }
-            AppStartupState.Ready -> key(
-                ProcessNavigationGuard.processEpoch,
-                sessionNavigationEpoch(sessionState),
-                logoutRevision,
-            ) {
-                MobileRootGraph(graphs, sessionState, roomCode, { roomCode = it }, viewModel::logout)
+            AppStartupState.Ready -> when (val entry = entryState) {
+                AppEntryState.Waiting ->
+                    Text(stringResource(R.string.app_startup_loading), Modifier.testTag(AppRootTags.STARTUP_LOADING))
+                is AppEntryState.Blocked -> Box(Modifier.fillMaxSize().testTag(AppRootTags.ENTRY_FAILED)) {
+                    QuizzMobileErrorFullScreen(entry.error, viewModel::onAction)
+                }
+                is AppEntryState.Ready -> key(entry.identity) {
+                    val initialDestination = when (entry.screen) {
+                        AppEntryScreen.SPLASH -> SplashRoute
+                        AppEntryScreen.SIGN_IN -> SignInRoute
+                    }
+                    MobileRootGraph(
+                        graphs = graphs,
+                        initialDestination = initialDestination,
+                        isCurrentGraph = { viewModel.isCurrentEntry(entry) },
+                        roomCode = roomCode,
+                        onRoomCodeChange = { roomCode = it },
+                        onLogout = viewModel::logout,
+                    )
+                }
             }
         }
     }

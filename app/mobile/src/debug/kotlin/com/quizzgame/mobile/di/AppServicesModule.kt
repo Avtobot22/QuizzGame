@@ -6,6 +6,7 @@ import com.quizzgame.app.network.AppNetworkSettings
 import com.quizzgame.app.session.SessionManagerFactory
 import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import com.quizzgame.debug.network.debugAppNetworkFactory
+import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.debug.startup.openDebugSession
 import com.quizzgame.mobile.BuildConfig
 import com.quizzgame.mobile.network.mocks.mobileMockRules
@@ -27,8 +28,9 @@ object AppServicesModule {
         @ApplicationContext context: Context,
         settings: AppNetworkSettings,
         revocationPolicy: RefreshRevocationPolicy,
-    ): AppNetworkGraphFactory =
-        debugAppNetworkFactory(
+    ): AppNetworkGraphFactory {
+        SplashMockScenario.initialize(context)
+        return debugAppNetworkFactory(
             context,
             settings,
             "mock/bodies/mobile-refresh.json",
@@ -36,4 +38,5 @@ object AppServicesModule {
             revocationPolicy,
             ::mobileMockRules,
         )
+    }
 }

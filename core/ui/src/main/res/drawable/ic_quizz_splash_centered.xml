@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Centered circular Q, with a separate overlapping tail for a seamless join. -->
+    <path
+        android:fillType="evenOdd"
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26 C69.46397,26 82,38.53603 82,54 C82,69.46397 69.46397,82 54,82 C38.53603,82 26,69.46397 26,54 C26,38.53603 38.53603,26 54,26 Z M54,38 C45.16344,38 38,45.16344 38,54 C38,62.83656 45.16344,70 54,70 C62.83656,70 70,62.83656 70,54 C70,45.16344 62.83656,38 54,38 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M64,68 L73,61 L84,76 L75,83 Z" />
+</vector>

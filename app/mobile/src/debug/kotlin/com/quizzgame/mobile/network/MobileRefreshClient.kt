@@ -6,7 +6,7 @@ import com.quizzgame.debug.network.DebugNetworkGraph
 
 /**
  * Borrows the graph's isolated refresh transport. The Mobile backend path must be supplied by its caller.
- * The packaged MOCK rule uses debug/mobile/auth/refresh only as a debug fixture, not as a backend contract.
+ * MOCK supports the Mobile API path and the legacy debug probe used by transport tests.
  */
 fun DebugNetworkGraph.mobileRefreshClient(endpoint: RefreshEndpoint): RefreshClient =
     RefreshClient(refresh.retrofit, endpoint, refresh.results)

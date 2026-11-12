@@ -27,6 +27,9 @@ navigation3 = "1.2.1"
 androidxHilt = "1.4.0"
 
 [libraries]
+featureflags-core = { module = "local.featureflags:core" }
+featureflags-json = { module = "local.featureflags:json" }
+featureflags-android = { module = "local.featureflags:android" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
 hilt-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hilt" }

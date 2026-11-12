@@ -12,4 +12,5 @@
     <string name="demo_counter">Entry counter: %1$d</string>
     <string name="demo_increment">Increment counter</string>
     <string name="demo_back">Back</string>
+    <string name="demo_restart">DEMO: restart startup</string>
 </resources>

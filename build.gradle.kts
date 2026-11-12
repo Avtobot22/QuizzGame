@@ -21,7 +21,7 @@ dependencies {
 
 tasks.withType<Detekt>().configureEach {
     include("**/*.kt", "**/*.kts")
-    exclude("docs/**", "external/android-mock-server/**", "**/build/**", "**/.*/**")
+    exclude("docs/**", "external/android-mock-server/**", "external/feature-flags/**", "**/build/**", "**/.*/**")
     jvmTarget = "17"
     reports {
         html.required.set(true)
@@ -39,6 +39,11 @@ tasks.register("ciLint") {
         ":app:debug-support:lintDebug",
         ":core:navigation:lint",
         ":core:network:lint",
+        ":core:presentation:lint",
+        ":core:feature-flags:lint",
+        ":shared:splash:lint",
+        ":feature:splash:tv:lint",
+        ":feature:splash:mobile:lint",
         ":core:session:lint",
         ":core:error:foundation:lint",
         ":core:error:ui-common:lint",
@@ -60,6 +65,11 @@ tasks.register("ciUnitTestDebug") {
         ":app:debug-support:testDebugUnitTest",
         ":core:navigation:testDebugUnitTest",
         ":core:network:testDebugUnitTest",
+        ":core:presentation:testDebugUnitTest",
+        ":core:feature-flags:testDebugUnitTest",
+        ":shared:splash:testDebugUnitTest",
+        ":feature:splash:tv:testDebugUnitTest",
+        ":feature:splash:mobile:testDebugUnitTest",
         ":core:session:testDebugUnitTest",
         ":core:error:foundation:testDebugUnitTest",
         ":core:error:ui-common:testDebugUnitTest",
@@ -80,6 +90,11 @@ tasks.register("ciUnitTestRelease") {
         ":app:foundation:testReleaseUnitTest",
         ":core:navigation:testReleaseUnitTest",
         ":core:network:testReleaseUnitTest",
+        ":core:presentation:testReleaseUnitTest",
+        ":core:feature-flags:testReleaseUnitTest",
+        ":shared:splash:testReleaseUnitTest",
+        ":feature:splash:tv:testReleaseUnitTest",
+        ":feature:splash:mobile:testReleaseUnitTest",
         ":core:session:testReleaseUnitTest",
         ":core:error:foundation:testReleaseUnitTest",
         ":core:error:ui-common:testReleaseUnitTest",
@@ -96,6 +111,11 @@ tasks.register("ciAssembleDebug") {
         ":app:debug-support:assembleDebug",
         ":core:navigation:assembleDebug",
         ":core:network:assembleDebug",
+        ":core:presentation:assembleDebug",
+        ":core:feature-flags:assembleDebug",
+        ":shared:splash:assembleDebug",
+        ":feature:splash:tv:assembleDebug",
+        ":feature:splash:mobile:assembleDebug",
         ":core:session:assembleDebug",
         ":core:error:foundation:assembleDebug",
         ":core:error:ui-common:assembleDebug",
@@ -113,6 +133,11 @@ tasks.register("ciAssembleRelease") {
         ":app:foundation:assembleRelease",
         ":core:navigation:assembleRelease",
         ":core:network:assembleRelease",
+        ":core:presentation:assembleRelease",
+        ":core:feature-flags:assembleRelease",
+        ":shared:splash:assembleRelease",
+        ":feature:splash:tv:assembleRelease",
+        ":feature:splash:mobile:assembleRelease",
         ":core:session:assembleRelease",
         ":core:error:foundation:assembleRelease",
         ":core:error:ui-common:assembleRelease",

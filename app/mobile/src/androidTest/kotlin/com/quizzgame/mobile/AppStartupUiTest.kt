@@ -1,12 +1,10 @@
 package com.quizzgame.mobile
 
 import androidx.activity.ComponentActivity
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
+import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupFailure
@@ -20,7 +18,9 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageFailure
+import com.quizzgame.mobile.navigation.MobileDemoTags
 import com.quizzgame.mobile.navigation.MobileNavigationModule
+import com.quizzgame.mobile.navigation.MobileNavigationTags
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -31,6 +31,9 @@ class AppStartupUiTest {
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
+    private val screen: AppShellScreen
+        get() = AppShellScreen(compose)
+
     @Test
     fun blockingStartupErrorRetriesItsOwnerAndThenShowsSplash() {
         val startup = FailingAppStartup()
@@ -38,15 +41,15 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(MobileNavigationModule.startupEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
                     viewModel,
                 )
             }
         }
-        compose.onNodeWithTag("app-startup-failed").assertIsDisplayed()
-        compose.onNodeWithText(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
-        compose.onNodeWithTag("splash").assertIsDisplayed()
+        screen.tag(AppRootTags.STARTUP_FAILED).assertIsDisplayed()
+        screen.text(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileNavigationTags.SPLASH).assertIsDisplayed()
         compose.runOnIdle { assertEquals(1, startup.retries) }
     }
 
@@ -57,19 +60,57 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(MobileNavigationModule.startupEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
                     viewModel,
                 )
             }
         }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
-        compose.onNodeWithTag("demo-action-0").performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag("signin").isDisplayed() }
-        compose.onNodeWithTag("demo-action-0").performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag("join-room").isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileDemoTags.action(1)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("signin").isDisplayed() }
-        compose.onNodeWithTag("join-room").assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
+    }
+
+    @Test
+    fun signInPlaceholderRestartsSplashWithoutGrantingContent() {
+        val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
+        val viewModel = AppRootViewModel(startup)
+        compose.setContent {
+            QuizzMobileTheme {
+                MobileAppRoot(
+                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    viewModel,
+                )
+            }
+        }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileDemoTags.action(0)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(MobileDemoTags.action(0)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
+    }
+
+    @Test
+    fun closedSessionShowsAnEntryErrorWithoutCreatingANavigationGraph() {
+        val startup = FailingAppStartup().apply {
+            state.value = AppStartupState.Ready
+            sessionState.value = SessionState.Closed
+        }
+        val viewModel = AppRootViewModel(startup)
+        compose.setContent {
+            QuizzMobileTheme {
+                MobileAppRoot(
+                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    viewModel,
+                )
+            }
+        }
+        screen.tag(AppRootTags.ENTRY_FAILED).assertIsDisplayed()
+        screen.tag(MobileNavigationTags.SPLASH).assertDoesNotExist()
+        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
     }
 
     @Test
@@ -83,17 +124,17 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(MobileNavigationModule.startupEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
                     viewModel,
                 )
             }
         }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
-        compose.onNodeWithTag("demo-action-1").performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag("join-room").isDisplayed() }
-        compose.onNodeWithTag("demo-action-0").performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag("app-startup-failed").isDisplayed() }
-        compose.onNodeWithTag("signin").assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(MobileDemoTags.action(1)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
+        screen.tag(MobileDemoTags.action(0)).performClick()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_FAILED).isDisplayed() }
+        screen.tag(MobileNavigationTags.SIGN_IN).assertDoesNotExist()
         compose.runOnIdle { assertEquals(0L, viewModel.logoutRevision.value) }
     }
 }

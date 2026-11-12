@@ -26,6 +26,8 @@ quizzDebug {
 dependencies {
     implementation(projects.app.foundation)
     implementation(projects.core.navigation)
+    implementation(projects.core.featureFlags)
+    implementation(projects.feature.splash.tv)
     implementation(projects.core.network)
     implementation(projects.core.session)
     implementation(projects.core.designsystem.tv)

@@ -89,10 +89,10 @@ class AppStartupCoordinator(
             when {
                 closed || current == SessionState.Closed -> GraphAccessResult.Closed
                 appGraph != null -> GraphAccessResult.Ready(requireNotNull(appGraph))
-                current is SessionState.Unavailable -> GraphAccessResult.Unavailable(
+                current is SessionState.Unavailable          -> GraphAccessResult.Unavailable(
                     startupFailureState(AppStartupFailure.Storage(current.reason), recovery),
                 )
-                current is SessionState.Ready && appGraph != null -> GraphAccessResult.Ready(requireNotNull(appGraph))
+
                 mutableState.value is AppStartupState.Failed ->
                     GraphAccessResult.Unavailable(mutableState.value as AppStartupState.Failed)
                 else -> GraphAccessResult.Ready(

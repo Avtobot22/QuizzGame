@@ -19,7 +19,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
-import com.quizzgame.core.navigation.GuestAccess
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.debug.navigation.DemoSignInViewModel
@@ -27,24 +26,13 @@ import com.quizzgame.tv.R
 import com.quizzgame.tv.dashboard.demo.DemoDashboard
 
 @Composable
-internal fun TvSplashDestination(onSignIn: () -> Unit, onContinue: (GuestAccess) -> Unit) {
-    DemoPlaceholder(
-        R.string.splash_placeholder,
-        listOf(
-            R.string.demo_signin to onSignIn,
-            R.string.demo_continue to { onContinue(GuestAccess.ALLOWED) },
-        ),
-    )
-}
-
-@Composable
 internal fun TvSignInDestination(
-    onContinue: (GuestAccess) -> Unit,
+    onContinue: () -> Unit,
     viewModel: DemoSignInViewModel = viewModel(),
 ) {
     val result by viewModel.result.collectAsStateWithLifecycle()
-    NavigationResultEffect(result, viewModel::resultHandled) { onContinue(GuestAccess.ALLOWED) }
-    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_continue to viewModel::continueAsGuest))
+    NavigationResultEffect(result, viewModel::resultHandled) { onContinue() }
+    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_restart to viewModel::requestRestart))
 }
 
 @Composable
@@ -68,7 +56,7 @@ internal fun DemoPlaceholder(title: Int, actions: List<Pair<Int, () -> Unit>>) {
         actions.forEachIndexed { index, (label, action) ->
             QuizzTvButton(
                 onClick = action,
-                modifier = Modifier.testTag("demo-action-$index")
+                modifier = Modifier.testTag(TvDemoTags.action(index))
                     .then(if (index == 0) Modifier.focusRequester(firstFocus) else Modifier),
             ) { Text(stringResource(label)) }
         }
