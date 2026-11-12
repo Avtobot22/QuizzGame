@@ -8,6 +8,7 @@ import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
+import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashOutcome
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,8 +28,8 @@ internal class TvSplashViewModel @Inject constructor(private val startSplash: St
     override fun handleIntent(intent: TvSplashIntent) {
         when (intent) {
             TvSplashIntent.Retry             -> if (state.value is TvSplashUiState.Failed) start()
-            is TvSplashIntent.NavigationHandled -> updateState { current ->
-                if (current is TvSplashUiState.NavigationPending && current.requestId == intent.requestId) {
+            TvSplashIntent.NavigationHandled -> updateState { current ->
+                if (current is TvSplashUiState.NavigationPending) {
                     TvSplashUiState.NavigationComplete
                 } else {
                     current

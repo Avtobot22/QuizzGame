@@ -18,7 +18,7 @@ import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.core.ui.QuizzBrandLoading
 import com.quizzgame.core.ui.QuizzBrandLoadingSize
 import com.quizzgame.feature.splash.tv.R
-import com.quizzgame.feature.splash.tv.presentation.TvSplashDestination
+import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.NavigationHandled
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.Retry
@@ -58,7 +58,7 @@ private fun TvSplashContent(
     val result = state as? TvSplashUiState.NavigationPending
     NavigationResultEffect(
         result,
-        onHandled = { onIntent(NavigationHandled(it.requestId)) },
+        onHandled = { onIntent(NavigationHandled) },
     ) {
         when (it.destination) {
             TvSplashDestination.DASHBOARD -> onDashboard()

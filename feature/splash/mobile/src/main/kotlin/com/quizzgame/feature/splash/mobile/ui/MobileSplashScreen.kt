@@ -17,7 +17,7 @@ import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorFullScreen
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.core.ui.QuizzBrandLoading
 import com.quizzgame.feature.splash.mobile.R
-import com.quizzgame.feature.splash.mobile.presentation.MobileSplashDestination
+import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.NavigationHandled
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.Retry
@@ -57,7 +57,7 @@ private fun MobileSplashContent(
     val result = state as? MobileSplashUiState.NavigationPending
     NavigationResultEffect(
         result,
-        onHandled = { onIntent(NavigationHandled(it.requestId)) },
+        onHandled = { onIntent(NavigationHandled) },
     ) {
         when (it.destination) {
             MobileSplashDestination.JOIN_ROOM -> onJoinRoom()

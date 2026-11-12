@@ -1,4 +1,4 @@
-package com.quizzgame.feature.splash.tv.presentation
+package com.quizzgame.feature.splash.tv.navigation
 
 internal enum class TvSplashDestination {
     DASHBOARD,

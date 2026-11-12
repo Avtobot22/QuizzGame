@@ -6,6 +6,7 @@ import com.quizzgame.core.error.failure.ConnectivityKind
 import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
 import com.quizzgame.shared.splash.domain.SplashRepository
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashOutcome
@@ -47,24 +48,16 @@ class TvSplashViewModelTest {
     }
 
     @Test
-    fun signInActionChoosesItsDestinationAndMatchingAcknowledgementConsumesIt() = runTest(dispatcher) {
+    fun signInActionChoosesItsDestinationAndAcknowledgementConsumesIt() = runTest(dispatcher) {
         val vm = createViewModel {
             SplashOutcome.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
         }
         advanceUntilIdle()
-        vm.onIntent(
-            TvSplashIntent.NavigationHandled(
-                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
-            ),
-        )
+        vm.onIntent(TvSplashIntent.NavigationHandled)
         assertTrue(vm.state.value is TvSplashUiState.Failed)
         vm.onIntent(TvSplashIntent.SignIn)
         assertEquals(TvSplashDestination.SIGN_IN, (vm.state.value as TvSplashUiState.NavigationPending).destination)
-        vm.onIntent(
-            TvSplashIntent.NavigationHandled(
-                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
-            ),
-        )
+        vm.onIntent(TvSplashIntent.NavigationHandled)
         assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
@@ -103,11 +96,7 @@ class TvSplashViewModelTest {
         advanceUntilIdle()
         assertEquals(2, calls)
         assertTrue(vm.state.value is TvSplashUiState.NavigationPending)
-        vm.onIntent(
-            TvSplashIntent.NavigationHandled(
-                (vm.state.value as? TvSplashUiState.NavigationPending)?.requestId ?: "stale",
-            ),
-        )
+        vm.onIntent(TvSplashIntent.NavigationHandled)
         assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
@@ -135,18 +124,6 @@ class TvSplashViewModelTest {
             val failed = vm.state.value as TvSplashUiState.Failed
             assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
         }
-    }
-
-    @Test
-    fun staleAcknowledgementDoesNotConsumeANewResultAndNoCollectorIsRequired() = runTest(dispatcher) {
-        val vm = createViewModel { SplashOutcome.Continue }
-        advanceUntilIdle()
-        val pending = vm.state.value as TvSplashUiState.NavigationPending
-        vm.onIntent(TvSplashIntent.NavigationHandled("previous-attempt"))
-        assertEquals(pending, vm.state.value)
-        vm.onIntent(TvSplashIntent.NavigationHandled(pending.requestId))
-        vm.onIntent(TvSplashIntent.NavigationHandled(pending.requestId))
-        assertEquals(TvSplashUiState.NavigationComplete, vm.state.value)
     }
 
     private fun createViewModel(outcome: suspend () -> SplashOutcome): TvSplashViewModel {

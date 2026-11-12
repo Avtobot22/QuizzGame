@@ -6,6 +6,7 @@ import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.policy.DefaultErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
+import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashOutcome
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,8 +29,8 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
     override fun handleIntent(intent: MobileSplashIntent) {
         when (intent) {
             MobileSplashIntent.Retry             -> if (state.value is MobileSplashUiState.Failed) start()
-            is MobileSplashIntent.NavigationHandled -> updateState { current ->
-                if (current is MobileSplashUiState.NavigationPending && current.requestId == intent.requestId) {
+            MobileSplashIntent.NavigationHandled -> updateState { current ->
+                if (current is MobileSplashUiState.NavigationPending) {
                     MobileSplashUiState.NavigationComplete
                 } else {
                     current
