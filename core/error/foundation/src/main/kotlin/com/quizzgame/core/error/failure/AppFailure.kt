@@ -16,4 +16,6 @@ sealed interface AppFailure {
 
     data object InvalidServerData : AppFailure
     data class Storage(val kind: StorageKind) : AppFailure
+    data object Configuration : AppFailure
+    data object OperationInterrupted : AppFailure
 }

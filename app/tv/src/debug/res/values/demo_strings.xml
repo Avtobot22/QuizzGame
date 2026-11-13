@@ -12,4 +12,5 @@
     <string name="demo_counter">Счётчик экрана: %1$d</string>
     <string name="demo_increment">Увеличить счётчик</string>
     <string name="demo_back">Назад</string>
+    <string name="demo_restart">DEMO: повторить запуск</string>
 </resources>

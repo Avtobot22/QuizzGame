@@ -8,11 +8,11 @@ class DemoSignInViewModelTest {
     @Test
     fun completionRemainsAvailableWithoutUiCollectorsUntilAcknowledged() {
         val model = DemoSignInViewModel()
-        model.continueAsGuest()
-        assertEquals(DemoSignInResult.GUEST_ACCESS_ALLOWED, model.result.value)
-        model.resultHandled(DemoSignInResult.GUEST_ACCESS_ALLOWED)
+        model.requestRestart()
+        assertEquals(DemoSignInResult.RESTART_REQUESTED, model.result.value)
+        model.resultHandled(DemoSignInResult.RESTART_REQUESTED)
         assertNull(model.result.value)
-        model.continueAsGuest()
-        assertEquals(DemoSignInResult.GUEST_ACCESS_ALLOWED, model.result.value)
+        model.requestRestart()
+        assertEquals(DemoSignInResult.RESTART_REQUESTED, model.result.value)
     }
 }

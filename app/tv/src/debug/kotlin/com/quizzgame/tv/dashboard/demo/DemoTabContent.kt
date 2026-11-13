@@ -33,7 +33,7 @@ internal fun DemoTabContent(
 ) {
     var focusedItem by rememberSaveable { mutableIntStateOf(0) }
     LazyColumn(
-        modifier = Modifier.testTag("tab-content-$tab").focusGroup(),
+        modifier = Modifier.testTag(DemoDashboardTags.tabContent(tab)).focusGroup(),
         state = rememberLazyListState(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
@@ -41,7 +41,7 @@ internal fun DemoTabContent(
             val focus = remember { FocusRequester() }
             QuizzTvButton(
                 onClick = { open(DashboardDestination.QuizDetail("$tab-$id")) },
-                modifier = Modifier.testTag("quiz-$tab-$id").focusRequester(focus)
+                modifier = Modifier.testTag(DemoDashboardTags.quiz(tab, id)).focusRequester(focus)
                     .onFocusChanged { if (it.isFocused) focusedItem = id },
             ) { Text(stringResource(R.string.demo_quiz, id + 1)) }
             LaunchedEffect(requestFocus) {
@@ -54,13 +54,13 @@ internal fun DemoTabContent(
 @Composable
 internal fun DemoQuizDetail(quizId: String, back: () -> Unit, viewModel: DemoEntryViewModel = hiltViewModel()) {
     val focus = remember { FocusRequester() }
-    Column(Modifier.testTag("quiz-detail"), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    Column(Modifier.testTag(DemoDashboardTags.DETAIL), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Text(stringResource(R.string.demo_detail, quizId))
-        Text(stringResource(R.string.demo_counter, viewModel.counter), Modifier.testTag("detail-counter"))
-        QuizzTvButton(viewModel::increment, Modifier.testTag("detail-increment").focusRequester(focus)) {
+        Text(stringResource(R.string.demo_counter, viewModel.counter), Modifier.testTag(DemoDashboardTags.COUNTER))
+        QuizzTvButton(viewModel::increment, Modifier.testTag(DemoDashboardTags.INCREMENT).focusRequester(focus)) {
             Text(stringResource(R.string.demo_increment))
         }
-        QuizzTvButton(back, Modifier.testTag("detail-back")) { Text(stringResource(R.string.demo_back)) }
+        QuizzTvButton(back, Modifier.testTag(DemoDashboardTags.BACK)) { Text(stringResource(R.string.demo_back)) }
     }
     LaunchedEffect(Unit) { focus.requestFocus() }
 }

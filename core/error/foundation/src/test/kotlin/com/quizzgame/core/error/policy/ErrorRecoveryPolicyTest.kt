@@ -25,6 +25,7 @@ class ErrorRecoveryPolicyTest {
             AppFailure.Connectivity(ConnectivityKind.TIMEOUT),
             AppFailure.Service(ServiceKind.UNAVAILABLE, 503),
             AppFailure.Service(ServiceKind.RATE_LIMITED, 429),
+            AppFailure.OperationInterrupted,
         )
         val expected = mapOf(
             RetrySafety.SAFE_TO_REPEAT to listOf(ErrorActionKind.RETRY),
@@ -69,6 +70,7 @@ class ErrorRecoveryPolicyTest {
             AppFailure.Service(ServiceKind.CLIENT_REJECTED, 422),
             AppFailure.Service(ServiceKind.OTHER_HTTP, 399),
             AppFailure.InvalidServerData,
+            AppFailure.Configuration,
         ) + StorageKind.entries.map(AppFailure::Storage)
         failures.forEach { failure ->
             RetrySafety.entries.forEach { safety ->

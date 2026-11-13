@@ -4,4 +4,5 @@
     <string name="demo_continue">DEMO: продолжить без авторизации</string>
     <string name="demo_signout">DEMO: завершить сессию</string>
     <string name="demo_room_code">Код комнаты - локальный пример</string>
+    <string name="demo_restart">DEMO: повторить запуск</string>
 </resources>

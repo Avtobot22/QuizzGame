@@ -3,12 +3,10 @@ package com.quizzgame.tv
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.semantics.SemanticsActions
-import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performSemanticsAction
+import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupFailure
@@ -23,7 +21,10 @@ import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageFailure
 import com.quizzgame.tv.dashboard.demo.DemoDashboardEntries
+import com.quizzgame.tv.dashboard.demo.DemoDashboardTags
+import com.quizzgame.tv.navigation.TvDemoTags
 import com.quizzgame.tv.navigation.TvNavigationModule
+import com.quizzgame.tv.navigation.TvNavigationTags
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -34,6 +35,9 @@ class AppStartupUiTest {
     @get:Rule
     val compose = createAndroidComposeRule<ComponentActivity>()
 
+    private val screen: AppShellScreen
+        get() = AppShellScreen(compose)
+
     @Test
     fun blockingStartupErrorRetriesItsOwnerAndThenShowsSplash() {
         val startup = FailingAppStartup()
@@ -41,17 +45,17 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(TvNavigationModule.startupEntries(), TvNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
                     setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
                     viewModel,
                 )
             }
         }
-        compose.onNodeWithTag("app-startup-failed").assertIsDisplayed()
-        compose.onNodeWithText(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).assertIsDisplayed()
+        screen.tag(AppRootTags.STARTUP_FAILED).assertIsDisplayed()
+        screen.text(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).assertIsDisplayed()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
-        compose.onNodeWithTag("splash").assertIsDisplayed()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.SPLASH).assertIsDisplayed()
         compose.runOnIdle { assertEquals(1, startup.retries) }
     }
 
@@ -62,20 +66,61 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(TvNavigationModule.startupEntries(), TvNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
                     setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
                     viewModel,
                 )
             }
         }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("signin").isDisplayed() }
-        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("dashboard").isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("signin").isDisplayed() }
-        compose.onNodeWithTag("dashboard").assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
+    }
+
+    @Test
+    fun signInPlaceholderRestartsSplashWithoutGrantingContent() {
+        val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
+        val viewModel = AppRootViewModel(startup)
+        compose.setContent {
+            QuizzTvTheme {
+                TvAppRoot(
+                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
+                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    viewModel,
+                )
+            }
+        }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SIGN_IN).isDisplayed() }
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
+    }
+
+    @Test
+    fun closedSessionShowsAnEntryErrorWithoutCreatingANavigationGraph() {
+        val startup = FailingAppStartup().apply {
+            state.value = AppStartupState.Ready
+            sessionState.value = SessionState.Closed
+        }
+        val viewModel = AppRootViewModel(startup)
+        compose.setContent {
+            QuizzTvTheme {
+                TvAppRoot(
+                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
+                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    viewModel,
+                )
+            }
+        }
+        screen.tag(AppRootTags.ENTRY_FAILED).assertIsDisplayed()
+        screen.tag(TvNavigationTags.SPLASH).assertDoesNotExist()
+        screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
     }
 
     @Test
@@ -89,21 +134,20 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(TvNavigationModule.startupEntries(), TvNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
                     setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
                     viewModel,
                 )
             }
         }
-        compose.waitUntil(5_000) { compose.onNodeWithTag("splash").isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("signin").isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
+        screen.tag(DemoDashboardTags.SIGN_OUT).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("dashboard").isDisplayed() }
-        compose.onNodeWithTag("dashboard-signin").performSemanticsAction(SemanticsActions.RequestFocus) { it() }
-        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
-        compose.waitUntil(5_000) { compose.onNodeWithTag("app-startup-failed").isDisplayed() }
-        compose.onNodeWithTag("signin").assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_FAILED).isDisplayed() }
+        screen.tag(TvNavigationTags.SIGN_IN).assertDoesNotExist()
         compose.runOnIdle { assertEquals(0L, viewModel.logoutRevision.value) }
     }
 }

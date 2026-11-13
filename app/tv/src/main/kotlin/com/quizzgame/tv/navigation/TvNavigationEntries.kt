@@ -1,5 +1,6 @@
 package com.quizzgame.tv.navigation
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.State
@@ -7,12 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
-import com.quizzgame.core.navigation.GuestAccess
+import com.quizzgame.app.routes.DashboardRoute
+import com.quizzgame.app.routes.SignInRoute
+import com.quizzgame.app.routes.SplashRoute
 import com.quizzgame.core.navigation.NavAction
 import com.quizzgame.core.navigation.registration.FeatureEntries
-import com.quizzgame.core.navigation.routes.DashboardRoute
-import com.quizzgame.core.navigation.routes.SignInRoute
-import com.quizzgame.core.navigation.routes.SplashRoute
+import com.quizzgame.feature.splash.tv.ui.TvSplashScreen
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,21 +23,25 @@ import dagger.multibindings.IntoSet
 internal data class TvNavigationContext(
     val dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     val navigate: (NavAction) -> Unit,
-    val onContinue: (GuestAccess) -> Unit,
     val onLogout: () -> Unit,
 )
 
 internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNavigationContext>) {
     entry<SplashRoute> {
         val current = context.value
-        Box(Modifier.fillMaxSize().testTag("splash")) {
-            TvSplashDestination({ current.navigate(NavAction.ResetTo(SignInRoute)) }, current.onContinue)
+        Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SPLASH)) {
+            val activity = LocalActivity.current
+            TvSplashScreen(
+                onDashboard = { current.navigate(NavAction.ResetTo(DashboardRoute)) },
+                onSignIn = { current.navigate(NavAction.ResetTo(SignInRoute)) },
+                onExit = { activity?.finish() },
+            )
         }
     }
     entry<SignInRoute> {
         val current = context.value
-        Box(Modifier.fillMaxSize().testTag("signin")) {
-            TvSignInDestination(current.onContinue)
+        Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SIGN_IN)) {
+            TvSignInDestination(onContinue = { current.navigate(NavAction.ResetTo(SplashRoute)) })
         }
     }
 }
@@ -44,7 +49,7 @@ internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNaviga
 internal fun EntryProviderScope<NavKey>.tvContentEntries(context: State<TvNavigationContext>) {
     entry<DashboardRoute> {
         val current = context.value
-        Box(Modifier.fillMaxSize().testTag("dashboard")) {
+        Box(Modifier.fillMaxSize().testTag(TvNavigationTags.DASHBOARD)) {
             TvDashboardDestination(current.onLogout, current.dashboardGraphs)
         }
     }

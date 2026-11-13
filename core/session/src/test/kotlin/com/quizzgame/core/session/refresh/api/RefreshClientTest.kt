@@ -49,7 +49,7 @@ class RefreshClientTest : RefreshTestFixture() {
         assertEquals("application/json; charset=utf-8", request.getHeader("Content-Type"))
         assertEquals("test-tv", request.getHeader("X-Client-Platform"))
         assertEquals("refresh-tests/1", request.getHeader("User-Agent"))
-        assertNull(request.getHeader("X-Endpoint-Version"))
+        assertEquals("1", request.getHeader("X-Endpoint-Version"))
         val body = fixture.json.parseToJsonElement(request.body.readUtf8()).jsonObject
         assertEquals(setOf("refreshToken", "deviceId"), body.keys)
         assertEquals("fixture-sensitive-refresh\"\\", body["refreshToken"]!!.jsonPrimitive.content)

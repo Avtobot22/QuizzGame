@@ -17,6 +17,9 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -29,6 +32,7 @@ class AppRootViewModelTest {
             val startup = LogoutTestStartup()
             val viewModel = AppRootViewModel(startup)
             store.put("root", viewModel)
+            val initialEntry = viewModel.entryState.value as AppEntryState.Ready
             viewModel.logout()
             viewModel.logout()
             runCurrent()
@@ -37,10 +41,35 @@ class AppRootViewModelTest {
             startup.gate.complete(Unit)
             runCurrent()
             assertEquals(1L, viewModel.logoutRevision.value)
+            assertFalse(viewModel.isCurrentEntry(initialEntry))
+            assertNotEquals(initialEntry, viewModel.entryState.value)
             viewModel.logout()
             runCurrent()
             assertEquals(2, startup.logouts)
             assertEquals(2L, viewModel.logoutRevision.value)
+        } finally {
+            store.clear()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun staleEntryIsRejectedImmediatelyBeforeThePublishedEntryFlowCatchesUp() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val startup = LogoutTestStartup()
+            val viewModel = AppRootViewModel(startup)
+            store.put("root", viewModel)
+            val initial = viewModel.entryState.value as AppEntryState.Ready
+            assertTrue(viewModel.isCurrentEntry(initial))
+            startup.sessionState.value = SessionState.Expired
+            assertFalse(viewModel.isCurrentEntry(initial))
+            runCurrent()
+            assertEquals(AppEntryScreen.SIGN_IN, (viewModel.entryState.value as AppEntryState.Ready).screen)
+            startup.sessionState.value = SessionState.Unavailable(SessionStorageFailure.WRITE)
+            runCurrent()
+            assertTrue(viewModel.entryState.value is AppEntryState.Blocked)
         } finally {
             store.clear()
             Dispatchers.resetMain()

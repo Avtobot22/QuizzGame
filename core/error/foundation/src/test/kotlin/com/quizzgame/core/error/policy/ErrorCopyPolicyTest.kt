@@ -30,6 +30,8 @@ class ErrorCopyPolicyTest {
             AppFailure.Authentication(AuthenticationKind.REQUIRED) to ErrorCopyKey.SIGN_IN_REQUIRED,
             AppFailure.Authentication(AuthenticationKind.REVOKED) to ErrorCopyKey.SESSION_EXPIRED,
             AppFailure.InvalidServerData to ErrorCopyKey.UNEXPECTED_RESPONSE,
+            AppFailure.Configuration to ErrorCopyKey.GENERIC_FAILURE,
+            AppFailure.OperationInterrupted to ErrorCopyKey.GENERIC_FAILURE,
         )
         cases.forEach { (failure, copyKey) ->
             val spec = policy.decide(failure, context)

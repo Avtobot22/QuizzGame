@@ -1,5 +1,6 @@
 package com.quizzgame.tv.network.mocks
 
+import com.quizzgame.debug.network.mocks.SplashMockScenario
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.mockRules
 import dev.androidmock.core.response.ResponseSpec
@@ -9,10 +10,23 @@ import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
 internal fun tvMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mockRules(assets) {
+    rule("splash-feature-toggles", "/api/tv/feature-toggles") {
+        match { method("GET") }
+        respondWith { _, _ ->
+            SplashMockScenario.response(SplashMockScenario.Stage.FLAGS, assets.read("mock/bodies/feature-toggles.json"))
+        }
+    }
+    rule("splash-user", "/api/tv/user") {
+        match { method("GET") }
+        respondWith { _, _ ->
+            SplashMockScenario.response(SplashMockScenario.Stage.USER, assets.read("mock/bodies/user.json"))
+        }
+    }
+
     rule("launch", "/api/tv/launch") {
         match { method("GET") }
-        respond {
-            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/launch.json").decodeToString()))
+        respondWith { _, _ ->
+            SplashMockScenario.response(SplashMockScenario.Stage.LAUNCH, assets.read("mock/bodies/launch.json"))
         }
     }
     rule("refresh", "/api/tv/auth/refresh") {

@@ -30,6 +30,7 @@ import com.quizzgame.core.error.ui.common.R
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorRemote
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorScreen
+import com.quizzgame.core.error.ui.tv.testutil.TvErrorTags
 import com.quizzgame.core.error.ui.tv.testutil.captureErrorPreview
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -50,7 +51,7 @@ class QuizzTvErrorAdaptersTest {
                 QuizzTvErrorFullScreen(
                     spec(ErrorSurface.BLOCKING),
                     onAction = actions::add,
-                    modifier = Modifier.testTag("error"),
+                    modifier = Modifier.testTag(TvErrorTags.ROOT),
                 )
             }
         }

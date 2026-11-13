@@ -16,4 +16,6 @@ enum class ErrorDiagnosticCategory {
     STORAGE_CRYPTO,
     STORAGE_CORRUPT,
     STORAGE_UNKNOWN,
+    CONFIGURATION,
+    OPERATION_INTERRUPTED,
 }

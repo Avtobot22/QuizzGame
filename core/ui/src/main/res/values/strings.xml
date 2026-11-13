@@ -1,4 +1,5 @@
 <resources>
+    <string name="quizz_brand_name" translatable="false">QuizzGame</string>
     <string name="quizz_status_waiting">Ожидание</string>
     <string name="quizz_status_approved">Подтверждено</string>
     <string name="quizz_status_expired">Срок действия истёк</string>

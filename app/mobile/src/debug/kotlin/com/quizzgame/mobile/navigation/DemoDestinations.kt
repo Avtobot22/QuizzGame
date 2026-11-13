@@ -16,30 +16,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzRoomCodeField
-import com.quizzgame.core.navigation.GuestAccess
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.debug.navigation.DemoSignInViewModel
 import com.quizzgame.mobile.R
 
 @Composable
-internal fun MobileSplashDestination(onSignIn: () -> Unit, onContinue: (GuestAccess) -> Unit) {
-    DemoPlaceholder(
-        R.string.splash_placeholder,
-        listOf(
-            R.string.demo_signin to onSignIn,
-            R.string.demo_continue to { onContinue(GuestAccess.ALLOWED) },
-        ),
-    )
-}
-
-@Composable
 internal fun MobileSignInDestination(
-    onContinue: (GuestAccess) -> Unit,
+    onContinue: () -> Unit,
     viewModel: DemoSignInViewModel = viewModel(),
 ) {
     val result by viewModel.result.collectAsStateWithLifecycle()
-    NavigationResultEffect(result, viewModel::resultHandled) { onContinue(GuestAccess.ALLOWED) }
-    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_continue to viewModel::continueAsGuest))
+    NavigationResultEffect(result, viewModel::resultHandled) { onContinue() }
+    DemoPlaceholder(R.string.signin_placeholder, listOf(R.string.demo_restart to viewModel::requestRestart))
 }
 
 @Composable
@@ -49,7 +37,7 @@ internal fun MobileJoinRoomDestination(roomCode: String, onRoomCodeChange: (Stri
             value = roomCode,
             onValueChange = onRoomCodeChange,
             label = stringResource(R.string.demo_room_code),
-            modifier = Modifier.testTag("demo-room-code"),
+            modifier = Modifier.testTag(MobileDemoTags.ROOM_CODE),
         )
     }
 }
@@ -71,7 +59,7 @@ internal fun DemoPlaceholder(
         actions.forEachIndexed { index, (label, action) ->
             QuizzButton(
                 onClick = action,
-                modifier = Modifier.testTag("demo-action-$index"),
+                modifier = Modifier.testTag(MobileDemoTags.action(index)),
             ) { Text(stringResource(label)) }
         }
     }
