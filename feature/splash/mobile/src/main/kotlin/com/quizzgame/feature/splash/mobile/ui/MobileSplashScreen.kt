@@ -17,7 +17,7 @@ import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorFullScreen
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.core.ui.QuizzBrandLoading
 import com.quizzgame.feature.splash.mobile.R
-import com.quizzgame.feature.splash.mobile.presentation.MobileSplashDestination
+import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.NavigationHandled
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.Retry
@@ -28,8 +28,8 @@ import com.quizzgame.core.ui.R as UiR
 
 @Composable
 fun MobileSplashScreen(
-    onJoinRoom: () -> Unit,
-    onSignIn: () -> Unit,
+    onJoinRoom: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -49,8 +49,8 @@ fun MobileSplashScreen(
 private fun MobileSplashContent(
     state: MobileSplashUiState,
     onIntent: (MobileSplashIntent) -> Unit,
-    onJoinRoom: () -> Unit,
-    onSignIn: () -> Unit,
+    onJoinRoom: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier,
 ) {
@@ -66,7 +66,7 @@ private fun MobileSplashContent(
     }
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (state) {
-            is MobileSplashUiState.Failed -> QuizzMobileErrorFullScreen(
+            is MobileSplashUiState.Error -> QuizzMobileErrorFullScreen(
                 state.spec,
                 onAction = { action ->
                     when (action) {

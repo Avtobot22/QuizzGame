@@ -18,7 +18,7 @@ import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.core.ui.QuizzBrandLoading
 import com.quizzgame.core.ui.QuizzBrandLoadingSize
 import com.quizzgame.feature.splash.tv.R
-import com.quizzgame.feature.splash.tv.presentation.TvSplashDestination
+import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.NavigationHandled
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.Retry
@@ -29,8 +29,8 @@ import com.quizzgame.core.ui.R as UiR
 
 @Composable
 fun TvSplashScreen(
-    onDashboard: () -> Unit,
-    onSignIn: () -> Unit,
+    onDashboard: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,8 +50,8 @@ fun TvSplashScreen(
 private fun TvSplashContent(
     state: TvSplashUiState,
     onIntent: (TvSplashIntent) -> Unit,
-    onDashboard: () -> Unit,
-    onSignIn: () -> Unit,
+    onDashboard: () -> Boolean,
+    onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier,
 ) {
@@ -67,7 +67,7 @@ private fun TvSplashContent(
     }
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
-            is TvSplashUiState.Failed -> QuizzTvErrorFullScreen(
+            is TvSplashUiState.Error -> QuizzTvErrorFullScreen(
                 current.spec,
                 onAction = { action ->
                     when (action) {

@@ -19,7 +19,11 @@ enum class AppEntryScreen { SPLASH, SIGN_IN }
 sealed interface AppEntryState {
     data object Waiting : AppEntryState
     data class Blocked(val error: ErrorPresentationSpec) : AppEntryState
-    data class Ready(val identity: String, val screen: AppEntryScreen) : AppEntryState
+    data class Ready(
+        val identity: String,
+        val screen: AppEntryScreen,
+        val restorationOwner: String = identity,
+    ) : AppEntryState
 }
 
 internal fun appEntryState(
@@ -28,16 +32,21 @@ internal fun appEntryState(
     processIdentity: String = processEpoch,
 ): AppEntryState {
     val identity = "$processIdentity:${sessionEpoch(session)}:$logoutRevision"
+    val owner = "${sessionEpoch(session)}:$logoutRevision"
     return when (session) {
         SessionState.Initializing -> AppEntryState.Waiting
         SessionState.Guest,
         is SessionState.Authenticated,
-        -> AppEntryState.Ready(identity, AppEntryScreen.SPLASH)
+        -> AppEntryState.Ready(identity, AppEntryScreen.SPLASH, owner)
 
-        SessionState.Expired        -> AppEntryState.Ready(identity, AppEntryScreen.SIGN_IN)
+        SessionState.Expired        -> AppEntryState.Ready(identity, AppEntryScreen.SIGN_IN, owner)
 
         is SessionState.Blocked     -> when (session.kind) {
-            CredentialUnavailableKind.REFRESH_UNCERTAIN   -> AppEntryState.Ready(identity, AppEntryScreen.SIGN_IN)
+            CredentialUnavailableKind.REFRESH_UNCERTAIN   -> AppEntryState.Ready(
+                identity,
+                AppEntryScreen.SIGN_IN,
+                owner,
+            )
             CredentialUnavailableKind.STORAGE_UNAVAILABLE -> blocked(AppFailure.Storage(StorageKind.UNKNOWN))
             else                                         -> blocked(AppFailure.OperationInterrupted)
         }

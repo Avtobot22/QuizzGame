@@ -6,6 +6,7 @@ import com.quizzgame.core.error.failure.ConnectivityKind
 import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 import com.quizzgame.shared.splash.domain.SplashRepository
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashOutcome
@@ -40,24 +41,27 @@ class MobileSplashViewModelTest {
         destinations.forEach { (outcome, destination) ->
             val vm = createViewModel { outcome }
             advanceUntilIdle()
-            assertEquals(MobileSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as MobileSplashUiState.NavigationPending).destination)
             runCurrent()
-            assertEquals(MobileSplashUiState.NavigationPending(destination), vm.state.value)
+            assertEquals(destination, (vm.state.value as MobileSplashUiState.NavigationPending).destination)
         }
     }
 
     @Test
-    fun signInActionChoosesItsDestinationAndPayloadFreeAcknowledgementConsumesIt() = runTest(dispatcher) {
+    fun signInActionChoosesItsDestinationAndAcknowledgementConsumesIt() = runTest(dispatcher) {
         val vm = createViewModel {
             SplashOutcome.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
         }
         advanceUntilIdle()
         vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertTrue(vm.state.value is MobileSplashUiState.Failed)
+        assertTrue(vm.state.value is MobileSplashUiState.Error)
         vm.onIntent(MobileSplashIntent.SignIn)
-        assertEquals(MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN), vm.state.value)
+        assertEquals(
+            MobileSplashDestination.SIGN_IN,
+            (vm.state.value as MobileSplashUiState.NavigationPending).destination,
+        )
         vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertEquals(MobileSplashUiState.Loading, vm.state.value)
+        assertEquals(MobileSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -89,14 +93,14 @@ class MobileSplashViewModelTest {
             }
         }
         advanceUntilIdle()
-        assertTrue(vm.state.value is MobileSplashUiState.Failed)
+        assertTrue(vm.state.value is MobileSplashUiState.Error)
         vm.onIntent(MobileSplashIntent.Retry)
         vm.onIntent(MobileSplashIntent.Retry)
         advanceUntilIdle()
         assertEquals(2, calls)
         assertTrue(vm.state.value is MobileSplashUiState.NavigationPending)
         vm.onIntent(MobileSplashIntent.NavigationHandled)
-        assertEquals(MobileSplashUiState.Loading, vm.state.value)
+        assertEquals(MobileSplashUiState.NavigationComplete, vm.state.value)
     }
 
     @Test
@@ -107,8 +111,8 @@ class MobileSplashViewModelTest {
             if (calls == 1) SplashOutcome.Failed(AppFailure.OperationInterrupted) else SplashOutcome.Continue
         }
         advanceUntilIdle()
-        val failed = vm.state.value as MobileSplashUiState.Failed
-        assertTrue(ErrorActionKind.RETRY in failed.spec.actions)
+        val error = vm.state.value as MobileSplashUiState.Error
+        assertTrue(ErrorActionKind.RETRY in error.spec.actions)
         vm.onIntent(MobileSplashIntent.Retry)
         advanceUntilIdle()
         assertEquals(2, calls)
@@ -120,8 +124,8 @@ class MobileSplashViewModelTest {
         listOf(AppFailure.Configuration, AppFailure.Storage(StorageKind.READ)).forEach { failure ->
             val vm = createViewModel { SplashOutcome.Failed(failure) }
             advanceUntilIdle()
-            val failed = vm.state.value as MobileSplashUiState.Failed
-            assertTrue(ErrorActionKind.RETRY !in failed.spec.actions)
+            val error = vm.state.value as MobileSplashUiState.Error
+            assertTrue(ErrorActionKind.RETRY !in error.spec.actions)
         }
     }
 

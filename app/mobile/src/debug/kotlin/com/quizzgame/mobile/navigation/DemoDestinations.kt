@@ -16,13 +16,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzRoomCodeField
+import com.quizzgame.core.designsystem.mobile.QuizzScreenScaffold
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.debug.navigation.DemoSignInViewModel
 import com.quizzgame.mobile.R
 
 @Composable
 internal fun MobileSignInDestination(
-    onContinue: () -> Unit,
+    onContinue: () -> Boolean,
     viewModel: DemoSignInViewModel = viewModel(),
 ) {
     val result by viewModel.result.collectAsStateWithLifecycle()
@@ -48,19 +49,21 @@ internal fun DemoPlaceholder(
     actions: List<Pair<Int, () -> Unit>>,
     content: @Composable () -> Unit = {},
 ) {
-    Column(
-        Modifier.fillMaxSize().padding(32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
-    ) {
-        Text(stringResource(R.string.demo_label))
-        Text(stringResource(title))
-        content()
-        actions.forEachIndexed { index, (label, action) ->
-            QuizzButton(
-                onClick = action,
-                modifier = Modifier.testTag(MobileDemoTags.action(index)),
-            ) { Text(stringResource(label)) }
+    QuizzScreenScaffold { padding ->
+        Column(
+            Modifier.fillMaxSize().padding(padding).padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        ) {
+            Text(stringResource(R.string.demo_label))
+            Text(stringResource(title))
+            content()
+            actions.forEachIndexed { index, (label, action) ->
+                QuizzButton(
+                    onClick = action,
+                    modifier = Modifier.testTag(MobileDemoTags.action(index)),
+                ) { Text(stringResource(label)) }
+            }
         }
     }
 }

@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -13,15 +12,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.Text
+import com.quizzgame.app.navigation.AppNavigationEnvironment
 import com.quizzgame.app.presentation.AppEntryScreen
 import com.quizzgame.app.presentation.AppEntryState
 import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
-import com.quizzgame.app.routes.SignInRoute
-import com.quizzgame.app.routes.SplashRoute
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.core.error.ui.tv.components.QuizzTvErrorFullScreen
+import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
+import com.quizzgame.core.navigation.routes.common.SignInRoute
+import com.quizzgame.feature.splash.tv.navigation.TvSplashRoute
 import com.quizzgame.tv.navigation.DashboardNavigationContext
 import com.quizzgame.tv.navigation.TvNavigationContext
 import com.quizzgame.tv.navigation.TvRootGraph
@@ -31,8 +32,10 @@ internal fun TvAppRoot(
     graphs: Set<FeatureEntries<TvNavigationContext>>,
     dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     viewModel: AppRootViewModel = hiltViewModel(),
+    policies: Set<NavigationPolicy> = emptySet(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val externalRequest by viewModel.pendingNavigation.collectAsStateWithLifecycle()
     val entryState by viewModel.entryState.collectAsStateWithLifecycle()
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
@@ -49,17 +52,26 @@ internal fun TvAppRoot(
                 is AppEntryState.Blocked -> Box(Modifier.fillMaxSize().testTag(AppRootTags.ENTRY_FAILED)) {
                     QuizzTvErrorFullScreen(entry.error, viewModel::onAction)
                 }
-                is AppEntryState.Ready -> key(entry.identity) {
+                is AppEntryState.Ready -> {
                     val initialDestination = when (entry.screen) {
-                        AppEntryScreen.SPLASH -> SplashRoute
+                        AppEntryScreen.SPLASH -> TvSplashRoute
                         AppEntryScreen.SIGN_IN -> SignInRoute
                     }
                     TvRootGraph(
                         graphs = graphs,
+                        policies = policies,
+                        externalRequest = externalRequest,
+                        onRequestHandled = viewModel::navigationRequestHandled,
                         dashboardGraphs = dashboardGraphs,
                         initialDestination = initialDestination,
                         isCurrentGraph = { viewModel.isCurrentEntry(entry) },
                         onLogout = viewModel::logout,
+                        environment = AppNavigationEnvironment(
+                            entry.identity,
+                            entry.restorationOwner,
+                            session = { viewModel.sessionState.value },
+                            isCurrent = { viewModel.isCurrentEntry(entry) },
+                        ),
                     )
                 }
             }

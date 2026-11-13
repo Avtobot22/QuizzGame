@@ -32,7 +32,6 @@ import io.github.kakaocup.compose.node.element.KNode
 import org.junit.Assert.assertTrue
 
 internal const val LOADING_LABEL = "QuizzGame is loading"
-private const val LOADER_TAG = "brand-loader"
 private const val TITLE = "Decorative brand title"
 private const val SUPPORTING = "Decorative supporting text"
 private val background = Color(0xFF111415)
@@ -48,7 +47,7 @@ internal class BrandLoadingScreen(private val provider: SemanticsNodeInteraction
         provider.onAllNodes(hasText(SUPPORTING)).assertCountEquals(0)
         provider.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsActions.RequestFocus)).assertCountEquals(0)
         provider.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.Focused)).assertCountEquals(0)
-        provider.onNodeWithTag(LOADER_TAG)
+        provider.onNodeWithTag(BrandLoadingTags.LOADER)
             .assertHasNoClickAction()
             .assert(
                 SemanticsMatcher.expectValue(SemanticsProperties.ContentDescription, listOf(LOADING_LABEL)),
@@ -64,7 +63,7 @@ internal class BrandLoadingScreen(private val provider: SemanticsNodeInteraction
     }
 
     fun captureVisibleFrame(): Bitmap {
-        val bitmap = provider.onNodeWithTag(LOADER_TAG).captureToImage().asAndroidBitmap()
+        val bitmap = provider.onNodeWithTag(BrandLoadingTags.LOADER).captureToImage().asAndroidBitmap()
         val pixels = IntArray(bitmap.width * bitmap.height)
         bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
         assertTrue("The finished loader must render visible content", pixels.any { it != background.toArgb() })
@@ -82,7 +81,7 @@ internal fun ComposeContentTestRule.setBrandLoading(size: QuizzBrandLoadingSize 
                 title = { BasicText(TITLE, style = TextStyle(color = Color.White, fontSize = 24.sp)) },
                 supporting = { BasicText(SUPPORTING, style = TextStyle(color = Color.White, fontSize = 14.sp)) },
                 size = size,
-                modifier = Modifier.testTag(LOADER_TAG),
+                modifier = Modifier.testTag(BrandLoadingTags.LOADER),
             )
         }
     }

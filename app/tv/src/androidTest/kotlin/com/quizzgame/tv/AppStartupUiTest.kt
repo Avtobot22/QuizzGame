@@ -6,6 +6,7 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.lifecycle.SavedStateHandle
 import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
@@ -41,7 +42,7 @@ class AppStartupUiTest {
     @Test
     fun blockingStartupErrorRetriesItsOwnerAndThenShowsSplash() {
         val startup = FailingAppStartup()
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -55,6 +56,7 @@ class AppStartupUiTest {
         screen.text(compose.activity.getString(ErrorR.string.quizz_error_action_retry)).assertIsDisplayed()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         screen.tag(TvNavigationTags.SPLASH).assertIsDisplayed()
         compose.runOnIdle { assertEquals(1, startup.retries) }
     }
@@ -62,7 +64,7 @@ class AppStartupUiTest {
     @Test
     fun confirmedExpiryDropsThePreviousRootAndShowsSignIn() {
         val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -73,18 +75,20 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
     }
 
     @Test
     fun signInPlaceholderRestartsSplashWithoutGrantingContent() {
         val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -95,10 +99,13 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SIGN_IN).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
     }
 
@@ -108,7 +115,7 @@ class AppStartupUiTest {
             state.value = AppStartupState.Ready
             sessionState.value = SessionState.Closed
         }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -130,7 +137,7 @@ class AppStartupUiTest {
             sessionState.value = SessionState.Authenticated(1)
             logoutResult = SessionOperation.Failed(SessionStorageFailure.WRITE)
         }
-        val viewModel = AppRootViewModel(startup)
+        val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
@@ -141,6 +148,7 @@ class AppStartupUiTest {
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
+        screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
         screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }

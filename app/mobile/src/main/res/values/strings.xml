@@ -5,4 +5,5 @@
     <string name="splash_placeholder">Splash — экран запуска в разработке</string>
     <string name="signin_placeholder">Вход — экран в разработке</string>
     <string name="join_room_placeholder">Присоединение к комнате — в разработке</string>
+    <string name="navigation_join_room">Комната</string>
 </resources>

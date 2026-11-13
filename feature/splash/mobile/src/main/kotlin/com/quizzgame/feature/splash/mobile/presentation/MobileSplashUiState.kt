@@ -1,9 +1,11 @@
 package com.quizzgame.feature.splash.mobile.presentation
 
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
+import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 
 internal sealed interface MobileSplashUiState {
     data object Loading : MobileSplashUiState
-    data class Failed(val spec: ErrorPresentationSpec) : MobileSplashUiState
+    data class Error(val spec: ErrorPresentationSpec) : MobileSplashUiState
     data class NavigationPending(val destination: MobileSplashDestination) : MobileSplashUiState
+    data object NavigationComplete : MobileSplashUiState
 }
