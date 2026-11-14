@@ -1,0 +1,4 @@
+<resources>
+    <color name="quizz_icon_background">@color/quizz_surface_dark</color>
+    <color name="quizz_icon_foreground">@color/quizz_primary_dark</color>
+</resources>
