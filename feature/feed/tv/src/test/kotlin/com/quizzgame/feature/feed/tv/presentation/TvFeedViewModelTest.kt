@@ -13,6 +13,7 @@ import com.quizzgame.feature.feed.tv.FeedTestData
 import com.quizzgame.feature.feed.tv.data.FeedRepositoryImpl
 import com.quizzgame.feature.feed.tv.domain.LoadFeedUseCase
 import com.quizzgame.feature.feed.tv.domain.LoadRailItemsUseCase
+import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
 import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +28,7 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -48,12 +50,13 @@ class TvFeedViewModelTest {
             )
             store.put("feed", model)
             var generations = 0
-            backgroundScope.launch { model.state.feedSections().collect { generations++ } }
-            val sections = model.state.feedSections().asSnapshot { scrollTo(2) }
+            backgroundScope.launch { model.feed.collect { generations++ } }
+            val sections = model.feed.asSnapshot { scrollTo(2) }
             assertEquals(3, sections.size)
             assertTrue(remote.itemCalls.isEmpty())
             val rail = sections.first()
             val flow = model.items(rail)
+            assertSame(flow, model.items(rail))
             val cards = flow.asSnapshot { scrollTo(2) }
             assertEquals(3, cards.size)
             assertEquals(cards, model.items(rail).asSnapshot { scrollTo(2) })
@@ -61,9 +64,9 @@ class TvFeedViewModelTest {
             val beforeNavigation = generations
             model.onIntent(TvFeedIntent.Open(cards.last().entryId))
             model.onIntent(TvFeedIntent.Open(cards.first().id))
-            assertEquals(cards.last().entryId, (model.state.value as TvFeedState.Content).destination)
+            assertEquals(cards.last().entryId, model.state.value.destination)
             model.onIntent(TvFeedIntent.NavigationHandled)
-            assertEquals(null, (model.state.value as TvFeedState.Content).destination)
+            assertEquals(null, model.state.value.destination)
             runCurrent()
             assertEquals(beforeNavigation, generations)
         } finally {
@@ -93,7 +96,7 @@ class TvFeedViewModelTest {
             val presenter = object : PagingDataPresenter<QuizRail>() {
                 override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
             }
-            backgroundScope.launch { model.state.feedSections().collectLatest(presenter::collectFrom) }
+            backgroundScope.launch { model.feed.collectLatest(presenter::collectFrom) }
             runCurrent()
             store.clear()
             runCurrent()
@@ -122,7 +125,7 @@ class TvFeedViewModelTest {
             val presenter = object : PagingDataPresenter<QuizRail>() {
                 override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
             }
-            backgroundScope.launch { model.state.feedSections().collectLatest(presenter::collectFrom) }
+            backgroundScope.launch { model.feed.collectLatest(presenter::collectFrom) }
             runCurrent()
             val before = presenter.snapshot().items
             assertTrue(before.isNotEmpty())
@@ -134,6 +137,58 @@ class TvFeedViewModelTest {
             presenter.retry()
             runCurrent()
             assertEquals(1, presenter.snapshot().items.size)
+            assertTrue(remote.feedCalls.takeLast(2).all { it == null })
+            assertTrue(model.items(before.first()).asSnapshot().isEmpty())
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun refreshAndRetryIntentsAreDeliveredToThePagingOwner() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(LoadFeedUseCase(repository), LoadRailItemsUseCase(repository), flags)
+            store.put("feed", model)
+            val received = mutableListOf<TvFeedEvent>()
+            backgroundScope.launch { model.events.collect { received += it } }
+            model.onIntent(TvFeedIntent.Refresh)
+            model.onIntent(TvFeedIntent.Retry)
+            runCurrent()
+            assertEquals(listOf(TvFeedEvent.REFRESH, TvFeedEvent.RETRY), received)
+            assertTrue(remote.feedCalls.isEmpty())
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun inactiveRailCacheIsBoundedAndEvictionRefetchesOnlyContinuation() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val seed = FeedTestData.feed().rails.first()
+            remote.feedReply = {
+                FeedResult.Loaded(
+                    Feed(List(14) { seed.copy(id = "rail-$it") }),
+                )
+            }
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(LoadFeedUseCase(repository), LoadRailItemsUseCase(repository), flags)
+            store.put("feed", model)
+            val rails = model.feed.asSnapshot { scrollTo(13) }
+            rails.forEach { model.items(it).asSnapshot { scrollTo(2) } }
+            model.items(rails.first()).asSnapshot { scrollTo(2) }
+            assertEquals(2, remote.itemCalls.count { it.first == rails.first().id })
+            assertEquals(1, remote.feedCalls.size)
         } finally {
             store.clear()
             runCurrent()

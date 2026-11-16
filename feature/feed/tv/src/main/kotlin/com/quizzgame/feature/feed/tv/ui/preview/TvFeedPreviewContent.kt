@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui.content
+package com.quizzgame.feature.feed.tv.ui.preview
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,15 +23,14 @@ import com.quizzgame.core.media.MediaSpec
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
-import com.quizzgame.feature.feed.tv.presentation.TvFeedState
-import com.quizzgame.feature.feed.tv.ui.paging.TvFeedRefreshAction
-import com.quizzgame.feature.feed.tv.ui.rail.TvQuizRail
-import com.quizzgame.feature.feed.tv.ui.status.TvFeedAppendingSections
+import com.quizzgame.feature.feed.tv.ui.TvFeedAppendingSections
+import com.quizzgame.feature.feed.tv.ui.TvFeedRefreshAction
+import com.quizzgame.feature.feed.tv.ui.TvQuizRail
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 
 @Composable
-internal fun TvFeedContent(
-    state: TvFeedState.Content,
+internal fun TvFeedPreviewContent(
+    state: TvFeedPreviewState.Content,
     onIntent: (TvFeedIntent) -> Unit,
     requestFocus: Boolean,
     modifier: Modifier,
@@ -63,7 +62,7 @@ internal fun TvFeedContent(
                         { action ->
                             when (action) {
                                 ErrorActionKind.RETRY -> onIntent(TvFeedIntent.Retry)
-                                ErrorActionKind.DISMISS -> onIntent(TvFeedIntent.DismissError)
+                                ErrorActionKind.DISMISS -> Unit
                                 ErrorActionKind.SIGN_IN -> onSignIn()
                                 else -> Unit
                             }
@@ -84,7 +83,7 @@ internal fun TvFeedContent(
 }
 
 private fun androidx.compose.foundation.lazy.LazyListScope.feedRails(
-    state: TvFeedState.Content,
+    state: TvFeedPreviewState.Content,
     onIntent: (TvFeedIntent) -> Unit,
     focus: FocusRequester,
     firstRailFocus: FocusRequester,

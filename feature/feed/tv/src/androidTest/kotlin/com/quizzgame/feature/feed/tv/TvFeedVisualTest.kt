@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
-import com.quizzgame.feature.feed.tv.presentation.TvFeedState
-import com.quizzgame.feature.feed.tv.ui.content.TvFeedStateContent
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
+import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
+import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewStateContent
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import com.quizzgame.feature.feed.tv.ui.tags.TvVisualTags
 import io.github.kakaocup.compose.node.element.KNode
@@ -38,16 +38,16 @@ class TvFeedVisualTest(private val index: Int) {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
                 QuizzTvPreviewScreen(Modifier.size(960.dp, 540.dp).testTag(TvVisualTags.ROOT)) {
-                    TvFeedStateContent(state, {}, false, Modifier, {})
+                    TvFeedPreviewStateContent(state, {}, false, Modifier, {})
                 }
             }
         }
         compose.waitForIdle()
         val stateTag = when (state) {
-            TvFeedState.Loading -> TvFeedTags.LOADING
-            TvFeedState.Empty -> TvFeedTags.EMPTY
-            is TvFeedState.Content -> TvFeedTags.CONTENT
-            is TvFeedState.Error -> TvVisualTags.ROOT
+            TvFeedPreviewState.Loading -> TvFeedTags.LOADING
+            TvFeedPreviewState.Empty -> TvFeedTags.EMPTY
+            is TvFeedPreviewState.Content -> TvFeedTags.CONTENT
+            is TvFeedPreviewState.Error -> TvVisualTags.ROOT
         }
         KNode(compose) { hasTestTag(stateTag) }.assertIsDisplayed()
         val context = InstrumentationRegistry.getInstrumentation().targetContext

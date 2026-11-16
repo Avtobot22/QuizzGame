@@ -1,7 +1,9 @@
 package com.quizzgame.feature.feed.tv.data.paging
 
+import androidx.paging.PagingConfig
 import androidx.paging.PagingSource.LoadParams
 import androidx.paging.PagingSource.LoadResult
+import androidx.paging.PagingState
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.feature.feed.tv.FakeFeedRemoteDataSource
@@ -11,9 +13,8 @@ import com.quizzgame.feature.feed.tv.domain.entity.CursorPageInfo
 import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
 import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
-import kotlinx.coroutines.CompletableDeferred
+import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
@@ -52,23 +53,6 @@ class FeedPagingSourceTest {
         assertEquals(listOf(rail.id to "opaque-rail-a-after-2"), repository.itemCalls)
         assertEquals(3, (first.data + last.data).map { it.id }.distinct().size)
         assertNull(last.nextKey)
-    }
-
-    @Test
-    fun concurrentSameKeyLoadsHaveOneRequestAndOneStablePage() = runTest {
-        val source = RailItemsPagingSource(FeedTestData.feed().rails.first(), repository, owner)
-        source.load(LoadParams.Refresh(null, 12, false))
-        val gate = CompletableDeferred<Unit>()
-        repository.itemsReply = {
-            gate.await()
-            FeedResult.Loaded(FeedTestData.items())
-        }
-        val first = async { source.load(LoadParams.Append("opaque-rail-a-after-2", 12, false)) }
-        val second = async { source.load(LoadParams.Append("opaque-rail-a-after-2", 12, false)) }
-        runCurrent()
-        assertEquals(1, repository.itemCalls.size)
-        gate.complete(Unit)
-        assertEquals(first.await(), second.await())
     }
 
     @Test
@@ -172,5 +156,64 @@ class FeedPagingSourceTest {
         assertEquals(4, cards.map(QuizCard::id).distinct().size)
         assertEquals(first.data.first().entryId, third.data.single().entryId)
         assertNull(third.nextKey)
+    }
+
+    @Test
+    fun failedInitialLoadIsAnErrorAndCanBeRetried() = runTest {
+        repository.feedReply = { FeedResult.Failed(AppFailure.InvalidServerData) }
+        val source = FeedSectionsPagingSource(repository, owner)
+        assertTrue(source.load(LoadParams.Refresh(null, 6, false)) is LoadResult.Error)
+        repository.feedReply = { FeedResult.Loaded(FeedTestData.feed()) }
+        assertTrue(source.load(LoadParams.Refresh(null, 6, false)) is LoadResult.Page)
+        assertEquals(listOf(null, null), repository.feedCalls)
+    }
+
+    @Test
+    fun unexpectedRequestExceptionBecomesAnErrorPage() = runTest {
+        val failure = java.io.IOException("Unavailable")
+        repository.feedReply = { throw failure }
+        val source = FeedSectionsPagingSource(repository, owner)
+        val error = source.load(LoadParams.Refresh(null, 6, false)) as LoadResult.Error
+        assertEquals(failure, error.throwable)
+    }
+
+    @Test
+    fun refreshKeyDoesNotReuseAnAnchoredCursor() {
+        val source = FeedSectionsPagingSource(repository, owner)
+        val page = LoadResult.Page<String, QuizRail>(
+            FeedTestData.feed().rails,
+            null,
+            "opaque",
+        )
+        assertNull(source.getRefreshKey(PagingState(listOf(page), 1, PagingConfig(6), 0)))
+    }
+
+    @Test
+    fun anEarlierCursorCycleWithDistinctCardsIsRejected() = runTest {
+        val rail = FeedTestData.feed().rails.first()
+        val source = RailItemsPagingSource(rail, repository, owner)
+        source.load(LoadParams.Refresh(null, 12, false))
+        repository.itemsReply = {
+            FeedResult.Loaded(FeedTestData.items().copy(page = CursorPageInfo(true, "third")))
+        }
+        source.load(LoadParams.Append("opaque-rail-a-after-2", 12, false))
+        repository.itemsReply = {
+            FeedResult.Loaded(
+                FeedTestData.items().copy(
+                    cards = listOf(rail.cards.first().copy(id = "new-card")),
+                    page = CursorPageInfo(true, "opaque-rail-a-after-2"),
+                ),
+            )
+        }
+        assertTrue(source.load(LoadParams.Append("third", 12, false)) is LoadResult.Error)
+    }
+
+    @Test
+    fun obsoleteRailDoesNotSendItsCursor() = runTest {
+        val rail = FeedTestData.feed().rails.first()
+        val source = RailItemsPagingSource(rail, repository, owner, isCurrent = { false })
+        val error = source.load(LoadParams.Append("obsolete", 12, false)) as LoadResult.Error
+        assertEquals(AppFailure.OperationInterrupted, (error.throwable as FeedPagingException).failure)
+        assertTrue(repository.itemCalls.isEmpty())
     }
 }

@@ -20,22 +20,25 @@ import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
+import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
+import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
 import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
 import com.quizzgame.feature.feed.tv.presentation.TvFeedState
-import com.quizzgame.feature.feed.tv.presentation.TvFeedViewModel
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
+import kotlinx.coroutines.flow.Flow
 
 @Composable
 internal fun TvPagedFeedContent(
     sections: LazyPagingItems<QuizRail>,
-    viewModel: TvFeedViewModel,
-    state: TvFeedState.Content,
+    onIntent: (TvFeedIntent) -> Unit,
+    items: (QuizRail) -> Flow<PagingData<QuizCard>>,
+    state: TvFeedState,
     requestFocus: Boolean,
     modifier: Modifier,
     onSignIn: () -> Unit,
@@ -56,11 +59,11 @@ internal fun TvPagedFeedContent(
         items(sections.itemCount, key = sections.itemKey { it.id }) { index ->
             sections[index]?.let { rail ->
                 TvPagedRail(
-                    rail, viewModel, state, firstRailFocus.takeIf { index == firstVisibleIndex },
+                    rail, items, state, firstRailFocus.takeIf { index == firstVisibleIndex },
                     headerAction = if (index == 0) {
                         {
                             TvFeedRefreshAction(sections.loadState.refresh is LoadState.Loading) {
-                                sections.refresh()
+                                onIntent(TvFeedIntent.Refresh)
                             }
                         }
                     } else {
@@ -68,7 +71,7 @@ internal fun TvPagedFeedContent(
                     },
                     onOpen = {
                         focus.saveFocusedChild()
-                        viewModel.onIntent(TvFeedIntent.Open(it))
+                        onIntent(TvFeedIntent.Open(it))
                     },
                     onSignIn = onSignIn,
                     restoreCardId = if (
@@ -85,19 +88,23 @@ internal fun TvPagedFeedContent(
                 )
             }
         }
-        feedLoadStates(sections, onSignIn)
+        feedLoadStates(sections, onSignIn) { onIntent(TvFeedIntent.Retry) }
     }
     TvEntryFocus(focus, requestFocus)
 }
 
-private fun LazyListScope.feedLoadStates(sections: LazyPagingItems<QuizRail>, onSignIn: () -> Unit) {
+private fun LazyListScope.feedLoadStates(
+    sections: LazyPagingItems<QuizRail>,
+    onSignIn: () -> Unit,
+    onRetry: () -> Unit,
+) {
     val refresh = sections.loadState.refresh as? LoadState.Error
     if (refresh != null) {
         item(key = "refresh-error") {
             TvFeedPageError(
                 refresh.error,
                 true,
-                sections::retry,
+                onRetry,
                 onSignIn,
                 operation = OperationKind.USER_REFRESH,
                 tag = TvFeedTags.REFRESH_RETRY,
@@ -107,7 +114,7 @@ private fun LazyListScope.feedLoadStates(sections: LazyPagingItems<QuizRail>, on
     when (val append = sections.loadState.append) {
         is LoadState.Loading -> item(key = "sections-loading") { TvFeedAppendingSections() }
         is LoadState.Error -> item(key = "sections-error") {
-            TvFeedPageError(append.error, true, sections::retry, onSignIn, tag = TvFeedTags.APPEND_RETRY)
+            TvFeedPageError(append.error, true, onRetry, onSignIn, tag = TvFeedTags.APPEND_RETRY)
         }
         is LoadState.NotLoading -> Unit
     }
