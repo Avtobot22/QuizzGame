@@ -9,6 +9,7 @@ import androidx.navigation3.runtime.rememberDecoratedNavEntries
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import com.quizzgame.core.navigation.chrome.TOP_LEVEL_ROOT
 
+/** Новое поколение графа создаёт новые владельцы state и ViewModel для всех его стеков. */
 @Composable
 fun NavigationState.decoratedEntries(provider: (NavKey) -> NavEntry<NavKey>): List<NavEntry<NavKey>> {
     val current = snapshot

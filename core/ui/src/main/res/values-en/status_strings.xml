@@ -1,4 +1,10 @@
 <resources>
     <string name="quizz_confirmation_confirm">Confirm</string>
     <string name="quizz_confirmation_cancel">Cancel</string>
+    <string name="quizz_loading">Loading</string>
+    <string name="quizz_action_back">Back</string>
+    <string name="quizz_status_network_help">Check your internet connection and try again.</string>
+    <string name="quizz_status_server_help">The service is temporarily unavailable. Please try again later.</string>
+    <string name="quizz_status_auth_help">Sign in to your account again to continue.</string>
+    <string name="quizz_status_generic_help">We could not complete this action. Please try again.</string>
 </resources>

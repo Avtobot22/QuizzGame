@@ -1,4 +1,4 @@
-package com.quizzgame.core.error.ui.tv.testutil
+package com.quizzgame.core.error.ui.tv.tags
 
 internal object TvErrorTags {
     const val ROOT = "error"

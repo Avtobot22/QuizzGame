@@ -3,6 +3,7 @@ package com.quizzgame.core.navigation.chrome
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.onAllNodesWithTag
+import com.quizzgame.core.navigation.chrome.ui.tags.NavigationChromeTestTags
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 

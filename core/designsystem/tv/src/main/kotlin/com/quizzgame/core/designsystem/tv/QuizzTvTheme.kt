@@ -11,7 +11,7 @@ import androidx.tv.material3.darkColorScheme
 import com.quizzgame.core.ui.LocalQuizzGameColors
 import com.quizzgame.core.ui.QuizzGameColors
 import com.quizzgame.core.ui.tokens.QuizzShape
-import com.quizzgame.core.ui.tokens.QuizzTypography
+import com.quizzgame.core.ui.tokens.QuizzTvTypography
 
 private val TvDarkColors = darkColorScheme(
     primary = TvDarkPalette.primary,
@@ -63,21 +63,21 @@ private val TvDarkGameColors = QuizzGameColors(
 )
 
 private val TvTypography = Typography(
-    displayLarge = QuizzTypography.displayLarge,
-    displayMedium = QuizzTypography.displayMedium,
-    displaySmall = QuizzTypography.displaySmall,
-    headlineLarge = QuizzTypography.headlineLarge,
-    headlineMedium = QuizzTypography.headlineMedium,
-    headlineSmall = QuizzTypography.headlineSmall,
-    titleLarge = QuizzTypography.titleLarge,
-    titleMedium = QuizzTypography.titleMedium,
-    titleSmall = QuizzTypography.titleSmall,
-    bodyLarge = QuizzTypography.bodyLarge,
-    bodyMedium = QuizzTypography.bodyMedium,
-    bodySmall = QuizzTypography.bodySmall,
-    labelLarge = QuizzTypography.labelLarge,
-    labelMedium = QuizzTypography.labelMedium,
-    labelSmall = QuizzTypography.labelSmall,
+    displayLarge = QuizzTvTypography.displayLarge,
+    displayMedium = QuizzTvTypography.displayMedium,
+    displaySmall = QuizzTvTypography.displaySmall,
+    headlineLarge = QuizzTvTypography.headlineLarge,
+    headlineMedium = QuizzTvTypography.headlineMedium,
+    headlineSmall = QuizzTvTypography.headlineSmall,
+    titleLarge = QuizzTvTypography.titleLarge,
+    titleMedium = QuizzTvTypography.titleMedium,
+    titleSmall = QuizzTvTypography.titleSmall,
+    bodyLarge = QuizzTvTypography.bodyLarge,
+    bodyMedium = QuizzTvTypography.bodyMedium,
+    bodySmall = QuizzTvTypography.bodySmall,
+    labelLarge = QuizzTvTypography.labelLarge,
+    labelMedium = QuizzTvTypography.labelMedium,
+    labelSmall = QuizzTvTypography.labelSmall,
 )
 
 private val TvShapes = Shapes(

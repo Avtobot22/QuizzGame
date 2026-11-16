@@ -1,5 +1,6 @@
 package com.quizzgame.core.error.ui.tv.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -23,6 +24,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.tv.material3.MaterialTheme
 import com.quizzgame.core.designsystem.tv.QuizzTvStatusContent
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
 import com.quizzgame.core.error.presentation.ErrorActionKind
@@ -32,7 +34,6 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.common.presentation.errorUiModel
 import com.quizzgame.core.error.ui.common.presentation.requireErrorSurface
 import com.quizzgame.core.ui.status.QuizzNoticeTone
-import com.quizzgame.core.ui.status.QuizzStatusDimensions
 import com.quizzgame.core.ui.tokens.QuizzDimensions
 
 @Composable
@@ -47,8 +48,9 @@ fun QuizzTvErrorFullScreen(
     val model = errorUiModel(spec)
     val firstAction = remember { FocusRequester() }
     var focused by remember { mutableStateOf(false) }
+    val colors = MaterialTheme.colorScheme
     Box(
-        modifier = modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing)
+        modifier = modifier.fillMaxSize().background(colors.background).windowInsetsPadding(WindowInsets.safeDrawing)
             .padding(
                 horizontal = QuizzDimensions.tvSafeHorizontalDp.dp,
                 vertical = QuizzDimensions.tvSafeVerticalDp.dp,
@@ -56,7 +58,7 @@ fun QuizzTvErrorFullScreen(
         contentAlignment = Alignment.Center,
     ) {
         Column(
-            modifier = Modifier.widthIn(max = QuizzStatusDimensions.tvWidth.dp)
+            modifier = Modifier.widthIn(max = 600.dp)
                 .fillMaxWidth().verticalScroll(rememberScrollState()),
         ) {
             QuizzTvStatusContent(

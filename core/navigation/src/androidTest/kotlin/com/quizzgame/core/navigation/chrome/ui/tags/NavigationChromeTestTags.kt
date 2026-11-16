@@ -1,4 +1,4 @@
-package com.quizzgame.core.navigation.chrome
+package com.quizzgame.core.navigation.chrome.ui.tags
 
 internal object NavigationChromeTestTags {
     const val CHROME = "chrome"

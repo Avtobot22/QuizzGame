@@ -63,11 +63,11 @@ fun QuizzConfirmationDialog(
             contentColor = colors.onSurface,
         ) {
             Column(
-                modifier = Modifier.padding(QuizzStatusDimensions.padding.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.gap.dp),
+                modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Text(title, style = MaterialTheme.typography.headlineSmall)
-                Text(text, style = MaterialTheme.typography.bodyLarge)
+                Text(text, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant)
                 ConfirmationActions(cancelLabel, confirmLabel, enabled && !completed, dismiss) {
                     if (!completed) {
                         completed = true
@@ -97,10 +97,10 @@ private fun ConfirmationActions(
     confirm: () -> Unit,
 ) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.actionGap.dp),
-        verticalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.actionGap.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        QuizzButton(onClick = dismiss, modifier = Modifier) { Text(cancelLabel) }
-        QuizzButton(onClick = confirm, enabled = enabled) { Text(confirmLabel) }
+        QuizzButton(onClick = dismiss, style = QuizzButtonStyle.TEXT) { Text(cancelLabel, maxLines = 1) }
+        QuizzButton(onClick = confirm, enabled = enabled) { Text(confirmLabel, maxLines = 1) }
     }
 }

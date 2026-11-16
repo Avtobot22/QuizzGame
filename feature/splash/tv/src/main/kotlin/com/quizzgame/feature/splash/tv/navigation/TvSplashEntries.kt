@@ -8,7 +8,7 @@ import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.feature.splash.tv.ui.TvSplashScreen
-import com.quizzgame.feature.splash.tv.ui.TvSplashTags
+import com.quizzgame.feature.splash.tv.ui.tags.TvSplashTags
 
 data class TvSplashCallbacks(val onContinue: () -> Boolean, val onSignIn: () -> Boolean)
 

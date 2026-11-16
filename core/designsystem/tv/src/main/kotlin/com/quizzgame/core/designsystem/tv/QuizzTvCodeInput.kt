@@ -31,7 +31,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.key.KeyEvent
@@ -155,7 +154,10 @@ private fun CodeCells(value: String, length: Int, enabled: Boolean, isError: Boo
                 modifier = Modifier
                     .width(QuizzDimensions.tvCodeCellWidthDp.dp)
                     .height(QuizzDimensions.tvCodeCellHeightDp.dp)
-                    .background(colors.surfaceVariant, MaterialTheme.shapes.medium)
+                    .background(
+                        if (active) colors.primaryContainer else colors.surfaceVariant.copy(alpha = 0.4f),
+                        MaterialTheme.shapes.medium,
+                    )
                     .border(
                         BorderStroke(if (active) QuizzDimensions.tvFocusOutlineDp.dp else 1.dp, stroke),
                         MaterialTheme.shapes.medium,
@@ -225,7 +227,6 @@ private fun CodeKey(
 ) {
     val colors = MaterialTheme.colorScheme
     val shape = MaterialTheme.shapes.small
-    val focusBorder = Border(BorderStroke(QuizzDimensions.tvFocusOutlineDp.dp, colors.primary), shape = shape)
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -234,17 +235,21 @@ private fun CodeKey(
             .height(QuizzDimensions.tvCodeKeyHeightDp.dp),
         shape = ButtonDefaults.shape(shape = shape),
         colors = ButtonDefaults.colors(
-            containerColor = Color.Transparent,
+            containerColor = colors.surfaceVariant.copy(alpha = 0.3f),
             contentColor = colors.onSurfaceVariant,
-            focusedContainerColor = colors.primary,
-            focusedContentColor = colors.onPrimary,
+            focusedContainerColor = colors.surfaceVariant,
+            focusedContentColor = colors.onSurface,
             pressedContainerColor = colors.primaryContainer,
             pressedContentColor = colors.onPrimaryContainer,
             disabledContainerColor = colors.surface,
             disabledContentColor = colors.onSurfaceVariant.copy(alpha = 0.38f),
         ),
         scale = ButtonDefaults.scale(focusedScale = QuizzDimensions.tvFocusScaleButton),
-        border = ButtonDefaults.border(focusedBorder = focusBorder, focusedDisabledBorder = focusBorder),
+        border = ButtonDefaults.border(
+            focusedBorder = Border(BorderStroke(2.dp, colors.onSurface), shape = shape),
+            focusedDisabledBorder = Border.None,
+        ),
+        glow = ButtonDefaults.glow(),
         contentPadding = PaddingValues(0.dp),
         content = content,
     )

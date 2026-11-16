@@ -28,6 +28,7 @@ import androidx.navigation3.scene.SceneStrategy
 import androidx.navigation3.scene.SceneStrategyScope
 import androidx.navigation3.scene.SinglePaneSceneStrategy
 import com.quizzgame.core.navigation.AppNavigator
+import com.quizzgame.core.navigation.chrome.ui.tags.NavigationChromeTestTags
 import com.quizzgame.core.navigation.decoratedEntries
 import com.quizzgame.core.navigation.rememberNavigationState
 import kotlinx.serialization.Serializable

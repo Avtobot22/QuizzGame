@@ -1,5 +1,6 @@
 package com.quizzgame.feature.splash.tv.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -11,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Text
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.ui.tv.components.QuizzTvErrorFullScreen
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
@@ -25,7 +25,7 @@ import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.Retry
 import com.quizzgame.feature.splash.tv.presentation.TvSplashIntent.SignIn
 import com.quizzgame.feature.splash.tv.presentation.TvSplashUiState
 import com.quizzgame.feature.splash.tv.presentation.TvSplashViewModel
-import com.quizzgame.core.ui.R as UiR
+import com.quizzgame.feature.splash.tv.ui.tags.TvSplashTags
 
 @Composable
 fun TvSplashScreen(
@@ -47,7 +47,7 @@ fun TvSplashScreen(
 }
 
 @Composable
-private fun TvSplashContent(
+internal fun TvSplashContent(
     state: TvSplashUiState,
     onIntent: (TvSplashIntent) -> Unit,
     onDashboard: () -> Boolean,
@@ -65,7 +65,11 @@ private fun TvSplashContent(
             TvSplashDestination.SIGN_IN   -> onSignIn()
         }
     }
-    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    val colors = MaterialTheme.colorScheme
+    Box(
+        modifier.fillMaxSize().background(colors.background),
+        contentAlignment = Alignment.Center,
+    ) {
         when (val current = state) {
             is TvSplashUiState.Error -> QuizzTvErrorFullScreen(
                 current.spec,
@@ -82,13 +86,6 @@ private fun TvSplashContent(
                 label = stringResource(R.string.splash_accessibility_loading),
                 primary = MaterialTheme.colorScheme.primary,
                 accent = MaterialTheme.colorScheme.tertiary,
-                title = {
-                    Text(
-                        stringResource(UiR.string.quizz_brand_name),
-                        style = MaterialTheme.typography.displayMedium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
-                },
                 modifier = Modifier.testTag(TvSplashTags.LOADING),
                 size = QuizzBrandLoadingSize.EXPANDED,
             )
