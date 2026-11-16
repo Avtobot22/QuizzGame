@@ -61,6 +61,8 @@ tasks.register("ciUnitTestDebug") {
     group = "verification"
     description = "Runs debug JVM unit tests."
     dependsOn(
+        ":core:media:test",
+        ":shared:catalog:test",
         ":app:foundation:testDebugUnitTest",
         ":app:debug-support:testDebugUnitTest",
         ":core:navigation:testDebugUnitTest",
@@ -87,6 +89,8 @@ tasks.register("ciUnitTestRelease") {
     group = "verification"
     description = "Runs release JVM unit tests."
     dependsOn(
+        ":core:media:test",
+        ":shared:catalog:test",
         ":app:foundation:testReleaseUnitTest",
         ":core:navigation:testReleaseUnitTest",
         ":core:network:testReleaseUnitTest",
