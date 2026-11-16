@@ -5,12 +5,12 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.SavedStateHandle
-import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupFailure
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.app.startup.GraphAccessResult
+import com.quizzgame.app.ui.tags.AppRootTags
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorCopyKey
@@ -19,10 +19,9 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageFailure
-import com.quizzgame.mobile.navigation.MobileChromeTags
-import com.quizzgame.mobile.navigation.MobileDemoTags
-import com.quizzgame.mobile.navigation.MobileNavigationModule
-import com.quizzgame.mobile.navigation.MobileNavigationTags
+import com.quizzgame.mobile.ui.tags.MobileChromeTags
+import com.quizzgame.mobile.ui.tags.MobileFixtureTags
+import com.quizzgame.mobile.ui.tags.MobileNavigationTags
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -43,7 +42,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -64,7 +63,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -72,7 +71,7 @@ class AppStartupUiTest {
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileDemoTags.action(1)).performClick()
+        screen.tag(MobileFixtureTags.action(1)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
@@ -88,7 +87,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -96,11 +95,11 @@ class AppStartupUiTest {
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileDemoTags.action(0)).performClick()
+        screen.tag(MobileFixtureTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileDemoTags.action(0)).performClick()
+        screen.tag(MobileFixtureTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
@@ -117,7 +116,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -138,7 +137,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzMobileTheme {
                 MobileAppRoot(
-                    setOf(startupTestEntries(), MobileNavigationModule.contentEntries()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -146,9 +145,9 @@ class AppStartupUiTest {
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileDemoTags.action(1)).performClick()
+        screen.tag(MobileFixtureTags.action(1)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
-        screen.tag(MobileDemoTags.action(0)).performClick()
+        screen.tag(MobileFixtureTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_FAILED).isDisplayed() }
         screen.tag(MobileNavigationTags.SIGN_IN).assertDoesNotExist()
         compose.runOnIdle { assertEquals(0L, viewModel.logoutRevision.value) }

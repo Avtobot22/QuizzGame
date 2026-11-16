@@ -1,0 +1,35 @@
+{
+  "id": "7c324c71-9cd5-4235-887b-a7800c39a401",
+  "tabs": [
+    {
+      "id": "feed",
+      "title": "Главная",
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.home"
+      },
+      "enabled": true
+    },
+    {
+      "id": "library",
+      "title": "Библиотека",
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.library"
+      },
+      "enabled": true
+    },
+    {
+      "id": "settings",
+      "title": "Настройки",
+      "enabled": false
+    }
+  ],
+  "navigationAppearance": {
+    "background": "solid",
+    "selectedColor": {
+      "kind": "token",
+      "name": "accent.primary"
+    }
+  }
+}

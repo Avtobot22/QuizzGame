@@ -9,11 +9,11 @@ import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
-import com.quizzgame.tv.dashboard.demo.DashboardTabDescriptor
-import com.quizzgame.tv.dashboard.demo.DashboardTabId
-import com.quizzgame.tv.dashboard.demo.DemoDashboard
-import com.quizzgame.tv.dashboard.demo.DemoDashboardEntries
-import com.quizzgame.tv.dashboard.demo.DemoDashboardTags
+import com.quizzgame.tv.dashboard.fixture.DashboardTabDescriptor
+import com.quizzgame.tv.dashboard.fixture.DashboardTabId
+import com.quizzgame.tv.dashboard.fixture.FixtureDashboard
+import com.quizzgame.tv.dashboard.fixture.FixtureDashboardEntries
+import com.quizzgame.tv.dashboard.fixture.ui.tags.FixtureDashboardTags
 import org.junit.Rule
 import org.junit.Test
 
@@ -26,22 +26,22 @@ class DashboardConfigurationTest {
         var tabs by mutableStateOf(listOf(DashboardTabDescriptor("main"), DashboardTabDescriptor("library")))
         compose.setContent {
             QuizzTvTheme {
-                DemoDashboard(
+                FixtureDashboard(
                     onLogout = {},
-                    graphs = setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    graphs = setOf(FixtureDashboardEntries.tabs(), FixtureDashboardEntries.details()),
                     tabs = tabs,
                 )
             }
         }
-        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.MAIN)).assertIsDisplayed()
+        compose.onNodeWithTag(FixtureDashboardTags.tabContent(DashboardTabId.MAIN)).assertIsDisplayed()
         compose.runOnIdle {
             tabs = listOf(DashboardTabDescriptor("main", false), DashboardTabDescriptor("settings"))
         }
-        compose.onNodeWithTag(DemoDashboardTags.tab(DashboardTabId.MAIN)).assertIsNotEnabled()
-        compose.onNodeWithTag(DemoDashboardTags.tab(DashboardTabId.LIBRARY)).assertDoesNotExist()
-        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertIsDisplayed()
+        compose.onNodeWithTag(FixtureDashboardTags.tab(DashboardTabId.MAIN)).assertIsNotEnabled()
+        compose.onNodeWithTag(FixtureDashboardTags.tab(DashboardTabId.LIBRARY)).assertDoesNotExist()
+        compose.onNodeWithTag(FixtureDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertIsDisplayed()
         compose.runOnIdle { tabs = emptyList() }
-        compose.onNodeWithTag(DemoDashboardTags.EMPTY).assertIsDisplayed()
-        compose.onNodeWithTag(DemoDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertDoesNotExist()
+        compose.onNodeWithTag(FixtureDashboardTags.EMPTY).assertIsDisplayed()
+        compose.onNodeWithTag(FixtureDashboardTags.tabContent(DashboardTabId.SETTINGS)).assertDoesNotExist()
     }
 }

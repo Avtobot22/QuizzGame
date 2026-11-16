@@ -9,7 +9,12 @@ plugins {
 
 android {
     namespace = "com.quizzgame.tv"
-    defaultConfig { applicationId = "com.quizzgame.tv" }
+    defaultConfig {
+        applicationId = "com.quizzgame.tv"
+        val imageHosts = providers.gradleProperty("quizz.catalog.imageHosts").orElse("").get()
+        require(imageHosts.matches(Regex("[A-Za-z0-9.,-]*")))
+        buildConfigField("String", "CATALOG_IMAGE_HOSTS", "\"$imageHosts\"")
+    }
 }
 
 quizzNetwork {
@@ -24,13 +29,16 @@ quizzDebug {
 }
 
 dependencies {
+    implementation(projects.core.designsystem.tv)
+    implementation(projects.feature.dashboard.tv)
+    implementation(projects.feature.feed.tv)
+    implementation(projects.feature.quizEntry.tv)
     implementation(projects.app.foundation)
     implementation(projects.core.navigation)
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.tv)
     implementation(projects.core.network)
     implementation(projects.core.session)
-    implementation(projects.core.designsystem.tv)
     implementation(projects.core.error.uiTv)
     implementation(libs.bundles.navigation3)
     implementation(libs.kotlinx.serialization.core)

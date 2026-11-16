@@ -1,0 +1,7 @@
+<resources>
+    <string name="dashboard_empty">The catalog is not ready yet</string>
+    <string name="dashboard_logout">Sign out</string>
+    <string name="dashboard_empty_description">We are getting the games ready. Please check back in a little while.</string>
+    <string name="dashboard_preview_title">Your next game night</string>
+    <string name="dashboard_preview_message">Quizzes to play with friends and family</string>
+</resources>

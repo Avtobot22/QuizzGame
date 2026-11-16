@@ -4,6 +4,7 @@ import android.content.Context
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.AppNetworkSettings
 import com.quizzgame.app.session.SessionManagerFactory
+import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import com.quizzgame.debug.network.debugAppNetworkFactory
 import com.quizzgame.debug.network.mocks.SplashMockScenario
@@ -20,8 +21,11 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object AppServicesModule {
     @Provides
-    fun sessionManagerFactory(@ApplicationContext context: Context): SessionManagerFactory =
-        SessionManagerFactory { openDebugSession(context, BuildConfig.DEBUG_SESSION_SCENARIO) }
+    fun sessionManagerFactory(
+        @ApplicationContext context: Context,
+        dispatchers: DispatcherProvider,
+    ): SessionManagerFactory =
+        SessionManagerFactory { openDebugSession(context, BuildConfig.DEBUG_SESSION_SCENARIO, dispatchers.io) }
 
     @Provides
     fun networkFactory(

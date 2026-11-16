@@ -1,0 +1,11 @@
+<resources>
+    <string name="feed_empty">Квизы ещё не появились</string>
+    <string name="feed_refresh">Обновить</string>
+    <string name="feed_quiz_bookmarked">В избранном</string>
+    <string name="feed_quiz_completed">Пройдено</string>
+    <string name="feed_quiz_progress">Прогресс: %1$d%%</string>
+    <string name="feed_empty_description">Здесь будут подборки для игры с друзьями. Попробуйте обновить каталог чуть позже.</string>
+    <string name="feed_refreshing">Обновляем…</string>
+    <string name="feed_loading_sections">Загружаем новые подборки</string>
+    <string name="feed_loading_cards">Загружаем ещё квизы</string>
+</resources>

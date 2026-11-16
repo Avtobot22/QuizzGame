@@ -1,0 +1,16 @@
+<resources>
+    <string name="fixture_label">TEST — локальная проверка переходов</string>
+    <string name="fixture_signin">TEST: открыть вход</string>
+    <string name="fixture_continue">TEST: продолжить без авторизации</string>
+    <string name="fixture_signout">TEST: завершить сессию</string>
+    <string name="fixture_dashboard_empty">Нет доступных разделов</string>
+    <string name="fixture_tab_main">Главная</string>
+    <string name="fixture_tab_library">Библиотека</string>
+    <string name="fixture_tab_settings">Настройки</string>
+    <string name="fixture_quiz">Тестовый квиз %1$d</string>
+    <string name="fixture_detail">Тестовый квиз: %1$s</string>
+    <string name="fixture_counter">Счётчик экрана: %1$d</string>
+    <string name="fixture_increment">Увеличить счётчик</string>
+    <string name="fixture_back">Назад</string>
+    <string name="fixture_restart">TEST: повторить запуск</string>
+</resources>

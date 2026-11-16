@@ -1,0 +1,12 @@
+<resources>
+    <string name="quiz_entry_duration">%1$d мин.</string>
+    <string name="quiz_entry_bookmarked">В избранном</string>
+    <string name="quiz_entry_label">О квизе</string>
+    <string name="quiz_entry_launch_soon">Запуск игры скоро появится</string>
+    <plurals name="quiz_entry_question_count">
+        <item quantity="one">%1$d вопрос</item>
+        <item quantity="few">%1$d вопроса</item>
+        <item quantity="many">%1$d вопросов</item>
+        <item quantity="other">%1$d вопроса</item>
+    </plurals>
+</resources>

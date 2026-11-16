@@ -1,6 +1,5 @@
 package com.quizzgame.mobile.navigation
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.ime
@@ -31,8 +30,7 @@ import com.quizzgame.core.navigation.chrome.MainNavigationHost
 import com.quizzgame.core.navigation.chrome.NavigationChromePlacement
 import com.quizzgame.mobile.R
 import com.quizzgame.mobile.navigation.routes.JoinRoomRoute
-
-internal data class MobileTopLevelItem(val route: NavKey, @param:StringRes val label: Int)
+import com.quizzgame.mobile.ui.tags.MobileChromeTags
 
 internal val MobileTopLevelItems = listOf(MobileTopLevelItem(JoinRoomRoute, R.string.navigation_join_room))
 
@@ -55,7 +53,7 @@ internal fun MobileMainNavigationHost(
         } else {
             NavigationBarDefaults.windowInsets.only(WindowInsetsSides.Bottom)
         },
-        chromeEnabled = useRail || WindowInsets.ime.getBottom(LocalDensity.current) == 0,
+        chromeEnabled = items.size > 1 && (useRail || WindowInsets.ime.getBottom(LocalDensity.current) == 0),
         sceneStrategies = sceneStrategies,
         onBack = onBack,
     ) { visible ->
@@ -67,7 +65,7 @@ internal fun MobileMainNavigationHost(
                         selected = state.snapshot.active == item.route,
                         onClick = { select(item.route) },
                         icon = { Icon(painterResource(R.drawable.ic_room), contentDescription = null) },
-                        label = { Text(stringResource(item.label)) },
+                        label = { Text(stringResource(item.label), maxLines = 1) },
                         modifier = Modifier.testTag(MobileChromeTags.item(item.route)),
                     )
                 }
@@ -79,7 +77,7 @@ internal fun MobileMainNavigationHost(
                         selected = state.snapshot.active == item.route,
                         onClick = { select(item.route) },
                         icon = { Icon(painterResource(R.drawable.ic_room), contentDescription = null) },
-                        label = { Text(stringResource(item.label)) },
+                        label = { Text(stringResource(item.label), maxLines = 1) },
                         modifier = Modifier.testTag(MobileChromeTags.item(item.route)),
                     )
                 }
@@ -89,9 +87,3 @@ internal fun MobileMainNavigationHost(
 }
 
 private const val MediumWindowWidthDp = 600
-
-internal object MobileChromeTags {
-    const val BAR = "mobile-navigation-bar"
-    const val RAIL = "mobile-navigation-rail"
-    fun item(route: NavKey): String = "navigation-item-$route"
-}

@@ -3,6 +3,7 @@ package com.quizzgame.app.navigation
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation3.runtime.NavKey
 import com.quizzgame.core.navigation.AppNavigator
+import com.quizzgame.core.navigation.NavigationBranch
 import com.quizzgame.core.navigation.NavigationSnapshot
 import com.quizzgame.core.navigation.NavigationState
 import com.quizzgame.core.navigation.policy.DestinationAccess
@@ -152,6 +153,34 @@ class NavigationCoordinatorTest {
         assertEquals(listOf(Key.HOME, Key.PUBLIC_DETAIL), history.snapshot.visibleEntries)
     }
 
+    @Test
+    fun accountSwitchInvalidatesBothActiveAndInactiveSectionHistories() {
+        val roots = listOf(Key.HOME, Key.LIBRARY)
+        val navigation = NavigationState(
+            NavigationSnapshot(Key.HOME, branches = roots.map { NavigationBranch(it) }),
+        )
+        val coordinator = NavigationCoordinator(
+            AppNavigator(navigation),
+            Key.SPLASH,
+            Key.AUTH,
+            { session },
+            { DestinationAccess.PUBLIC },
+        )
+        session = SessionState.Authenticated(1)
+        coordinator.synchronize("auth-1", "owner-1", false)
+        coordinator.splashCompleted()
+        coordinator.navigator.navigate(Key.PUBLIC_DETAIL)
+        coordinator.navigator.switchTopLevel(Key.LIBRARY)
+        coordinator.navigator.navigate(Key.ROOM)
+        val generation = navigation.snapshot.generation
+        session = SessionState.Authenticated(2)
+        coordinator.synchronize("auth-2", "owner-2", false)
+        assertEquals(generation + 1, navigation.snapshot.generation)
+        assertEquals(Key.HOME, navigation.snapshot.active)
+        navigation.snapshot.branches.forEach { branch -> assertEquals(listOf(branch.root), branch.entries) }
+        assertEquals(listOf(Key.SPLASH), navigation.snapshot.flow)
+    }
+
     private fun synchronize() { coordinator.synchronize("process-1", "guest", false) }
     private fun request(id: String, destination: NavKey = Key.ROOM) = NavigationRequest(id, destination, Key.HOME)
     private fun createCoordinator() = NavigationCoordinator(
@@ -170,5 +199,5 @@ class NavigationCoordinatorTest {
     )
 
     @Serializable
-    enum class Key : NavKey { HOME, SPLASH, AUTH, ROOM, SECOND_ROOM, PUBLIC_DETAIL, UNKNOWN }
+    enum class Key : NavKey { HOME, LIBRARY, SPLASH, AUTH, ROOM, SECOND_ROOM, PUBLIC_DETAIL, UNKNOWN }
 }

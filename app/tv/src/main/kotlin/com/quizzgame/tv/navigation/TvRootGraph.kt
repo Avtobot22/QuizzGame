@@ -19,7 +19,6 @@ internal fun TvRootGraph(
     graphs: Set<FeatureEntries<TvNavigationContext>>,
     initialDestination: NavKey,
     isCurrentGraph: () -> Boolean,
-    dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     onLogout: () -> Unit,
     policies: Set<NavigationPolicy> = emptySet(),
     externalRequest: NavigationRequest? = null,
@@ -45,12 +44,8 @@ internal fun TvRootGraph(
         graphs = graphs,
         externalRequest = externalRequest,
         onRequestHandled = onRequestHandled,
-        mainContent = { state, navigator, entries, onBack ->
-            TvMainContent(state, navigator, entries, onBack)
-        },
         context = { coordinator ->
             TvNavigationContext(
-                dashboardGraphs,
                 onContentReady = { isCurrentGraph() && coordinator.splashCompleted() },
                 onSignIn = { isCurrentGraph() && coordinator.requireSignIn() },
                 onRestartSplash = { isCurrentGraph() && coordinator.restartSplash() },
