@@ -7,28 +7,40 @@ import androidx.compose.ui.platform.testTag
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashRoute
-import com.quizzgame.mobile.navigation.DemoPlaceholder
+import com.quizzgame.mobile.navigation.FixturePlaceholder
+import com.quizzgame.mobile.navigation.MobileFixtureSignInDestination
 import com.quizzgame.mobile.navigation.MobileNavigationContext
-import com.quizzgame.mobile.navigation.MobileNavigationTags
-import com.quizzgame.mobile.navigation.MobileSignInDestination
+import com.quizzgame.mobile.ui.tags.MobileNavigationTags
+import com.quizzgame.mobile.test.R as FixtureR
 
 /** Root-policy tests substitute only the network-owning Splash entry. */
 internal fun startupTestEntries(): FeatureEntries<MobileNavigationContext> = FeatureEntries { scope, context ->
     scope.entry<MobileSplashRoute> {
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.SPLASH)) {
-            DemoPlaceholder(
+            FixturePlaceholder(
                 R.string.splash_placeholder,
                 listOf(
-                    R.string.demo_signin to { current.onSignIn() },
-                    R.string.demo_continue to { current.onContentReady() },
+                    FixtureR.string.fixture_signin to { current.onSignIn() },
+                    FixtureR.string.fixture_continue to { current.onContentReady() },
                 ),
             )
         }
     }
     scope.entry<SignInRoute> {
         Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.SIGN_IN)) {
-            MobileSignInDestination(onContinue = { context.value.onRestartSplash() })
+            MobileFixtureSignInDestination(onContinue = { context.value.onRestartSplash() })
+        }
+    }
+}
+
+internal fun fixtureContentEntries(): FeatureEntries<MobileNavigationContext> = FeatureEntries { scope, context ->
+    scope.entry<com.quizzgame.mobile.navigation.routes.JoinRoomRoute> {
+        val current = context.value
+        Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.JOIN_ROOM)) {
+            com.quizzgame.mobile.navigation.MobileFixtureJoinRoomDestination(
+                current.onLogout,
+            )
         }
     }
 }

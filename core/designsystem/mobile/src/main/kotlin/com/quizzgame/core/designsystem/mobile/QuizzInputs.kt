@@ -50,7 +50,7 @@ fun QuizzOtpInput(
     require(length > 0)
     var focused by remember { mutableStateOf(false) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text(label, style = MaterialTheme.typography.headlineSmall)
+        Text(label, style = MaterialTheme.typography.titleMedium)
         BasicTextField(
             value = value,
             onValueChange = { onValueChange(it.filter { char -> char in '0'..'9' }.take(length)) },
@@ -108,6 +108,7 @@ fun QuizzRoomCodeField(
             keyboardType = KeyboardType.Ascii,
         ),
         singleLine = true,
+        shape = MaterialTheme.shapes.large,
         modifier = modifier,
     )
 }
@@ -144,7 +145,14 @@ private fun OtpDecoration(
                         .weight(1f)
                         .heightIn(min = 48.dp)
                         .alpha(if (enabled) 1f else 0.38f)
-                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.medium)
+                        .background(
+                            if (active) {
+                                MaterialTheme.colorScheme.primaryContainer
+                            } else {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            },
+                            MaterialTheme.shapes.medium,
+                        )
                         .border(
                             BorderStroke(if (active) 2.dp else 1.dp, border),
                             MaterialTheme.shapes.medium,
@@ -153,8 +161,8 @@ private fun OtpDecoration(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        value.getOrNull(index)?.toString() ?: "—",
-                        style = MaterialTheme.typography.headlineLarge.copy(
+                        value.getOrNull(index)?.toString() ?: "",
+                        style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
                             lineHeight = 32.sp,
                         ),

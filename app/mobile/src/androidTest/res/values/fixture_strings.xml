@@ -1,0 +1,8 @@
+<resources>
+    <string name="fixture_label">TEST — локальная проверка переходов</string>
+    <string name="fixture_signin">TEST: открыть вход</string>
+    <string name="fixture_continue">TEST: продолжить без авторизации</string>
+    <string name="fixture_signout">TEST: завершить сессию</string>
+    <string name="fixture_room_code">Код комнаты - локальный пример</string>
+    <string name="fixture_restart">TEST: повторить запуск</string>
+</resources>

@@ -1,15 +1,19 @@
 package com.quizzgame.core.designsystem.tv
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
@@ -20,16 +24,13 @@ import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
+import com.quizzgame.core.ui.QuizzConnectionIllustration
+import com.quizzgame.core.ui.QuizzSceneIllustration
 import com.quizzgame.core.ui.R
 import com.quizzgame.core.ui.status.QuizzNoticeTone
 import com.quizzgame.core.ui.status.QuizzStatusDimensions
 import com.quizzgame.core.ui.status.QuizzStatusIcon
 
-/**
- * Визуальное состояние с произвольными content/actions. Подходит для пустого, успешного,
- * информационного или ошибочного состояния. Полную область, прокрутку, insets и начальный фокус
- * задаёт внешний shell; компонент не меняет навигацию и не выполняет действия сам.
- */
 @Composable
 fun QuizzTvStatusContent(
     modifier: Modifier = Modifier,
@@ -38,12 +39,31 @@ fun QuizzTvStatusContent(
     actions: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    StatusPanel(modifier.widthIn(max = QuizzStatusDimensions.tvWidth.dp), tone) {
-        MessageBody(Modifier.padding(QuizzStatusDimensions.padding.dp), icon, actions, content)
+    val colors = MaterialTheme.colorScheme
+    CompositionLocalProvider(LocalContentColor provides colors.onSurface) {
+        Column(
+            modifier.widthIn(max = QuizzStatusDimensions.tvWidth.dp)
+                .padding(24.dp).semantics { liveRegion = LiveRegionMode.Polite },
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(20.dp),
+        ) {
+            if (icon == QuizzStatusIcon.ROOM) {
+                QuizzConnectionIllustration(colors.primary, colors.tertiary, Modifier.size(180.dp))
+            } else if (icon != null) {
+                QuizzSceneIllustration(colors.primary, colors.tertiary, Modifier.size(144.dp)) {
+                    QuizzTvStatusSymbol(
+                        icon,
+                        Modifier.size(44.dp),
+                        tone,
+                    )
+                }
+            }
+            content()
+            Box(Modifier.fillMaxWidth().padding(8.dp), contentAlignment = Alignment.Center) { actions() }
+        }
     }
 }
 
-/** Встроенное сообщение рядом с сохранённым содержимым. Не забирает фокус и не закрывается само. */
 @Composable
 fun QuizzTvNoticeBanner(
     modifier: Modifier = Modifier,
@@ -52,12 +72,30 @@ fun QuizzTvNoticeBanner(
     actions: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    StatusPanel(modifier.fillMaxWidth(), tone) {
-        MessageBody(Modifier.padding(QuizzStatusDimensions.compactPadding.dp), icon, actions, content)
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = SurfaceDefaults.colors(
+            containerColor = lerp(colors.surface, colors.surfaceVariant, 0.28f),
+            contentColor = colors.onSurface,
+        ),
+
+    ) {
+        Row(
+            Modifier.padding(20.dp).semantics { liveRegion = LiveRegionMode.Polite },
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Top,
+        ) {
+            if (icon != null) QuizzTvStatusSymbol(icon, Modifier.size(28.dp), tone)
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                content()
+                actions()
+            }
+        }
     }
 }
 
-/** Локальное сообщение без панели. Размещение возле нужного поля определяет владелец формы. */
 @Composable
 fun QuizzTvInlineMessage(
     modifier: Modifier = Modifier,
@@ -66,61 +104,35 @@ fun QuizzTvInlineMessage(
     actions: @Composable () -> Unit = {},
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val colors = MaterialTheme.colorScheme
-    CompositionLocalProvider(
-        LocalContentColor provides if (tone == QuizzNoticeTone.ERROR) colors.error else colors.onSurface,
-    ) {
-        MessageBody(modifier, icon, actions, content)
-    }
-}
-
-@Composable
-private fun StatusPanel(modifier: Modifier, tone: QuizzNoticeTone, content: @Composable () -> Unit) {
-    val colors = MaterialTheme.colorScheme
-    val container = when (tone) {
-        QuizzNoticeTone.NEUTRAL -> colors.surfaceVariant
-        QuizzNoticeTone.INFORMATION -> colors.secondaryContainer
-        QuizzNoticeTone.ERROR -> colors.errorContainer
-    }
-    val foreground = when (tone) {
-        QuizzNoticeTone.NEUTRAL -> colors.onSurfaceVariant
-        QuizzNoticeTone.INFORMATION -> colors.onSecondaryContainer
-        QuizzNoticeTone.ERROR -> colors.onErrorContainer
-    }
-    Surface(
-        modifier = modifier,
-        shape = MaterialTheme.shapes.large,
-        colors = SurfaceDefaults.colors(containerColor = container, contentColor = foreground),
-    ) {
-        content()
-    }
-}
-
-@Composable
-private fun MessageBody(
-    modifier: Modifier,
-    icon: QuizzStatusIcon?,
-    actions: @Composable () -> Unit,
-    content: @Composable ColumnScope.() -> Unit,
-) {
-    Column(
-        modifier = modifier.semantics { liveRegion = LiveRegionMode.Polite },
-        verticalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.gap.dp),
-    ) {
-        if (icon != null) QuizzTvStatusSymbol(icon)
+    Column(modifier, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        if (icon != null) QuizzTvStatusSymbol(icon, Modifier.size(24.dp), tone)
         content()
         actions()
     }
 }
 
-/** Декоративная семантическая пиктограмма; текст сообщения содержит доступное описание. */
 @Composable
-fun QuizzTvStatusSymbol(icon: QuizzStatusIcon, modifier: Modifier = Modifier) {
+fun QuizzTvStatusSymbol(
+    icon: QuizzStatusIcon,
+    modifier: Modifier = Modifier,
+    tone: QuizzNoticeTone = QuizzNoticeTone.NEUTRAL,
+) {
     val resource = when (icon) {
         QuizzStatusIcon.NETWORK -> R.drawable.ic_quizz_status_network
         QuizzStatusIcon.SERVER -> R.drawable.ic_quizz_status_server
         QuizzStatusIcon.AUTH -> R.drawable.ic_quizz_status_auth
         QuizzStatusIcon.GENERIC -> R.drawable.ic_quizz_status_generic
+        QuizzStatusIcon.ROOM -> R.drawable.ic_quizz_room
+        QuizzStatusIcon.CATALOG -> R.drawable.ic_quizz_quiz
     }
-    Icon(painterResource(resource), contentDescription = null, modifier.size(QuizzStatusDimensions.tvIcon.dp))
+    Icon(
+        painterResource(resource),
+        contentDescription = null,
+        modifier = modifier.size(QuizzStatusDimensions.tvIcon.dp),
+        tint = if (tone == QuizzNoticeTone.ERROR) {
+            MaterialTheme.colorScheme.error
+        } else {
+            MaterialTheme.colorScheme.primary
+        },
+    )
 }

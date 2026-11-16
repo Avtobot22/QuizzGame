@@ -7,12 +7,12 @@ import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.SavedStateHandle
-import com.quizzgame.app.presentation.AppRootTags
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupFailure
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.app.startup.GraphAccessResult
+import com.quizzgame.app.ui.tags.AppRootTags
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorCopyKey
@@ -21,11 +21,9 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageFailure
-import com.quizzgame.tv.dashboard.demo.DemoDashboardEntries
-import com.quizzgame.tv.dashboard.demo.DemoDashboardTags
-import com.quizzgame.tv.navigation.TvDemoTags
-import com.quizzgame.tv.navigation.TvNavigationModule
-import com.quizzgame.tv.navigation.TvNavigationTags
+import com.quizzgame.tv.dashboard.fixture.ui.tags.FixtureDashboardTags
+import com.quizzgame.tv.ui.tags.TvFixtureTags
+import com.quizzgame.tv.ui.tags.TvNavigationTags
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -46,8 +44,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
-                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -68,15 +65,14 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
-                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
         screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
-        screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
+        screen.tag(TvFixtureTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
@@ -92,8 +88,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
-                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -119,8 +114,7 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
-                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
@@ -141,18 +135,17 @@ class AppStartupUiTest {
         compose.setContent {
             QuizzTvTheme {
                 TvAppRoot(
-                    setOf(startupTestEntries(), TvNavigationModule.contentEntries()),
-                    setOf(DemoDashboardEntries.tabs(), DemoDashboardEntries.details()),
+                    setOf(startupTestEntries(), fixtureContentEntries()),
                     viewModel,
                 )
             }
         }
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
         screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
-        screen.tag(TvDemoTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
+        screen.tag(TvFixtureTags.action(1)).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
-        screen.tag(DemoDashboardTags.SIGN_OUT).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
+        screen.tag(FixtureDashboardTags.SIGN_OUT).performSemanticsAction(SemanticsActions.RequestFocus) { it() }
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_FAILED).isDisplayed() }
         screen.tag(TvNavigationTags.SIGN_IN).assertDoesNotExist()

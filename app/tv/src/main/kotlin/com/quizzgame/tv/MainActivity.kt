@@ -6,17 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.tv.material3.MaterialTheme
+import androidx.tv.material3.Surface
+import androidx.tv.material3.SurfaceDefaults
 import com.quizzgame.app.navigation.ExternalNavigationRouter
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
+import com.quizzgame.core.designsystem.tv.media.LocalTvMediaLoader
+import com.quizzgame.core.designsystem.tv.media.TvMediaLoader
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
-import com.quizzgame.tv.navigation.DashboardNavigationContext
 import com.quizzgame.tv.navigation.TvNavigationContext
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -32,24 +34,31 @@ class MainActivity : ComponentActivity() {
     internal lateinit var navigationGraphs: Set<@JvmSuppressWildcards FeatureEntries<TvNavigationContext>>
 
     @Inject
-    internal lateinit var dashboardGraphs: Set<@JvmSuppressWildcards FeatureEntries<DashboardNavigationContext>>
+    lateinit var navigationPolicies: Set<@JvmSuppressWildcards NavigationPolicy>
 
     @Inject
-    lateinit var navigationPolicies: Set<@JvmSuppressWildcards NavigationPolicy>
+    lateinit var mediaLoader: TvMediaLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (savedInstanceState == null) acceptNavigationIntent(intent)
         setContent {
-            QuizzTvTheme {
-                Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-                    TvAppRoot(
-                        navigationGraphs,
-                        dashboardGraphs,
-                        viewModel = rootViewModel,
-                        policies = navigationPolicies,
-                    )
+            CompositionLocalProvider(LocalTvMediaLoader provides mediaLoader) {
+                QuizzTvTheme {
+                    Surface(
+                        modifier = Modifier.fillMaxSize(),
+                        colors = SurfaceDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                        ),
+                    ) {
+                        TvAppRoot(
+                            navigationGraphs,
+                            viewModel = rootViewModel,
+                            policies = navigationPolicies,
+                        )
+                    }
                 }
             }
         }

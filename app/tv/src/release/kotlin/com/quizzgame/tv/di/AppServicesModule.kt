@@ -5,6 +5,7 @@ import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.AppNetworkSettings
 import com.quizzgame.app.network.realAppNetworkFactory
 import com.quizzgame.app.session.SessionManagerFactory
+import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.session.platform.AndroidSession
 import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import dagger.Module
@@ -17,8 +18,11 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 object AppServicesModule {
     @Provides
-    fun sessionManagerFactory(@ApplicationContext context: Context): SessionManagerFactory =
-        SessionManagerFactory { AndroidSession.open(context) }
+    fun sessionManagerFactory(
+        @ApplicationContext context: Context,
+        dispatchers: DispatcherProvider,
+    ): SessionManagerFactory =
+        SessionManagerFactory { AndroidSession.open(context, dispatchers.io) }
 
     @Provides
     fun networkFactory(

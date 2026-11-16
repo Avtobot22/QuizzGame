@@ -3,6 +3,7 @@ package com.quizzgame.app.startup
 import com.quizzgame.app.network.AppNetworkConfigurationException
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.core.error.presentation.ErrorCopyKey
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.lifecycle.SessionState
 import kotlinx.coroutines.CancellationException
@@ -21,6 +22,29 @@ import java.io.IOException
 @OptIn(ExperimentalCoroutinesApi::class)
 class AppStartupCoordinatorTest {
     @Test
+    fun networkFactoryReceivesTheSuppliedJsonInstance() = runTest {
+        val dispatcher = StandardTestDispatcher(testScheduler)
+        val json = createNetworkJson()
+        var networkOpens = 0
+        val coordinator = AppStartupCoordinator(
+            openSession = { SessionManager.open(StartupTestStore(), dispatcher) },
+            networkFactory = AppNetworkGraphFactory { session, supplied ->
+                networkOpens++
+                assertSame(json, supplied)
+                fakeNetworkFactory().open(session, supplied)
+            },
+            dispatcher = dispatcher,
+            json = json,
+        )
+        try {
+            coordinator.accessGraph()
+            assertEquals(1, networkOpens)
+        } finally {
+            coordinator.shutdown()
+        }
+    }
+
+    @Test
     fun concurrentCallersShareOneFlightAndCancellingAScreenDoesNotCancelStartup() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val gate = CompletableDeferred<Unit>()
@@ -29,6 +53,7 @@ class AppStartupCoordinatorTest {
         val manager = SessionManager.open(store, dispatcher)
         var opens = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 opens++
                 gate.await()
@@ -63,6 +88,7 @@ class AppStartupCoordinatorTest {
         var opens = 0
         var networks = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 opens++
                 SessionManager.open(store, dispatcher)
@@ -97,6 +123,7 @@ class AppStartupCoordinatorTest {
         val store = StartupTestStore()
         var attempts = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = AppNetworkGraphFactory { session, json ->
                 attempts++
@@ -121,6 +148,7 @@ class AppStartupCoordinatorTest {
     fun missingRealConfigurationIsExplicitAndDoesNotPretendToBeOffline() = runTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(StartupTestStore(), dispatcher) },
             networkFactory = AppNetworkGraphFactory { _, _ -> throw AppNetworkConfigurationException() },
             dispatcher = dispatcher,
@@ -137,6 +165,7 @@ class AppStartupCoordinatorTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val events = mutableListOf<String>()
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(StartupTestStore(events), dispatcher) },
             networkFactory = AppNetworkGraphFactory { _, _ -> error("Broken graph implementation") },
             dispatcher = dispatcher,
@@ -155,6 +184,7 @@ class AppStartupCoordinatorTest {
     @Test
     fun initializerCancellationIsNotConvertedIntoAFailedOrGuestState() = runTest {
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { throw CancellationException("Application scope stopped") },
             networkFactory = fakeNetworkFactory(),
             dispatcher = StandardTestDispatcher(testScheduler),

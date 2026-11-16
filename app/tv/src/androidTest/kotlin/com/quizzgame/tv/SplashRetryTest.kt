@@ -8,7 +8,7 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso
 import com.quizzgame.debug.network.mocks.SplashMockScenario
-import com.quizzgame.tv.navigation.TvNavigationTags
+import com.quizzgame.tv.ui.tags.TvNavigationTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

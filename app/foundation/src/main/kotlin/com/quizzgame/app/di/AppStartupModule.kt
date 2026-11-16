@@ -6,18 +6,24 @@ import com.quizzgame.app.session.SessionManagerFactory
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupCoordinator
 import com.quizzgame.app.startup.GraphAccessResult
+import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiCallExecutor
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Dispatchers
+import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
 object AppStartupModule {
+    @Provides
+    @Singleton
+    fun json(): Json = createNetworkJson()
+
     @Provides
     @Singleton
     fun sessionStateReader(startup: AppStartup): SessionStateReader =
@@ -30,10 +36,16 @@ object AppStartupModule {
 
     @Provides
     @Singleton
-    fun apiCallExecutor(startup: AppStartup): ApiCallExecutor = StartupApiCallExecutor(startup)
+    fun apiCallExecutor(startup: AppStartup, dispatchers: DispatcherProvider): ApiCallExecutor =
+        StartupApiCallExecutor(startup, dispatchers)
 
     @Provides
     @Singleton
-    fun startup(sessionFactory: SessionManagerFactory, networkFactory: AppNetworkGraphFactory): AppStartup =
-        AppStartupCoordinator(sessionFactory::open, networkFactory, Dispatchers.IO)
+    fun startup(
+        sessionFactory: SessionManagerFactory,
+        networkFactory: AppNetworkGraphFactory,
+        json: Json,
+        dispatchers: DispatcherProvider,
+    ): AppStartup =
+        AppStartupCoordinator(sessionFactory::open, networkFactory, dispatchers.io, json)
 }

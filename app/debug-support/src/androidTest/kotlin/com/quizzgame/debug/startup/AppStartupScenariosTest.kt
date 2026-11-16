@@ -20,6 +20,7 @@ import com.quizzgame.core.session.refresh.api.RefreshEndpoint
 import com.quizzgame.core.session.refresh.api.RefreshFailure
 import com.quizzgame.debug.network.debugAppNetworkFactory
 import dev.androidmock.core.dsl.mockRules
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.JsonObject
 import org.junit.Assert.assertEquals
@@ -38,11 +39,11 @@ class AppStartupScenariosTest {
 
     @Test
     fun fakeSessionScenariosStayLocalAndUnavailableCanRecover() = runBlocking {
-        openDebugSession(context, "GUEST").use { assertEquals(SessionState.Guest, it.state.value) }
-        openDebugSession(context, "AUTHENTICATED").use {
+        openDebugSession(context, "GUEST", Dispatchers.IO).use { assertEquals(SessionState.Guest, it.state.value) }
+        openDebugSession(context, "AUTHENTICATED", Dispatchers.IO).use {
             assertTrue(it.state.value is SessionState.Authenticated)
         }
-        openDebugSession(context, "UNAVAILABLE").use {
+        openDebugSession(context, "UNAVAILABLE", Dispatchers.IO).use {
             assertTrue(it.state.value is SessionState.Unavailable)
             it.restoreStoredSession()
             assertEquals(SessionState.Guest, it.state.value)
@@ -65,7 +66,7 @@ class AppStartupScenariosTest {
             true,
             RefreshRevocationPolicy.never(),
         ) { _, _ -> emptyList() }
-        openDebugSession(context, "GUEST").use { session ->
+        openDebugSession(context, "GUEST", Dispatchers.IO).use { session ->
             val json = createNetworkJson()
             assertThrows(IOException::class.java) { factory.open(session, json) }
             factory.open(session, json).use { graph ->
@@ -100,7 +101,7 @@ class AppStartupScenariosTest {
                 rule("protected", "/private") { respond { status(401) } }
             }
         }
-        openDebugSession(context, "AUTHENTICATED").use { session ->
+        openDebugSession(context, "AUTHENTICATED", Dispatchers.IO).use { session ->
             val access = session.snapshot().accessToken
             factory.open(session, createNetworkJson()).use { graph ->
                 val api = graph.api.retrofit.create(ProtectedApi::class.java)

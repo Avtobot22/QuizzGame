@@ -28,9 +28,9 @@ import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.common.R
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
+import com.quizzgame.core.error.ui.tv.tags.TvErrorTags
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorRemote
 import com.quizzgame.core.error.ui.tv.testutil.TvErrorScreen
-import com.quizzgame.core.error.ui.tv.testutil.TvErrorTags
 import com.quizzgame.core.error.ui.tv.testutil.captureErrorPreview
 import org.junit.Assert.assertEquals
 import org.junit.Rule

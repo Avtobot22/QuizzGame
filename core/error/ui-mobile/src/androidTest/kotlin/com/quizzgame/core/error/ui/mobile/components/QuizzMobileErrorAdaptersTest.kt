@@ -22,8 +22,8 @@ import com.quizzgame.core.error.presentation.ErrorCopyKey
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.common.R
+import com.quizzgame.core.error.ui.mobile.tags.MobileErrorTags
 import com.quizzgame.core.error.ui.mobile.testutil.MobileErrorScreen
-import com.quizzgame.core.error.ui.mobile.testutil.MobileErrorTags
 import com.quizzgame.core.error.ui.mobile.testutil.captureErrorPreview
 import org.junit.Assert.assertEquals
 import org.junit.Rule

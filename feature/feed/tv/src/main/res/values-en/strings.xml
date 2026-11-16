@@ -1,0 +1,11 @@
+<resources>
+    <string name="feed_empty">No quizzes yet</string>
+    <string name="feed_refresh">Refresh</string>
+    <string name="feed_quiz_bookmarked">Bookmarked</string>
+    <string name="feed_quiz_completed">Completed</string>
+    <string name="feed_quiz_progress">Progress: %1$d%%</string>
+    <string name="feed_empty_description">Quizzes for your next game night will appear here. Try refreshing the catalog in a little while.</string>
+    <string name="feed_refreshing">Refreshing…</string>
+    <string name="feed_loading_sections">Loading more collections</string>
+    <string name="feed_loading_cards">Loading more quizzes</string>
+</resources>

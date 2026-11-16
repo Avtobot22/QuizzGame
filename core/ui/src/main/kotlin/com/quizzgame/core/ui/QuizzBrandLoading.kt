@@ -1,6 +1,5 @@
 package com.quizzgame.core.ui
 
-import android.os.Build
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
@@ -26,8 +25,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.MotionDurationScale
-import androidx.compose.ui.draw.BlurredEdgeTreatment
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
@@ -37,10 +34,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.luminance
-import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -53,20 +47,13 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-/**
- * One shared brand mark for Mobile and TV, in light/dark Material themes.
- * - The logo uses the same centered vector geometry as the adaptive launcher icon.
- * - The neon halo is static. No repeating logo scale, glow pulse or alpha animation.
- * - The orbit uses ONE smooth vector path with a continuous trailing gradient.
- * - The phase is read in DrawScope, so only the animated canvas needs redrawing.
- */
 @Composable
 fun QuizzBrandLoading(
     label: String,
     primary: Color,
     accent: Color,
     modifier: Modifier = Modifier,
-    title: @Composable () -> Unit,
+    title: (@Composable () -> Unit)? = null,
     supporting: (@Composable () -> Unit)? = null,
     size: QuizzBrandLoadingSize = QuizzBrandLoadingSize.COMPACT,
 ) {
@@ -118,14 +105,15 @@ fun QuizzBrandLoading(
             verticalArrangement = Arrangement.spacedBy(gap.dp),
         ) {
             BrandMark(primary, accent, phase, Modifier.size(markSize))
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(QuizzBrandLoadingDimensions.textGap.dp),
-            ) {
-                title()
-                supporting?.invoke()
+            if (title != null || supporting != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(QuizzBrandLoadingDimensions.textGap.dp),
+                ) {
+                    title?.invoke()
+                    supporting?.invoke()
+                }
             }
-            LoadingDots(primary)
         }
     }
 }
@@ -147,41 +135,9 @@ private fun brandPhase(motionEnabled: Boolean, expanded: Boolean): State<Float> 
 @Composable
 private fun BrandMark(primary: Color, accent: Color, phase: State<Float>, modifier: Modifier = Modifier) {
     val vector = painterResource(R.drawable.ic_quizz_monochrome)
-    val glowAlpha = if (primary.luminance() > 0.48f) 0.49f else 0.26f
-    val logoPaths = remember {
-        listOf(
-            PathParser().parsePathString(Q_RING_PATH).toPath(),
-            PathParser().parsePathString(Q_TAIL_PATH).toPath(),
-        )
-    }
 
     Box(modifier, contentAlignment = Alignment.Center) {
         BrandOrbit(primary, accent, phase)
-
-        // Android 12+: the vector is rasterized by Compose at display resolution and
-        // blurred only for its static neon halo. This is NOT a pre-rendered bitmap GIF.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            Image(
-                painter = vector,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-                    .blur(13.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                    .graphicsLayer { alpha = glowAlpha },
-                colorFilter = ColorFilter.tint(primary),
-            )
-            Image(
-                painter = vector,
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize()
-                    .blur(4.dp, edgeTreatment = BlurredEdgeTreatment.Unbounded)
-                    .graphicsLayer { alpha = glowAlpha * 0.55f },
-                colorFilter = ColorFilter.tint(primary),
-            )
-        } else {
-            // Older Android: three translucent vector outlines simulate a soft halo
-            // without relying on the unsupported pre-31 RenderEffect blur.
-            LegacyBrandHalo(primary, logoPaths)
-        }
 
         Image(
             painter = vector,
@@ -189,32 +145,6 @@ private fun BrandMark(primary: Color, accent: Color, phase: State<Float>, modifi
             modifier = Modifier.fillMaxSize(),
             colorFilter = ColorFilter.tint(primary),
         )
-    }
-}
-
-@Composable
-private fun LegacyBrandHalo(primary: Color, logoPaths: List<Path>) {
-    Canvas(Modifier.fillMaxSize()) {
-        val factor = size.minDimension / VECTOR_VIEWPORT
-        withTransform({ scale(factor, factor, pivot = Offset.Zero) }) {
-            for (path in logoPaths) {
-                drawPath(
-                    path,
-                    primary.copy(alpha = 0.075f),
-                    style = Stroke(width = 11f, join = StrokeJoin.Round),
-                )
-                drawPath(
-                    path,
-                    primary.copy(alpha = 0.105f),
-                    style = Stroke(width = 6f, join = StrokeJoin.Round),
-                )
-                drawPath(
-                    path,
-                    primary.copy(alpha = 0.14f),
-                    style = Stroke(width = 2.5f, join = StrokeJoin.Round),
-                )
-            }
-        }
     }
 }
 
@@ -233,16 +163,6 @@ private fun BrandOrbit(primary: Color, accent: Color, phase: State<Float>) {
         val head = orbitPoint(center, orbit, headAngle)
         val tail = orbitPoint(center, orbit, tailAngle)
 
-        // One path per pass: no abrupt join between separately drawn arc segments.
-        drawPath(
-            path = trail,
-            brush = Brush.linearGradient(
-                colors = listOf(primary.copy(alpha = 0.0f), primary.copy(alpha = 0.16f)),
-                start = tail,
-                end = head,
-            ),
-            style = Stroke(width = 9.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
-        )
         drawPath(
             path = trail,
             brush = Brush.linearGradient(
@@ -252,7 +172,6 @@ private fun BrandOrbit(primary: Color, accent: Color, phase: State<Float>) {
             ),
             style = Stroke(width = 2.2.dp.toPx(), cap = StrokeCap.Round, join = StrokeJoin.Round),
         )
-        drawCircle(accent.copy(alpha = 0.20f), radius = 5.5.dp.toPx(), center = head)
         drawCircle(accent, radius = 2.6.dp.toPx(), center = head)
     }
 }
@@ -262,28 +181,6 @@ private fun orbitPoint(center: Offset, radius: Float, angleDegrees: Float): Offs
     return center + Offset(cos(radians).toFloat(), sin(radians).toFloat()) * radius
 }
 
-@Composable
-private fun LoadingDots(color: Color) {
-    Canvas(Modifier.size(QuizzBrandLoadingDimensions.dotsWidth.dp, QuizzBrandLoadingDimensions.dotsHeight.dp)) {
-        val alpha = floatArrayOf(0.26f, 0.43f, 0.68f)
-        repeat(3) { index ->
-            drawCircle(
-                color = color.copy(alpha = alpha[index]),
-                radius = 2.7.dp.toPx(),
-                center = Offset(center.x + (index - 1) * 16.dp.toPx(), center.y),
-            )
-        }
-    }
-}
-
-// Keep these paths in sync with ic_quizz(_monochrome).xml and design/logo-q.svg.
-private const val Q_RING_PATH =
-    "M54,26 C69.46397,26 82,38.53603 82,54 C82,69.46397 69.46397,82 54,82 C38.53603,82 " +
-        "26,69.46397 26,54 C26,38.53603 38.53603,26 54,26 Z M54,38 C45.16344,38 38,45.16344 " +
-        "38,54 C38,62.83656 45.16344,70 54,70 C62.83656,70 70,62.83656 70,54 C70,45.16344 " +
-        "62.83656,38 54,38 Z"
-private const val Q_TAIL_PATH = "M64,68 L73,61 L84,76 L75,83 Z"
-private const val VECTOR_VIEWPORT = 108f
 private const val ORBIT_RADIUS_FRACTION = 0.385f
 private const val TRAIL_SWEEP_DEGREES = 66f
 private const val ENTRANCE_MS = 620

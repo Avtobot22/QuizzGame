@@ -1,0 +1,10 @@
+<resources>
+    <string name="quiz_entry_duration">%1$d min</string>
+    <string name="quiz_entry_bookmarked">Bookmarked</string>
+    <string name="quiz_entry_label">About this quiz</string>
+    <string name="quiz_entry_launch_soon">Launching games is coming soon</string>
+    <plurals name="quiz_entry_question_count">
+        <item quantity="one">%1$d question</item>
+        <item quantity="other">%1$d questions</item>
+    </plurals>
+</resources>

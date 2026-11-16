@@ -8,14 +8,14 @@ import com.quizzgame.core.error.policy.DefaultErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
+import com.quizzgame.shared.splash.domain.entity.SplashResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MobileSplashViewModel @Inject constructor(private val startSplash: StartSplashUseCase) :
+internal class MobileSplashViewModel @Inject constructor(private val startSplashUseCase: StartSplashUseCase) :
     BaseViewModel<MobileSplashUiState, MobileSplashIntent, Nothing>() {
 
     private var job: Job? = null
@@ -47,12 +47,12 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
         if (job?.isActive == true) return
         updateState { MobileSplashUiState.Loading }
         job = viewModelScope.launch {
-            val next = when (val outcome = startSplash()) {
-                SplashOutcome.Continue  -> MobileSplashUiState.NavigationPending(MobileSplashDestination.JOIN_ROOM)
-                SplashOutcome.SignIn    -> MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN)
-                is SplashOutcome.Failed -> MobileSplashUiState.Error(
+            val next = when (val result = startSplashUseCase()) {
+                SplashResult.Continue  -> MobileSplashUiState.NavigationPending(MobileSplashDestination.JOIN_ROOM)
+                SplashResult.SignIn    -> MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN)
+                is SplashResult.Failed -> MobileSplashUiState.Error(
                     DefaultErrorDecisionPolicy().decide(
-                        outcome.failure,
+                        result.failure,
                         ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT),
                     ),
                 )

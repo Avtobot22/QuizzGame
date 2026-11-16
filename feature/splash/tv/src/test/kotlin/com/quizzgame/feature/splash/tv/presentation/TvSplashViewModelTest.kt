@@ -9,7 +9,7 @@ import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
 import com.quizzgame.shared.splash.domain.SplashRepository
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
+import com.quizzgame.shared.splash.domain.entity.SplashResult
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -35,11 +35,11 @@ class TvSplashViewModelTest {
     @Test
     fun startupOutcomeSelectsTheConcreteDestinationBeforeUiHandlesNavigation() = runTest(dispatcher) {
         val destinations = mapOf(
-            SplashOutcome.Continue to TvSplashDestination.DASHBOARD,
-            SplashOutcome.SignIn to TvSplashDestination.SIGN_IN,
+            SplashResult.Continue to TvSplashDestination.DASHBOARD,
+            SplashResult.SignIn to TvSplashDestination.SIGN_IN,
         )
-        destinations.forEach { (outcome, destination) ->
-            val vm = createViewModel { outcome }
+        destinations.forEach { (result, destination) ->
+            val vm = createViewModel { result }
             advanceUntilIdle()
             assertEquals(destination, (vm.state.value as TvSplashUiState.NavigationPending).destination)
             runCurrent()
@@ -50,7 +50,7 @@ class TvSplashViewModelTest {
     @Test
     fun signInActionChoosesItsDestinationAndAcknowledgementConsumesIt() = runTest(dispatcher) {
         val vm = createViewModel {
-            SplashOutcome.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
+            SplashResult.Failed(AppFailure.Authentication(AuthenticationKind.REQUIRED))
         }
         advanceUntilIdle()
         vm.onIntent(TvSplashIntent.NavigationHandled)
@@ -64,7 +64,7 @@ class TvSplashViewModelTest {
     @Test
     fun repeatedRetryWhileLoadingDoesNotStartConcurrentAttempts() = runTest(dispatcher) {
         var calls = 0
-        val pending = CompletableDeferred<SplashOutcome>()
+        val pending = CompletableDeferred<SplashResult>()
         val vm = createViewModel {
             calls++
             pending.await()
@@ -73,7 +73,7 @@ class TvSplashViewModelTest {
         runCurrent()
         vm.onIntent(TvSplashIntent.Retry)
         assertEquals(1, calls)
-        pending.complete(SplashOutcome.Continue)
+        pending.complete(SplashResult.Continue)
         advanceUntilIdle()
         assertTrue(vm.state.value is TvSplashUiState.NavigationPending)
     }
@@ -84,9 +84,9 @@ class TvSplashViewModelTest {
         val vm = createViewModel {
             calls++
             if (calls == 1) {
-                SplashOutcome.Failed(AppFailure.Connectivity(ConnectivityKind.TIMEOUT))
+                SplashResult.Failed(AppFailure.Connectivity(ConnectivityKind.TIMEOUT))
             } else {
-                SplashOutcome.Continue
+                SplashResult.Continue
             }
         }
         advanceUntilIdle()
@@ -105,7 +105,7 @@ class TvSplashViewModelTest {
         var calls = 0
         val vm = createViewModel {
             calls++
-            if (calls == 1) SplashOutcome.Failed(AppFailure.OperationInterrupted) else SplashOutcome.Continue
+            if (calls == 1) SplashResult.Failed(AppFailure.OperationInterrupted) else SplashResult.Continue
         }
         advanceUntilIdle()
         val error = vm.state.value as TvSplashUiState.Error
@@ -119,27 +119,27 @@ class TvSplashViewModelTest {
     @Test
     fun configurationAndStorageFailuresDoNotOfferRetry() = runTest(dispatcher) {
         listOf(AppFailure.Configuration, AppFailure.Storage(StorageKind.READ)).forEach { failure ->
-            val vm = createViewModel { SplashOutcome.Failed(failure) }
+            val vm = createViewModel { SplashResult.Failed(failure) }
             advanceUntilIdle()
             val error = vm.state.value as TvSplashUiState.Error
             assertTrue(ErrorActionKind.RETRY !in error.spec.actions)
         }
     }
 
-    private fun createViewModel(outcome: suspend () -> SplashOutcome): TvSplashViewModel {
-        var result: SplashOutcome = SplashOutcome.Continue
+    private fun createViewModel(result: suspend () -> SplashResult): TvSplashViewModel {
+        var result: SplashResult = SplashResult.Continue
         val repository = object : SplashRepository {
             override suspend fun currentSession(): SessionState = SessionState.Guest
 
             override suspend fun loadLaunch(): AppFailure? {
-                result = outcome()
-                return (result as? SplashOutcome.Failed)?.failure
+                result = result()
+                return (result as? SplashResult.Failed)?.failure
             }
 
             override suspend fun refreshFlags(): AppFailure? = null
             override suspend fun loadUser(expectedGeneration: Long): AppFailure? =
                 error("Guest fixture must not load user")
-            override fun guestAllowed(): Boolean = result == SplashOutcome.Continue
+            override fun guestAllowed(): Boolean = result == SplashResult.Continue
             override fun clearUser() = Unit
         }
         return TvSplashViewModel(StartSplashUseCase(repository))

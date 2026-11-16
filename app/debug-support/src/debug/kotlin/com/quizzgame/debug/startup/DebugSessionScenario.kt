@@ -8,11 +8,16 @@ import com.quizzgame.core.session.storage.SessionRecord
 import com.quizzgame.core.session.storage.SessionStorageException
 import com.quizzgame.core.session.storage.SessionStorageFailure
 import com.quizzgame.core.session.storage.SessionStore
+import kotlinx.coroutines.CoroutineDispatcher
 import java.util.UUID
 
-suspend fun openDebugSession(context: Context, scenario: String): SessionManager = when (scenario) {
-    "STORED" -> AndroidSession.open(context)
-    "GUEST", "AUTHENTICATED", "UNAVAILABLE" -> SessionManager.open(ScenarioSessionStore(scenario))
+suspend fun openDebugSession(
+    context: Context,
+    scenario: String,
+    ioDispatcher: CoroutineDispatcher,
+): SessionManager = when (scenario) {
+    "STORED" -> AndroidSession.open(context, ioDispatcher)
+    "GUEST", "AUTHENTICATED", "UNAVAILABLE" -> SessionManager.open(ScenarioSessionStore(scenario), ioDispatcher)
     else -> error("Unknown debug session scenario")
 }
 
@@ -20,7 +25,7 @@ private class ScenarioSessionStore(scenario: String) : SessionStore {
     private val deviceId = UUID.randomUUID().toString()
     private var failRead = scenario == "UNAVAILABLE"
     private var tokens = if (scenario == "AUTHENTICATED") {
-        TokenPair("fixture-demo-access", "fixture-demo-refresh")
+        TokenPair("fixture-access", "fixture-refresh")
     } else {
         null
     }

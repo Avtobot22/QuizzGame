@@ -19,8 +19,6 @@ internal fun MobileRootGraph(
     graphs: Set<FeatureEntries<MobileNavigationContext>>,
     initialDestination: NavKey,
     isCurrentGraph: () -> Boolean,
-    roomCode: String,
-    onRoomCodeChange: (String) -> Unit,
     onLogout: () -> Unit,
     policies: Set<NavigationPolicy> = emptySet(),
     externalRequest: NavigationRequest? = null,
@@ -52,8 +50,6 @@ internal fun MobileRootGraph(
         },
         context = { coordinator ->
             MobileNavigationContext(
-                roomCode,
-                onRoomCodeChange,
                 onContentReady = { isCurrentGraph() && coordinator.splashCompleted() },
                 onSignIn = { isCurrentGraph() && coordinator.requireSignIn() },
                 onRestartSplash = { isCurrentGraph() && coordinator.restartSplash() },

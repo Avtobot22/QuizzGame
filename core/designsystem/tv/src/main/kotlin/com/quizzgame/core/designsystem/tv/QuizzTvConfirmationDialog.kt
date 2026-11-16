@@ -27,7 +27,6 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
 import com.quizzgame.core.ui.R
-import com.quizzgame.core.ui.status.QuizzStatusDimensions
 
 /**
  * Подтверждение произвольного действия. Confirm или Cancel доставляются один раз за показ.
@@ -60,16 +59,16 @@ fun QuizzTvConfirmationDialog(
     ) {
         val colors = MaterialTheme.colorScheme
         Surface(
-            modifier = modifier.widthIn(max = QuizzStatusDimensions.tvWidth.dp).fillMaxWidth(),
+            modifier = modifier.widthIn(max = 560.dp).fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
             colors = SurfaceDefaults.colors(containerColor = colors.surface, contentColor = colors.onSurface),
         ) {
             Column(
-                modifier = Modifier.padding(QuizzStatusDimensions.padding.dp).verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.gap.dp),
+                modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Text(title, style = MaterialTheme.typography.headlineSmall)
-                Text(text, style = MaterialTheme.typography.bodyLarge)
+                Text(text, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant)
                 ConfirmationActions(cancelLabel, confirmLabel, enabled && !completed, dismiss) {
                     if (!completed) {
                         completed = true
@@ -101,10 +100,14 @@ private fun ConfirmationActions(
     val cancelFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) { cancelFocus.requestFocus() }
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.actionGap.dp),
-        verticalArrangement = Arrangement.spacedBy(QuizzStatusDimensions.actionGap.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        QuizzTvButton(onClick = dismiss, modifier = Modifier.focusRequester(cancelFocus)) { Text(cancelLabel) }
-        QuizzTvButton(onClick = confirm, enabled = enabled) { Text(confirmLabel) }
+        QuizzTvButton(
+            onClick = dismiss,
+            modifier = Modifier.focusRequester(cancelFocus),
+            style = QuizzTvButtonStyle.SECONDARY,
+        ) { QuizzTvActionLabel(cancelLabel) }
+        QuizzTvButton(onClick = confirm, enabled = enabled) { QuizzTvActionLabel(confirmLabel) }
     }
 }

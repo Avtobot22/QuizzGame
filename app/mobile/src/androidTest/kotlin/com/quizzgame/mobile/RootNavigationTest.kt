@@ -6,7 +6,7 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.lifecycle.Lifecycle
 import androidx.test.espresso.Espresso
-import com.quizzgame.mobile.navigation.MobileNavigationTags
+import com.quizzgame.mobile.ui.tags.MobileNavigationTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

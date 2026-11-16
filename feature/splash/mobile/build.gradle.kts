@@ -7,6 +7,8 @@ plugins {
 android { namespace = "com.quizzgame.feature.splash.mobile" }
 
 dependencies {
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(projects.core.presentation)
     implementation(projects.shared.splash)
     implementation(projects.core.navigation)

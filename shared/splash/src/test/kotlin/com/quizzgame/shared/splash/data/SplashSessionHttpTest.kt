@@ -31,7 +31,7 @@ import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.data.mapper.validated
 import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
+import com.quizzgame.shared.splash.domain.entity.SplashResult
 import io.github.avtobot22.featureflags.FeatureFlagsSource
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -56,7 +56,7 @@ class SplashSessionHttpTest {
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             fixture.server.enqueue(MockResponse().setBody(ROTATED))
             fixture.server.enqueue(MockResponse().setBody(USER))
-            assertEquals(SplashOutcome.Continue, fixture.useCase())
+            assertEquals(SplashResult.Continue, fixture.useCase())
             assertEquals(5, fixture.server.requestCount)
             assertEquals("fixture-access-2", fixture.store.record.tokens?.access)
             assertEquals("fixture-refresh-2", fixture.store.record.tokens?.refresh)
@@ -85,7 +85,7 @@ class SplashSessionHttpTest {
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             fixture.server.enqueue(MockResponse().setBody(ROTATED))
             fixture.server.enqueue(MockResponse().setResponseCode(401))
-            assertFalse(fixture.useCase() is SplashOutcome.Continue)
+            assertFalse(fixture.useCase() is SplashResult.Continue)
             assertEquals(5, fixture.server.requestCount)
             assertNull(fixture.users.current())
         }
@@ -100,7 +100,7 @@ class SplashSessionHttpTest {
                 MockResponse().setResponseCode(400)
                     .setBody("""{"reasonCode":21001,"debugMessage":"invalid","userFriendlyMessage":null}"""),
             )
-            assertEquals(SplashOutcome.SignIn, fixture.useCase())
+            assertEquals(SplashResult.SignIn, fixture.useCase())
             assertEquals(SessionState.Expired, fixture.session.state.value)
             assertEquals(4, fixture.server.requestCount)
             assertNull(fixture.store.record.tokens)
@@ -114,13 +114,13 @@ class SplashSessionHttpTest {
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             fixture.server.enqueue(MockResponse().setResponseCode(503))
-            assertEquals(SplashOutcome.SignIn, fixture.useCase())
+            assertEquals(SplashResult.SignIn, fixture.useCase())
             val state = fixture.session.state.value as SessionState.Blocked
             assertEquals(CredentialUnavailableKind.REFRESH_UNCERTAIN, state.kind)
             assertEquals("fixture-refresh-1", fixture.store.record.tokens?.refresh)
             assertEquals(4, fixture.server.requestCount)
             assertNull(fixture.users.current())
-            assertEquals(SplashOutcome.SignIn, fixture.useCase())
+            assertEquals(SplashResult.SignIn, fixture.useCase())
             assertEquals(4, fixture.server.requestCount)
         }
     }

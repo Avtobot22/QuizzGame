@@ -39,9 +39,10 @@ import com.quizzgame.core.navigation.chrome.NavigationChromePolicy
 import com.quizzgame.core.navigation.chrome.navigationChrome
 import com.quizzgame.core.navigation.decoratedEntries
 import com.quizzgame.core.navigation.rememberNavigationState
-import com.quizzgame.mobile.navigation.MobileChromeTags
 import com.quizzgame.mobile.navigation.MobileMainNavigationHost
 import com.quizzgame.mobile.navigation.MobileTopLevelItem
+import com.quizzgame.mobile.ui.tags.MobileChromeTags
+import com.quizzgame.mobile.ui.tags.MobileNavigationChromeTestTags
 import kotlinx.serialization.Serializable
 import org.junit.Assert.assertEquals
 import org.junit.Rule

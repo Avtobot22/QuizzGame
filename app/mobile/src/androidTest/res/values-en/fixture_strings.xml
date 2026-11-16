@@ -1,0 +1,8 @@
+<resources>
+    <string name="fixture_label">TEST — local navigation only</string>
+    <string name="fixture_signin">TEST: open sign in</string>
+    <string name="fixture_continue">TEST: continue without authorization</string>
+    <string name="fixture_signout">TEST: end session</string>
+    <string name="fixture_room_code">Room code - local example</string>
+    <string name="fixture_restart">TEST: restart startup</string>
+</resources>

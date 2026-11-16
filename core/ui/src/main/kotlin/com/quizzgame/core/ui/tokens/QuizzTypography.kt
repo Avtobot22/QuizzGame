@@ -1,7 +1,9 @@
 package com.quizzgame.core.ui.tokens
 
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.sp
 
 object QuizzTypography {
@@ -90,6 +92,8 @@ object QuizzTypography {
         letterSpacing = 0.4.sp,
     )
     val labelLarge = TextStyle(
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+        lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
         fontFamily = QuizzFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 14.sp,
@@ -97,6 +101,8 @@ object QuizzTypography {
         letterSpacing = 0.1.sp,
     )
     val labelMedium = TextStyle(
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+        lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
         fontFamily = QuizzFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
@@ -104,6 +110,8 @@ object QuizzTypography {
         letterSpacing = 0.5.sp,
     )
     val labelSmall = TextStyle(
+        platformStyle = PlatformTextStyle(includeFontPadding = false),
+        lineHeightStyle = LineHeightStyle(LineHeightStyle.Alignment.Center, LineHeightStyle.Trim.Both),
         fontFamily = QuizzFontFamily,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,

@@ -22,6 +22,12 @@ class FeatureFlagsSdkAdapter(
 
     override fun guestAllowed(): Boolean = reader.get(guestDefinition)
 
+    override fun catalogPrefetch(): CatalogPrefetch = reader.get(AppFeatureDefinitions.tvPrefetch).let {
+        it.params.copy(enabled = it.enabled)
+    }
+
+    override fun catalogParallax(): Boolean = reader.get(AppFeatureDefinitions.tvParallax)
+
     override suspend fun refresh(): FeatureFlagsLoadResult = when (val result = system.manager.refresh()) {
         is RefreshResult.Applied -> FeatureFlagsLoadResult.Applied
         is RefreshResult.Failure -> FeatureFlagsLoadResult.Failed(result.error.sanitized())

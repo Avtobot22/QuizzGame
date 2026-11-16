@@ -32,6 +32,11 @@ data class AppNavigationEnvironment(
     val isCurrent: () -> Boolean = { true },
 )
 
+/**
+ * Основные разделы образуют область пользовательского контекста. Смена owner пересоздаёт
+ * её стеки и ViewModelStore, включая неактивные разделы. PUBLIC разрешает гостевой вход,
+ * но не означает, что содержимое экрана независимо от пользователя.
+ */
 data class AppNavigationConfiguration(
     val primary: NavKey,
     val splash: NavKey,

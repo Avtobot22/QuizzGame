@@ -13,6 +13,7 @@ import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashCallbacks
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashEntries
 import com.quizzgame.mobile.navigation.routes.JoinRoomRoute
+import com.quizzgame.mobile.ui.tags.MobileNavigationTags
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,8 +21,6 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal data class MobileNavigationContext(
-    val roomCode: String,
-    val onRoomCodeChange: (String) -> Unit,
     val onContentReady: () -> Boolean,
     val onSignIn: () -> Boolean,
     val onRestartSplash: () -> Boolean,
@@ -33,18 +32,16 @@ internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<Mobi
         MobileSplashCallbacks(it.onContentReady, it.onSignIn)
     }.register(this, context)
     entry<SignInRoute> {
-        val current = context.value
         Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.SIGN_IN)) {
-            MobileSignInDestination(onContinue = current.onRestartSplash)
+            MobileSignInDestination()
         }
     }
 }
 
-internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<MobileNavigationContext>) {
+internal fun EntryProviderScope<NavKey>.mobileContentEntries() {
     entry<JoinRoomRoute> {
-        val current = context.value
         Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.JOIN_ROOM)) {
-            MobileJoinRoomDestination(current.roomCode, current.onRoomCodeChange, current.onLogout)
+            MobileJoinRoomDestination()
         }
     }
 }
@@ -60,5 +57,5 @@ internal object MobileNavigationModule {
     @Provides
     @IntoSet
     fun contentEntries(): FeatureEntries<MobileNavigationContext> =
-        FeatureEntries { scope, context -> scope.mobileContentEntries(context) }
+        FeatureEntries { scope, _ -> scope.mobileContentEntries() }
 }

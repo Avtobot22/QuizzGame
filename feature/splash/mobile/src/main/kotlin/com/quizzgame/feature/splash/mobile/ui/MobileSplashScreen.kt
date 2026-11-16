@@ -1,9 +1,9 @@
 package com.quizzgame.feature.splash.mobile.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -24,7 +24,7 @@ import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.Retry
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashIntent.SignIn
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashUiState
 import com.quizzgame.feature.splash.mobile.presentation.MobileSplashViewModel
-import com.quizzgame.core.ui.R as UiR
+import com.quizzgame.feature.splash.mobile.ui.tags.MobileSplashTags
 
 @Composable
 fun MobileSplashScreen(
@@ -46,7 +46,7 @@ fun MobileSplashScreen(
 }
 
 @Composable
-private fun MobileSplashContent(
+internal fun MobileSplashContent(
     state: MobileSplashUiState,
     onIntent: (MobileSplashIntent) -> Unit,
     onJoinRoom: () -> Boolean,
@@ -64,7 +64,11 @@ private fun MobileSplashContent(
             MobileSplashDestination.SIGN_IN   -> onSignIn()
         }
     }
-    Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+    val colors = MaterialTheme.colorScheme
+    Box(
+        modifier.fillMaxSize().background(colors.background),
+        contentAlignment = Alignment.Center,
+    ) {
         when (state) {
             is MobileSplashUiState.Error -> QuizzMobileErrorFullScreen(
                 state.spec,
@@ -84,13 +88,6 @@ private fun MobileSplashContent(
                     primary = MaterialTheme.colorScheme.primary,
                     accent = MaterialTheme.colorScheme.tertiary,
                     modifier = Modifier.testTag(MobileSplashTags.LOADING),
-                    title = {
-                        Text(
-                            stringResource(UiR.string.quizz_brand_name),
-                            style = MaterialTheme.typography.displaySmall,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                    },
                 )
         }
     }

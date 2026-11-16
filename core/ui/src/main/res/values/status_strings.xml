@@ -1,4 +1,10 @@
 <resources>
     <string name="quizz_confirmation_confirm">Подтвердить</string>
     <string name="quizz_confirmation_cancel">Отмена</string>
+    <string name="quizz_loading">Загрузка</string>
+    <string name="quizz_action_back">Назад</string>
+    <string name="quizz_status_network_help">Проверьте подключение к интернету и попробуйте снова.</string>
+    <string name="quizz_status_server_help">Сервис временно недоступен. Попробуйте чуть позже.</string>
+    <string name="quizz_status_auth_help">Войдите в аккаунт снова, чтобы продолжить.</string>
+    <string name="quizz_status_generic_help">Не получилось завершить действие. Попробуйте ещё раз.</string>
 </resources>

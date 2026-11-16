@@ -2,8 +2,10 @@ package com.quizzgame.core.designsystem.tv
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
@@ -42,14 +44,23 @@ fun QuizzTvPairingPanel(
             stateDescription = status
         },
         shape = MaterialTheme.shapes.extraLarge,
-        colors = SurfaceDefaults.colors(containerColor = colors.surfaceVariant, contentColor = colors.onSurface),
+        colors = SurfaceDefaults.colors(
+            containerColor = colors.surfaceVariant.copy(alpha = 0.3f),
+            contentColor = colors.onSurface,
+        ),
     ) {
-        Column(Modifier.padding(24.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, style = TvComponentType.panelTitle)
+        Row(
+            Modifier.padding(32.dp),
+            horizontalArrangement = Arrangement.spacedBy(32.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                Text(title, style = TvComponentType.panelTitle)
+                Text(code, color = colors.primary, style = TvComponentType.panelCode)
+                Text(supportingText, color = colors.onSurfaceVariant, style = TvComponentType.panelHelper)
+                actions()
+            }
             qrContent()
-            Text(code, color = colors.primary, style = TvComponentType.panelCode)
-            Text(supportingText, color = colors.onSurfaceVariant, style = TvComponentType.panelHelper)
-            actions()
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.quizzgame.core.designsystem.mobile
 
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import com.quizzgame.core.designsystem.mobile.ui.tags.MobileStatusTags
 import io.github.kakaocup.compose.node.element.ComposeScreen
 import io.github.kakaocup.compose.node.element.KNode
 

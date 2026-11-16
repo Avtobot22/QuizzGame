@@ -7,28 +7,29 @@ import androidx.compose.ui.platform.testTag
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.feature.splash.tv.navigation.TvSplashRoute
-import com.quizzgame.tv.navigation.DemoPlaceholder
+import com.quizzgame.tv.navigation.FixturePlaceholder
+import com.quizzgame.tv.navigation.TvFixtureSignInDestination
 import com.quizzgame.tv.navigation.TvNavigationContext
-import com.quizzgame.tv.navigation.TvNavigationTags
-import com.quizzgame.tv.navigation.TvSignInDestination
+import com.quizzgame.tv.ui.tags.TvNavigationTags
+import com.quizzgame.tv.test.R as FixtureR
 
 /** Root-policy tests substitute only the network-owning Splash entry. */
 internal fun startupTestEntries(): FeatureEntries<TvNavigationContext> = FeatureEntries { scope, context ->
     scope.entry<TvSplashRoute> {
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SPLASH)) {
-            DemoPlaceholder(
+            FixturePlaceholder(
                 R.string.splash_placeholder,
                 listOf(
-                    R.string.demo_signin to { current.onSignIn() },
-                    R.string.demo_continue to { current.onContentReady() },
+                    FixtureR.string.fixture_signin to { current.onSignIn() },
+                    FixtureR.string.fixture_continue to { current.onContentReady() },
                 ),
             )
         }
     }
     scope.entry<SignInRoute> {
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SIGN_IN)) {
-            TvSignInDestination(onContinue = { context.value.onRestartSplash() })
+            TvFixtureSignInDestination(onContinue = { context.value.onRestartSplash() })
         }
     }
 }

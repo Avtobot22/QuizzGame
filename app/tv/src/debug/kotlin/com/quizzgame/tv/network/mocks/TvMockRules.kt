@@ -23,6 +23,24 @@ internal fun tvMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mo
         }
     }
 
+    rule("catalog-dashboard", "/api/tv/dashboard") {
+        match { method("GET") }
+        respond {
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/dashboard.json").decodeToString()))
+        }
+    }
+    rule("catalog-feed", "/api/tv/feed") {
+        match { method("GET") }
+        respond {
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/feed.json").decodeToString()))
+        }
+    }
+    rule("catalog-quiz-entry", "/api/tv/quiz-entries/58e2b5b5-05e6-43f5-1580-8e88ec7130fd") {
+        match { method("GET") }
+        respond {
+            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/quiz-entry.json").decodeToString()))
+        }
+    }
     rule("launch", "/api/tv/launch") {
         match { method("GET") }
         respondWith { _, _ ->

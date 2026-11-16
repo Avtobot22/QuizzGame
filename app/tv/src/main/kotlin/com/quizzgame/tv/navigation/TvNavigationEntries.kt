@@ -13,6 +13,7 @@ import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.feature.splash.tv.navigation.TvSplashCallbacks
 import com.quizzgame.feature.splash.tv.navigation.TvSplashEntries
 import com.quizzgame.tv.navigation.routes.DashboardRoute
+import com.quizzgame.tv.ui.tags.TvNavigationTags
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +21,6 @@ import dagger.hilt.android.components.ActivityRetainedComponent
 import dagger.multibindings.IntoSet
 
 internal data class TvNavigationContext(
-    val dashboardGraphs: Set<FeatureEntries<DashboardNavigationContext>>,
     val onContentReady: () -> Boolean,
     val onSignIn: () -> Boolean,
     val onRestartSplash: () -> Boolean,
@@ -32,9 +32,8 @@ internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNaviga
         TvSplashCallbacks(it.onContentReady, it.onSignIn)
     }.register(this, context)
     entry<SignInRoute> {
-        val current = context.value
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SIGN_IN)) {
-            TvSignInDestination(onContinue = current.onRestartSplash)
+            TvSignInDestination()
         }
     }
 }
@@ -43,7 +42,7 @@ internal fun EntryProviderScope<NavKey>.tvContentEntries(context: State<TvNaviga
     entry<DashboardRoute> {
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.DASHBOARD)) {
-            TvDashboardDestination(current.onLogout, current.dashboardGraphs)
+            TvCatalogDashboard(current.onLogout, current.onSignIn)
         }
     }
 }

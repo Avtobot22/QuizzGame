@@ -10,6 +10,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.semantics
@@ -43,11 +44,7 @@ fun QuizzTvAnswerCard(
         AnswerVisualState.WRONG -> stringResource(R.string.quizz_answer_wrong)
         else -> null
     }
-    val shape = RoundedCornerShape(27.dp)
-    val focusBorder = Border(
-        BorderStroke(QuizzDimensions.tvFocusOutlineDp.dp, MaterialTheme.colorScheme.border),
-        shape = shape,
-    )
+    val shape = RoundedCornerShape(16.dp)
     Surface(
         selected = state == AnswerVisualState.SELECTED,
         onClick = onClick,
@@ -62,9 +59,9 @@ fun QuizzTvAnswerCard(
             focusedDisabledScale = QuizzDimensions.tvFocusScaleCard,
         ),
         border = SelectableSurfaceDefaults.border(
-            focusedBorder = focusBorder,
-            focusedDisabledBorder = focusBorder,
+            focusedBorder = Border(BorderStroke(2.dp, MaterialTheme.colorScheme.onSurface), 2.dp, shape),
         ),
+        glow = SelectableSurfaceDefaults.glow(),
     ) {
         AnswerCardContent(title, helperText, state)
     }
@@ -75,13 +72,13 @@ private fun answerSurfaceColors(background: Color, foreground: Color): Selectabl
     SelectableSurfaceDefaults.colors(
         containerColor = background,
         contentColor = foreground,
-        focusedContainerColor = background,
+        focusedContainerColor = lerp(background, MaterialTheme.colorScheme.onSurface, 0.12f),
         focusedContentColor = foreground,
         pressedContainerColor = background,
         pressedContentColor = foreground,
         selectedContainerColor = background,
         selectedContentColor = foreground,
-        focusedSelectedContainerColor = background,
+        focusedSelectedContainerColor = lerp(background, MaterialTheme.colorScheme.onSurface, 0.12f),
         focusedSelectedContentColor = foreground,
         pressedSelectedContainerColor = background,
         pressedSelectedContentColor = foreground,
@@ -106,7 +103,7 @@ private fun QuizzGameColors.contentFor(state: AnswerVisualState) = when (state) 
 @Composable
 private fun AnswerCardContent(title: String, helperText: String, state: AnswerVisualState) {
     Column(
-        Modifier.padding(start = 34.dp, end = 30.dp, top = 24.dp, bottom = 24.dp),
+        Modifier.padding(start = 24.dp, end = 24.dp, top = 20.dp, bottom = 20.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(title, style = TvComponentType.answerTitle)
