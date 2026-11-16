@@ -1,5 +1,6 @@
 package com.quizzgame.app.network
 
+import com.quizzgame.core.coroutines.DefaultDispatcherProvider
 import com.quizzgame.core.network.api.ApiCallResult
 import com.quizzgame.core.network.auth.AuthPolicy
 import com.quizzgame.core.network.auth.RefreshFailureReason
@@ -47,7 +48,7 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
             gate.await()
             fixture.session
         }
-        val executor = StartupApiCallExecutor(startup)
+        val executor = StartupApiCallExecutor(startup, DefaultDispatcherProvider())
         val first = async(start = CoroutineStart.UNDISPATCHED) {
             executor.call(Api::class.java) { load(guestPolicy()) }
         }
@@ -73,7 +74,7 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
     @Test
     fun requiredGuestCallDoesNotReachHttpAndResponseCallsKeepNetworkErrors() = runBlocking {
         val fixture = fixture()
-        val executor = StartupApiCallExecutor(fixture.startup())
+        val executor = StartupApiCallExecutor(fixture.startup(), DefaultDispatcherProvider())
         assertEquals(
             ApiCallResult.Executed(NetworkResult.Failure(NetworkFailure.AuthenticationRequired)),
             executor.call(Api::class.java) { load(authPolicy()) },
@@ -90,7 +91,10 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
     fun aSecondUnauthorizedGetStopsAfterOneIsolatedRefresh() = runBlocking {
         val fixture = fixture(TokenPair("fixture-access-1", "fixture-refresh-1"))
         fixture.server.dispatcher = dispatcher { MockResponse().setBody(REFRESH_PAIR) }
-        val result = StartupApiCallExecutor(fixture.startup()).call(Api::class.java) { load(authPolicy()) }
+        val result = StartupApiCallExecutor(
+            fixture.startup(),
+            DefaultDispatcherProvider(),
+        ).call(Api::class.java) { load(authPolicy()) }
         assertEquals(ApiCallResult.Executed(NetworkResult.Failure(NetworkFailure.Http(401))), result)
         assertEquals(3, fixture.server.requestCount)
         val requests = List(3) { fixture.server.takeRequest(1, TimeUnit.SECONDS)!! }
@@ -108,7 +112,10 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
         fixture.server.dispatcher = dispatcher { MockResponse().setResponseCode(401) }
         assertEquals(
             ApiCallResult.Executed(NetworkResult.Failure(NetworkFailure.SessionRevoked)),
-            StartupApiCallExecutor(fixture.startup()).call(Api::class.java) { load(authPolicy()) },
+            StartupApiCallExecutor(
+                fixture.startup(),
+                DefaultDispatcherProvider(),
+            ).call(Api::class.java) { load(authPolicy()) },
         )
         assertEquals(SessionState.Expired, fixture.session.state.value)
         assertNull(fixture.store.tokens)
@@ -128,7 +135,10 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
             val reason = status?.let { RefreshFailureReason.Http(it) } ?: RefreshFailureReason.Timeout
             assertEquals(
                 ApiCallResult.Executed(NetworkResult.Failure(NetworkFailure.RefreshUncertain(reason))),
-                StartupApiCallExecutor(fixture.startup()).call(Api::class.java) { load(authPolicy()) },
+                StartupApiCallExecutor(
+                    fixture.startup(),
+                    DefaultDispatcherProvider(),
+                ).call(Api::class.java) { load(authPolicy()) },
             )
             assertEquals("fixture-access-1", fixture.store.tokens!!.access)
             assertEquals(1, fixture.store.writes)
@@ -145,7 +155,10 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
         fixture.server.enqueue(MockResponse().setSocketPolicy(SocketPolicy.NO_RESPONSE))
         assertEquals(
             ApiCallResult.Executed(NetworkResult.Failure(NetworkFailure.Timeout)),
-            StartupApiCallExecutor(fixture.startup()).call(Api::class.java) { write(authPolicy()) },
+            StartupApiCallExecutor(
+                fixture.startup(),
+                DefaultDispatcherProvider(),
+            ).call(Api::class.java) { write(authPolicy()) },
         )
         assertEquals(1, fixture.server.requestCount)
         assertEquals(0, fixture.store.writes)

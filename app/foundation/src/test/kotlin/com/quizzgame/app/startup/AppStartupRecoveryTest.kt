@@ -2,6 +2,7 @@ package com.quizzgame.app.startup
 
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.core.error.presentation.ErrorActionKind
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
@@ -27,6 +28,7 @@ class AppStartupRecoveryTest {
         val store = StartupTestStore(initialTokens = tokens)
         var networks = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = AppNetworkGraphFactory { session, json ->
                 networks++
@@ -60,6 +62,7 @@ class AppStartupRecoveryTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val store = StartupTestStore().apply { failRead = true }
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = AppNetworkGraphFactory { _, _ -> error("Unavailable storage must block network startup") },
             dispatcher = dispatcher,
@@ -84,6 +87,7 @@ class AppStartupRecoveryTest {
         permanentFailures.forEach { reason ->
             val store = StartupTestStore(initialTokens = tokens)
             val coordinator = AppStartupCoordinator(
+                json = createNetworkJson(),
                 openSession = { SessionManager.open(store, dispatcher) },
                 networkFactory = fakeNetworkFactory(),
                 dispatcher = dispatcher,
@@ -110,6 +114,7 @@ class AppStartupRecoveryTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val store = StartupTestStore(initialTokens = TokenPair("fixture-access", "fixture-refresh"))
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = fakeNetworkFactory(),
             dispatcher = dispatcher,
@@ -133,6 +138,7 @@ class AppStartupRecoveryTest {
         val tokens = TokenPair("fixture-access", "fixture-refresh")
         val store = StartupTestStore(initialTokens = tokens)
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = fakeNetworkFactory(),
             dispatcher = dispatcher,

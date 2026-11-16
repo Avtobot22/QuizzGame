@@ -3,6 +3,7 @@ package com.quizzgame.app.startup
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.presentation.ErrorCopyKey
+import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.storage.SessionStorageException
@@ -30,6 +31,7 @@ class AppStartupAvailabilityTest {
     fun failedAccessIsTypedAndDoesNotAutomaticallyOpenStorageAgain() = runTest {
         var attempts = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 attempts++
                 throw IOException("Local file cannot be opened")
@@ -51,6 +53,7 @@ class AppStartupAvailabilityTest {
     fun openingCryptoFailureIsPreservedAndDoesNotOfferRetryOrSignIn() = runTest {
         var attempts = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 attempts++
                 throw SessionStorageException(SessionStorageFailure.CRYPTO)
@@ -73,6 +76,7 @@ class AppStartupAvailabilityTest {
         var networks = 0
         var closes = 0
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = AppNetworkGraphFactory { session, json ->
                 networks++
@@ -101,6 +105,7 @@ class AppStartupAvailabilityTest {
     fun shutdownReleasesSharedWaitersAsClosedWithoutInventingAStartupFailure() = runTest {
         val entered = CompletableDeferred<Unit>()
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 entered.complete(Unit)
                 awaitCancellation()
@@ -120,6 +125,7 @@ class AppStartupAvailabilityTest {
         val dispatcher = StandardTestDispatcher(testScheduler)
         val gate = CompletableDeferred<Unit>()
         val coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = {
                 gate.await()
                 SessionManager.open(StartupTestStore(), dispatcher)
@@ -152,6 +158,7 @@ class AppStartupAvailabilityTest {
         lateinit var coordinator: AppStartupCoordinator
         lateinit var closing: Job
         coordinator = AppStartupCoordinator(
+            json = createNetworkJson(),
             openSession = { SessionManager.open(store, dispatcher) },
             networkFactory = AppNetworkGraphFactory { session, json ->
                 closing = backgroundScope.launch(start = CoroutineStart.UNDISPATCHED) { coordinator.shutdown() }

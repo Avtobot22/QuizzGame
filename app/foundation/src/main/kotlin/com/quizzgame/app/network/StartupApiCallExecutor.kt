@@ -4,6 +4,7 @@ import com.quizzgame.app.graph.AppGraph
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupFailure
 import com.quizzgame.app.startup.GraphAccessResult
+import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiCallExecutor
 import com.quizzgame.core.network.api.ApiCallResult
 import com.quizzgame.core.network.api.ApiRuntime
@@ -12,10 +13,14 @@ import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.lifecycle.SessionState
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.util.concurrent.RejectedExecutionException
 
-internal class StartupApiCallExecutor(private val startup: AppStartup) : ApiCallExecutor {
+internal class StartupApiCallExecutor(
+    private val startup: AppStartup,
+    private val dispatchers: DispatcherProvider,
+) : ApiCallExecutor {
     override suspend fun <S : Any, T> call(service: Class<S>, request: suspend S.() -> T): ApiCallResult<T> =
         withRuntime { runtime -> runtime.results.call { request(runtime.retrofit.create(service)) } }
 
@@ -25,9 +30,11 @@ internal class StartupApiCallExecutor(private val startup: AppStartup) : ApiCall
     ): ApiCallResult<T> =
         withRuntime { runtime -> runtime.results.response { request(runtime.retrofit.create(service)) } }
 
-    private suspend fun <T> withRuntime(request: suspend (ApiRuntime) -> NetworkResult<T>): ApiCallResult<T> {
+    private suspend fun <T> withRuntime(
+        request: suspend (ApiRuntime) -> NetworkResult<T>,
+    ): ApiCallResult<T> = withContext(dispatchers.io) {
         currentCoroutineContext().ensureActive()
-        return when (val access = startup.accessGraph()) {
+        when (val access = startup.accessGraph()) {
             GraphAccessResult.Closed -> ApiCallResult.Closed
             is GraphAccessResult.Unavailable -> ApiCallResult.Unavailable(access.failure.reason.toApiReason())
             is GraphAccessResult.Ready -> execute(access.graph, request)

@@ -4,7 +4,6 @@ import com.quizzgame.app.graph.AppGraph
 import com.quizzgame.app.network.AppNetworkConfigurationException
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.core.error.presentation.ErrorActionKind
-import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
@@ -29,12 +28,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import java.io.IOException
 
 class AppStartupCoordinator(
     private val openSession: suspend () -> SessionManager,
     private val networkFactory: AppNetworkGraphFactory,
     dispatcher: CoroutineDispatcher,
+    private val json: Json,
     private val recovery: StorageRecoveryPolicy = StorageRecoveryPolicy(),
 ) : AppStartup {
     private val scope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -126,7 +127,7 @@ class AppStartupCoordinator(
             return
         }
         try {
-            val graph = networkFactory.open(manager, createNetworkJson())
+            val graph = networkFactory.open(manager, json)
             var retained = false
             try {
                 lock.withLock {

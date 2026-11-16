@@ -78,6 +78,7 @@ abstract class ApiExecutorTestFixture {
 
         fun startup(openSession: suspend () -> SessionManager = { session }): AppStartupCoordinator =
             AppStartupCoordinator(
+                json = createNetworkJson(),
                 openSession = {
                     sessionOpens.incrementAndGet()
                     openSession()

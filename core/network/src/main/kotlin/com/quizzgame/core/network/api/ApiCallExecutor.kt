@@ -3,6 +3,10 @@ package com.quizzgame.core.network.api
 import com.quizzgame.core.network.result.NetworkResult
 import retrofit2.Response
 
+/**
+ * Выполняет запрос и обработку результата вне Main; вызывающую корутину возвращает в её исходный контекст.
+ * Отмена вызывающей корутины отменяет запрос и не преобразуется в сетевую ошибку.
+ */
 interface ApiCallExecutor {
     suspend fun <S : Any, T> call(service: Class<S>, request: suspend S.() -> T): ApiCallResult<T>
 
