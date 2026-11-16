@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.data.dto
+package com.quizzgame.feature.feed.tv.data.dto.item
 
 import com.quizzgame.core.media.data.dto.MediaDto
 import com.quizzgame.shared.catalog.data.dto.BadgeDto

@@ -9,12 +9,11 @@ import com.quizzgame.core.media.MediaSpec
 import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
 import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
-import com.quizzgame.feature.feed.tv.presentation.TvFeedState
 import com.quizzgame.shared.catalog.domain.entity.CatalogBadge
 import com.quizzgame.shared.catalog.domain.entity.PassingStatus
 import com.quizzgame.shared.catalog.domain.entity.QuizUserState
 
-internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedState> {
+internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedPreviewState> {
     private val feed = Feed(
         rails = listOf(
             QuizRail(
@@ -40,24 +39,24 @@ internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedState> {
         ),
     )
 
-    override val values: Sequence<TvFeedState> = sequenceOf(
-        TvFeedState.Loading,
-        TvFeedState.Empty,
-        TvFeedState.Error(
+    override val values: Sequence<TvFeedPreviewState> = sequenceOf(
+        TvFeedPreviewState.Loading,
+        TvFeedPreviewState.Empty,
+        TvFeedPreviewState.Error(
             ErrorPresentationSpec(
                 ErrorSurface.BLOCKING,
                 ErrorCopyKey.CONNECTION_PROBLEM,
                 actions = listOf(ErrorActionKind.RETRY),
             ),
         ),
-        TvFeedState.Content(feed),
-        TvFeedState.Content(feed, refreshing = true),
-        TvFeedState.Content(feed, appendingSections = true),
-        TvFeedState.Content(
+        TvFeedPreviewState.Content(feed),
+        TvFeedPreviewState.Content(feed, refreshing = true),
+        TvFeedPreviewState.Content(feed, appendingSections = true),
+        TvFeedPreviewState.Content(
             feed.copy(rails = feed.rails.map { it.copy(cards = it.cards.take(1)) }),
             appendingRails = setOf("popular"),
         ),
-        TvFeedState.Content(
+        TvFeedPreviewState.Content(
             feed,
             error = ErrorPresentationSpec(
                 ErrorSurface.BANNER,

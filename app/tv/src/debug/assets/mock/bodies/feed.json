@@ -21,7 +21,15 @@
             "passingStatus": "inProgress"
           }
         }
-      ]
+      ],
+      "itemsPage": {
+        "hasMore": false,
+        "nextCursor": null
+      }
     }
-  ]
+  ],
+  "page": {
+    "hasMore": false,
+    "nextCursor": null
+  }
 }

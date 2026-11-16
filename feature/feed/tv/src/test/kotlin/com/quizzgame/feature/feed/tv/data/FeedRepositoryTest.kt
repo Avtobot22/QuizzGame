@@ -1,106 +1,133 @@
 package com.quizzgame.feature.feed.tv.data
 
-import com.quizzgame.core.coroutines.DefaultDispatcherProvider
-import com.quizzgame.core.error.failure.AppFailure
-import com.quizzgame.core.network.api.ApiCallExecutor
-import com.quizzgame.core.network.api.ApiCallResult
-import com.quizzgame.core.network.auth.AuthPolicy
-import com.quizzgame.core.network.auth.ReplayPolicy
-import com.quizzgame.core.network.auth.RequestPolicy
-import com.quizzgame.core.network.config.createNetworkJson
-import com.quizzgame.core.network.result.NetworkResultAdapter
+import androidx.paging.PagingDataEvent
+import androidx.paging.PagingDataPresenter
+import androidx.paging.cachedIn
+import androidx.paging.testing.asSnapshot
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
+import com.quizzgame.feature.feed.tv.FakeFeedRemoteDataSource
+import com.quizzgame.feature.feed.tv.FeedTestData
+import com.quizzgame.feature.feed.tv.data.paging.FeedPagingSession
 import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import kotlinx.coroutines.runBlocking
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.kotlinx.serialization.asConverterFactory
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class FeedRepositoryTest {
-    private val json = createNetworkJson()
-    private val mapper = FeedMapper()
-
     @Test
-    fun fixtureUsesOptionalAuthAndCorrectEndpoint() = runBlocking {
-        MockWebServer().use { server ->
-            server.enqueue(MockResponse().setBody(fixture()).setHeader("Content-Type", "application/json"))
-            var policy: RequestPolicy? = null
-            val repository = FeedRepositoryImpl(
-                executor(server) { policy = it },
-                SessionStateReader { SessionState.Guest },
-                DefaultDispatcherProvider(),
-                mapper,
-            )
-            assertTrue(repository.load() is FeedResult.Loaded)
-            val request = server.takeRequest()
-            assertEquals("/api/tv/feed", request.path)
-            assertNull(request.getHeader("X-Endpoint-Version"))
-            assertEquals(RequestPolicy(AuthPolicy.OPTIONAL, ReplayPolicy.AFTER_REFRESH_ONCE), policy)
-        }
+    fun repositoryDoesNotCacheRailPagesOrFetchInlinePreviewAgain() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+        val rails = repository.getFeed().cachedIn(backgroundScope).asSnapshot { scrollTo(2) }
+        assertTrue(remote.itemCalls.isEmpty())
+        val first = repository.loadItems(rails.first()).asSnapshot { scrollTo(2) }
+        val repeated = repository.loadItems(rails.first()).asSnapshot { scrollTo(2) }
+        assertEquals(first, repeated)
+        assertEquals(2, remote.itemCalls.size)
     }
 
     @Test
-    fun invalidBusinessPayloadBecomesTypedFailureAndLateSessionResponseIsDiscarded() = runBlocking {
-        MockWebServer().use { server ->
-            server.enqueue(MockResponse().setBody("{}").setHeader("Content-Type", "application/json"))
-            val invalid = FeedRepositoryImpl(
-                executor(server),
-                SessionStateReader { SessionState.Guest },
-                DefaultDispatcherProvider(),
-                mapper,
-            )
-            assertEquals(FeedResult.Failed(AppFailure.InvalidServerData), invalid.load())
-            server.enqueue(MockResponse().setBody(fixture()).setHeader("Content-Type", "application/json"))
-            var reads = 0
-            val session = SessionStateReader { if (reads++ == 0) SessionState.Authenticated(1) else SessionState.Guest }
-            val late = FeedRepositoryImpl(executor(server), session, DefaultDispatcherProvider(), mapper)
-            assertEquals(FeedResult.Failed(AppFailure.OperationInterrupted), late.load())
-        }
+    fun newViewModelRepositoryDoesNotReusePreviousOwnerPages() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        val previous = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Authenticated(1) })
+        val old = previous.getFeed().cachedIn(backgroundScope).asSnapshot { scrollTo(2) }
+        val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Authenticated(2) })
+        val current = repository.getFeed().cachedIn(backgroundScope).asSnapshot { scrollTo(2) }
+        assertNotEquals(old.first().snapshotId, current.first().snapshotId)
+        assertTrue(repository.loadItems(old.first()).asSnapshot().isEmpty())
+        assertTrue(remote.itemCalls.isEmpty())
+        assertEquals(3, repository.loadItems(current.first()).asSnapshot { scrollTo(2) }.size)
     }
 
     @Test
-    fun unknownKindBecomesInvalidServerData() = runBlocking {
-        MockWebServer().use { server ->
-            val invalid = fixture().replace("\"kind\": \"rail\"", "\"kind\": \"future\"")
-            server.enqueue(MockResponse().setBody(invalid).setHeader("Content-Type", "application/json"))
-            val repository = FeedRepositoryImpl(
-                executor(server),
-                SessionStateReader { SessionState.Guest },
-                DefaultDispatcherProvider(),
-                mapper,
-            )
-            assertEquals(FeedResult.Failed(AppFailure.InvalidServerData), repository.load())
+    fun explicitRefreshRenewsTheOneAutomaticExpirationRecovery() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        remote.feedReply = { cursor ->
+            if (cursor == null) FeedResult.Loaded(FeedTestData.feed()) else FeedResult.Expired
         }
+        val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+        val presenter = object : PagingDataPresenter<QuizRail>(StandardTestDispatcher(testScheduler)) {
+            override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
+        }
+        backgroundScope.launch {
+            repository.getFeed().cachedIn(backgroundScope).collectLatest(presenter::collectFrom)
+        }
+        runCurrent()
+        repeat(2) {
+            presenter[0]
+            runCurrent()
+        }
+        assertEquals(2, remote.feedCalls.count { it == null })
+        assertEquals(2, remote.feedCalls.count { it != null })
+        presenter.refresh()
+        runCurrent()
+        presenter[0]
+        runCurrent()
+        assertEquals(4, remote.feedCalls.count { it == null })
     }
 
-    private fun executor(server: MockWebServer, observed: (RequestPolicy?) -> Unit = {}): ApiCallExecutor {
-        val client = OkHttpClient.Builder().addInterceptor { chain ->
-            observed(chain.request().tag(RequestPolicy::class.java))
-            chain.proceed(chain.request())
-        }.build()
-        val retrofit = Retrofit.Builder().baseUrl(server.url("/")).client(client)
-            .addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build()
-        val adapter = NetworkResultAdapter(json)
-        return object : ApiCallExecutor {
-            override suspend fun <S : Any, T> call(service: Class<S>, request: suspend S.() -> T): ApiCallResult<T> =
-                ApiCallResult.Executed(adapter.call { request(retrofit.create(service)) })
-
-            override suspend fun <S : Any, T> response(
-                service: Class<S>,
-                request: suspend S.() -> Response<T>,
-            ): ApiCallResult<T> = ApiCallResult.Executed(adapter.response { request(retrofit.create(service)) })
+    @Test
+    fun expirationHasOneAutomaticRecoveryUntilAnExplicitRefresh() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        remote.feedReply = { cursor ->
+            if (cursor == null) FeedResult.Loaded(FeedTestData.feed()) else FeedResult.Expired
         }
+        val paging = FeedPagingSession(
+            remote,
+            SessionState.Guest,
+        )
+        val failure = runCatching { paging.sections.asSnapshot { scrollTo(2) } }
+        assertTrue(failure.isFailure)
+        assertEquals(2, remote.feedCalls.count { it == null })
+        assertEquals(2, remote.feedCalls.count { it != null })
+        paging.close()
     }
 
-    private fun fixture(): String = checkNotNull(javaClass.getResource("/feed.json")).readText()
+    @Test
+    fun feedIsColdAndCollectorsHaveIndependentSnapshots() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+        val feed = repository.getFeed()
+        assertTrue(remote.feedCalls.isEmpty())
+        val first = feed.cachedIn(backgroundScope).asSnapshot { scrollTo(2) }
+        val second = feed.cachedIn(backgroundScope).asSnapshot { scrollTo(2) }
+        assertNotEquals(first.first().snapshotId, second.first().snapshotId)
+        assertEquals(3, repository.loadItems(first.first()).asSnapshot { scrollTo(2) }.size)
+        assertEquals(3, repository.loadItems(second.first()).asSnapshot { scrollTo(2) }.size)
+    }
+
+    @Test
+    fun pagingSerializesSimultaneousAppendHintsWithoutManualLocking() = runTest {
+        val remote = FakeFeedRemoteDataSource()
+        val gate = CompletableDeferred<Unit>()
+        remote.feedReply = { cursor ->
+            if (cursor != null) gate.await()
+            FeedResult.Loaded(FeedTestData.feed(if (cursor == null) "feed-page-1.json" else "feed-page-2.json"))
+        }
+        val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+        val presenter = object : PagingDataPresenter<QuizRail>(StandardTestDispatcher(testScheduler)) {
+            override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
+        }
+        backgroundScope.launch { repository.getFeed().collectLatest(presenter::collectFrom) }
+        runCurrent()
+        presenter[0]
+        presenter[1]
+        runCurrent()
+        assertEquals(1, remote.feedCalls.count { it != null })
+        assertEquals(2, presenter.snapshot().items.size)
+        gate.complete(Unit)
+        runCurrent()
+        assertEquals(3, presenter.snapshot().items.size)
+    }
 }

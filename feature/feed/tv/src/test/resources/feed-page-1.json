@@ -1,0 +1,75 @@
+{
+  "sections": [
+    {
+      "kind": "rail",
+      "id": "58e2b5b5-05e6-43f5-9580-8e88ec7130fd",
+      "title": "Популярные викторины",
+      "items": [
+        {
+          "kind": "quiz",
+          "id": "18e2b5b5-05e6-43f5-9580-2e88ec713001",
+          "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713001",
+          "title": "Обо всём на свете",
+          "image": {
+            "kind": "asset",
+            "name": "quiz.cover"
+          },
+          "user": {
+            "bookmarked": true,
+            "progress": 0.25,
+            "passingStatus": "inProgress"
+          }
+        },
+        {
+          "kind": "quiz",
+          "id": "18e2b5b5-05e6-43f5-9580-2e88ec713002",
+          "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713002",
+          "title": "Космос",
+          "image": {
+            "kind": "asset",
+            "name": "quiz.cover"
+          },
+          "user": {
+            "bookmarked": false,
+            "progress": 0,
+            "passingStatus": "notStarted"
+          }
+        }
+      ],
+      "itemsPage": {
+        "hasMore": true,
+        "nextCursor": "opaque-rail-a-after-2"
+      }
+    },
+    {
+      "kind": "rail",
+      "id": "58e2b5b5-05e6-43f5-9580-8e88ec7130fe",
+      "title": "Для компании",
+      "items": [
+        {
+          "kind": "quiz",
+          "id": "18e2b5b5-05e6-43f5-9580-2e88ec713003",
+          "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713003",
+          "title": "Угадай мелодию",
+          "image": {
+            "kind": "asset",
+            "name": "quiz.cover"
+          },
+          "user": {
+            "bookmarked": false,
+            "progress": 0,
+            "passingStatus": "notStarted"
+          }
+        }
+      ],
+      "itemsPage": {
+        "hasMore": false,
+        "nextCursor": null
+      }
+    }
+  ],
+  "page": {
+    "hasMore": true,
+    "nextCursor": "opaque-feed-after-2-sections"
+  }
+}

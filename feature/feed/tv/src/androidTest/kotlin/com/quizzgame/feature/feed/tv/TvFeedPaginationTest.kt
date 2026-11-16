@@ -11,9 +11,9 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
-import com.quizzgame.feature.feed.tv.presentation.TvFeedState
-import com.quizzgame.feature.feed.tv.ui.content.TvFeedStateContent
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
+import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
+import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewStateContent
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -25,7 +25,7 @@ class TvFeedPaginationTest {
 
     @Test
     fun appendingBothAxesPreservesCardFocusAndDoesNotAddRemoteTargets() {
-        val content = TvFeedPreviewProvider().values.filterIsInstance<TvFeedState.Content>().first()
+        val content = TvFeedPreviewProvider().values.filterIsInstance<TvFeedPreviewState.Content>().first()
         val state = mutableStateOf(
             content.copy(
                 value = content.value.copy(rails = content.value.rails.map { it.copy(cards = it.cards.take(1)) }),
@@ -35,7 +35,7 @@ class TvFeedPaginationTest {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
                 QuizzTvPreviewScreen(Modifier.size(960.dp, 540.dp)) {
-                    TvFeedStateContent(
+                    TvFeedPreviewStateContent(
                         state.value,
                         { if (it is TvFeedIntent.Open) opened++ },
                         true,

@@ -1,70 +1,198 @@
 package com.quizzgame.feature.feed.tv.presentation
 
+import androidx.lifecycle.ViewModelStore
+import androidx.paging.PagingDataEvent
+import androidx.paging.PagingDataPresenter
+import androidx.paging.testing.asSnapshot
 import com.quizzgame.core.error.failure.AppFailure
-import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.flags.AppFeatureFlags
-import com.quizzgame.core.network.config.createNetworkJson
-import com.quizzgame.feature.feed.tv.data.dto.FeedDto
-import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
-import com.quizzgame.feature.feed.tv.domain.FeedRepository
+import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.lifecycle.SessionStateReader
+import com.quizzgame.feature.feed.tv.FakeFeedRemoteDataSource
+import com.quizzgame.feature.feed.tv.FeedTestData
+import com.quizzgame.feature.feed.tv.data.FeedRepositoryImpl
 import com.quizzgame.feature.feed.tv.domain.LoadFeedUseCase
+import com.quizzgame.feature.feed.tv.domain.LoadRailItemsUseCase
+import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import kotlinx.coroutines.CompletableDeferred
+import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TvFeedViewModelTest {
+    private val flags = object : AppFeatureFlags { override fun guestAllowed(): Boolean = true }
+
     @Test
-    fun concurrentRetryDoesNotDuplicateAndFailedRefreshRetainsContent() = runTest {
+    fun pagingIsMandatoryAndHorizontalPagersAreCreatedOnlyOnDemand() = runTest {
         Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
         try {
-            var calls = 0
-            val reply = CompletableDeferred<FeedResult>()
-            val repository = object : FeedRepository {
-                override suspend fun load(): FeedResult {
-                    calls++
-                    return if (calls == 1) reply.await() else FeedResult.Failed(AppFailure.InvalidServerData)
-                }
-            }
-            val model = TvFeedViewModel(LoadFeedUseCase(repository), flags)
-            runCurrent()
-            repeat(5) { model.onIntent(TvFeedIntent.Retry) }
-            runCurrent()
-            assertEquals(1, calls)
-            reply.complete(FeedResult.Loaded(fixture()))
-            runCurrent()
-            val content = (model.state.value as TvFeedState.Content).value
-            model.onIntent(TvFeedIntent.Refresh)
-            runCurrent()
-            val failedRefresh = model.state.value as TvFeedState.Content
-            assertEquals(content, failedRefresh.value)
-            assertNotNull(failedRefresh.error)
-            assertEquals(ErrorSurface.BANNER, failedRefresh.error?.surface)
-            val entryId = content.rails.first().cards.first().entryId
-            model.onIntent(TvFeedIntent.Open(entryId))
-            model.onIntent(TvFeedIntent.Open("invalid"))
-            assertEquals(entryId, (model.state.value as TvFeedState.Content).destination)
+            val remote = FakeFeedRemoteDataSource()
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(
+                LoadFeedUseCase(repository),
+                LoadRailItemsUseCase(repository),
+                flags,
+            )
+            store.put("feed", model)
+            var generations = 0
+            backgroundScope.launch { model.feed.collect { generations++ } }
+            val sections = model.feed.asSnapshot { scrollTo(2) }
+            assertEquals(3, sections.size)
+            assertTrue(remote.itemCalls.isEmpty())
+            val rail = sections.first()
+            val flow = model.items(rail)
+            assertSame(flow, model.items(rail))
+            val cards = flow.asSnapshot { scrollTo(2) }
+            assertEquals(3, cards.size)
+            assertEquals(cards, model.items(rail).asSnapshot { scrollTo(2) })
+            assertEquals(1, remote.itemCalls.size)
+            val beforeNavigation = generations
+            model.onIntent(TvFeedIntent.Open(cards.last().entryId))
+            model.onIntent(TvFeedIntent.Open(cards.first().id))
+            assertEquals(cards.last().entryId, model.state.value.destination)
             model.onIntent(TvFeedIntent.NavigationHandled)
-            assertEquals(null, (model.state.value as TvFeedState.Content).destination)
+            assertEquals(null, model.state.value.destination)
+            runCurrent()
+            assertEquals(beforeNavigation, generations)
         } finally {
+            store.clear()
+            runCurrent()
             Dispatchers.resetMain()
         }
     }
 
-    private fun fixture(): com.quizzgame.feature.feed.tv.domain.entity.Feed {
-        val json = createNetworkJson()
-        val dto = json.decodeFromString<FeedDto>(checkNotNull(javaClass.getResource("/feed.json")).readText())
-        return FeedMapper().map(dto)
+    @Test
+    fun clearingViewModelCancelsOutstandingPaginationRequests() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            var cancelled = false
+            remote.feedReply = {
+                try { awaitCancellation() } finally { cancelled = true }
+            }
+            val model = TvFeedViewModel(
+                LoadFeedUseCase(repository),
+                LoadRailItemsUseCase(repository),
+                flags,
+            )
+            store.put("feed", model)
+            val presenter = object : PagingDataPresenter<QuizRail>() {
+                override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
+            }
+            backgroundScope.launch { model.feed.collectLatest(presenter::collectFrom) }
+            runCurrent()
+            store.clear()
+            runCurrent()
+            assertTrue(cancelled)
+            assertTrue(presenter.snapshot().items.isEmpty())
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
     }
 
-    private val flags = object : AppFeatureFlags { override fun guestAllowed(): Boolean = true }
+    @Test
+    fun refreshFailureKeepsLoadedSectionsAndRetryUsesSameRequest() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(
+                LoadFeedUseCase(repository),
+                LoadRailItemsUseCase(repository),
+                flags,
+            )
+            store.put("feed", model)
+            val presenter = object : PagingDataPresenter<QuizRail>() {
+                override suspend fun presentPagingDataEvent(event: PagingDataEvent<QuizRail>) = Unit
+            }
+            backgroundScope.launch { model.feed.collectLatest(presenter::collectFrom) }
+            runCurrent()
+            val before = presenter.snapshot().items
+            assertTrue(before.isNotEmpty())
+            remote.feedReply = { FeedResult.Failed(AppFailure.InvalidServerData) }
+            presenter.refresh()
+            runCurrent()
+            assertEquals(before, presenter.snapshot().items)
+            remote.feedReply = { FeedResult.Loaded(FeedTestData.feed("feed-page-2.json")) }
+            presenter.retry()
+            runCurrent()
+            assertEquals(1, presenter.snapshot().items.size)
+            assertTrue(remote.feedCalls.takeLast(2).all { it == null })
+            assertTrue(model.items(before.first()).asSnapshot().isEmpty())
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun refreshAndRetryIntentsAreDeliveredToThePagingOwner() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(LoadFeedUseCase(repository), LoadRailItemsUseCase(repository), flags)
+            store.put("feed", model)
+            val received = mutableListOf<TvFeedEvent>()
+            backgroundScope.launch { model.events.collect { received += it } }
+            model.onIntent(TvFeedIntent.Refresh)
+            model.onIntent(TvFeedIntent.Retry)
+            runCurrent()
+            assertEquals(listOf(TvFeedEvent.REFRESH, TvFeedEvent.RETRY), received)
+            assertTrue(remote.feedCalls.isEmpty())
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
+
+    @Test
+    fun inactiveRailCacheIsBoundedAndEvictionRefetchesOnlyContinuation() = runTest {
+        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
+        val store = ViewModelStore()
+        try {
+            val remote = FakeFeedRemoteDataSource()
+            val seed = FeedTestData.feed().rails.first()
+            remote.feedReply = {
+                FeedResult.Loaded(
+                    Feed(List(14) { seed.copy(id = "rail-$it") }),
+                )
+            }
+            val repository = FeedRepositoryImpl(remote, SessionStateReader { SessionState.Guest })
+            val model = TvFeedViewModel(LoadFeedUseCase(repository), LoadRailItemsUseCase(repository), flags)
+            store.put("feed", model)
+            val rails = model.feed.asSnapshot { scrollTo(13) }
+            rails.forEach { model.items(it).asSnapshot { scrollTo(2) } }
+            model.items(rails.first()).asSnapshot { scrollTo(2) }
+            assertEquals(2, remote.itemCalls.count { it.first == rails.first().id })
+            assertEquals(1, remote.feedCalls.size)
+        } finally {
+            store.clear()
+            runCurrent()
+            Dispatchers.resetMain()
+        }
+    }
 }

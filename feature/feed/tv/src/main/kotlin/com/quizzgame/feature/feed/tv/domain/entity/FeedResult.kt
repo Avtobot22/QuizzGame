@@ -2,7 +2,8 @@ package com.quizzgame.feature.feed.tv.domain.entity
 
 import com.quizzgame.core.error.failure.AppFailure
 
-internal sealed interface FeedResult {
-    data class Loaded(val content: Feed) : FeedResult
-    data class Failed(val failure: AppFailure) : FeedResult
+internal sealed interface FeedResult<out T> {
+    data class Loaded<T>(val content: T) : FeedResult<T>
+    data class Failed(val failure: AppFailure) : FeedResult<Nothing>
+    data object Expired : FeedResult<Nothing>
 }

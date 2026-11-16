@@ -20,11 +20,11 @@ class FeedMapperTest {
     }
 
     @Test
-    fun unknownSectionAndCardKindsAreSerializationErrors() {
-        assertThrows(SerializationException::class.java) { decode("""{"sections":[{"kind":"future"}]}""") }
-        val unknownCard = """{"sections":[{"kind":"rail","id":"58e2b5b5-05e6-43f5-9580-8e88ec7130fd",
-          "items":[{"kind":"future"}]}]}"""
-        assertThrows(SerializationException::class.java) { decode(unknownCard) }
+    fun unknownSectionAndCardKindsAreSkipped() {
+        val unknown = """{"sections":[{"kind":"future"}],"page":{"hasMore":false,"nextCursor":null}}"""
+        assertEquals(emptyList<Any>(), decode(unknown).rails)
+        val card = fixture().replace("\"kind\": \"quiz\"", "\"kind\": \"future\"")
+        assertEquals(emptyList<Any>(), decode(card).rails.single().cards)
     }
 
     @Test
@@ -37,7 +37,23 @@ class FeedMapperTest {
 
     @Test
     fun emptyFeedRemainsAValidResult() {
-        assertEquals(emptyList<Any>(), decode("""{"sections":[]}""").rails)
+        assertEquals(emptyList<Any>(), decode("""{"sections":[],"page":{"hasMore":false,"nextCursor":null}}""").rails)
+    }
+
+    @Test
+    fun pageInvariantsAndEmptyContinuationAreRejected() {
+        val badPages = listOf(
+            """{"hasMore":false}""",
+            """{"hasMore":true,"nextCursor":null}""",
+            """{"hasMore":true,"nextCursor":""}""",
+            """{"hasMore":false,"nextCursor":"cursor"}""",
+            """{"hasMore":true,"nextCursor":"next"}""",
+        )
+        badPages.forEach { page ->
+            assertThrows(kotlinx.serialization.SerializationException::class.java) {
+                decode("""{"sections":[],"page":$page}""")
+            }
+        }
     }
 
     private fun decode(input: String) = mapper.map(json.decodeFromString<FeedDto>(input))
