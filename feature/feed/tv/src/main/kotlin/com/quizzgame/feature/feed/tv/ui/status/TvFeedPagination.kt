@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.status
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

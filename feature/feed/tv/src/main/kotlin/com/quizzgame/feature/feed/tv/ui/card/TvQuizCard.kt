@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.card
 
 import android.animation.ValueAnimator
 import androidx.compose.foundation.BorderStroke

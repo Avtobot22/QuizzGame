@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
 import com.quizzgame.feature.feed.tv.presentation.TvFeedState
-import com.quizzgame.feature.feed.tv.ui.TvFeedStateContent
+import com.quizzgame.feature.feed.tv.ui.content.TvFeedStateContent
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import org.junit.Assert.assertEquals

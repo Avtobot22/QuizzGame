@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.paging
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size

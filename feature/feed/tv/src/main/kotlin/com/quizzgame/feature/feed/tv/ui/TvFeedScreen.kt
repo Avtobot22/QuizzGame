@@ -9,6 +9,7 @@ import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
 import com.quizzgame.feature.feed.tv.presentation.TvFeedState
 import com.quizzgame.feature.feed.tv.presentation.TvFeedViewModel
+import com.quizzgame.feature.feed.tv.ui.content.TvFeedStateContent
 
 @Composable
 fun TvFeedScreen(

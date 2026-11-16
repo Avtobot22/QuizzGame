@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

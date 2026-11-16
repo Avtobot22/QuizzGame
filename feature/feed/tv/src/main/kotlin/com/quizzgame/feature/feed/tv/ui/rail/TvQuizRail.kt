@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.rail
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,6 +28,7 @@ import com.quizzgame.core.designsystem.tv.QuizzTvSkeletonCard
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.feed.tv.R
 import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import com.quizzgame.feature.feed.tv.ui.card.TvQuizCard
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 
 @Composable
