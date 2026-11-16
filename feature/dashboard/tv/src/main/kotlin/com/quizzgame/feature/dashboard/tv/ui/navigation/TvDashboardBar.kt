@@ -1,4 +1,4 @@
-package com.quizzgame.feature.dashboard.tv.ui
+package com.quizzgame.feature.dashboard.tv.ui.navigation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

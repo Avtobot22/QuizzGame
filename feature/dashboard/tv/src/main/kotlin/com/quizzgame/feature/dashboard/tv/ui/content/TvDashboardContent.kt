@@ -1,4 +1,4 @@
-package com.quizzgame.feature.dashboard.tv.ui
+package com.quizzgame.feature.dashboard.tv.ui.content
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.focusGroup
@@ -26,6 +26,7 @@ import com.quizzgame.core.navigation.rememberNavigationState
 import com.quizzgame.feature.dashboard.tv.domain.entity.Dashboard
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardContext
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardTabRoute
+import com.quizzgame.feature.dashboard.tv.ui.navigation.TvDashboardBar
 
 @Composable
 internal fun TvDashboardContent(

@@ -12,7 +12,7 @@ import com.quizzgame.feature.dashboard.tv.R
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardContext
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardTabRoute
 import com.quizzgame.feature.dashboard.tv.presentation.TvDashboardState
-import com.quizzgame.feature.dashboard.tv.ui.TvDashboardStateContent
+import com.quizzgame.feature.dashboard.tv.ui.content.TvDashboardStateContent
 
 @Preview(name = "TvDashboard", locale = "ru", widthDp = 960, heightDp = 540)
 @Preview(name = "TvDashboard EN", locale = "en", widthDp = 960, heightDp = 540)

@@ -7,6 +7,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardContext
 import com.quizzgame.feature.dashboard.tv.presentation.TvDashboardViewModel
+import com.quizzgame.feature.dashboard.tv.ui.content.TvDashboardStateContent
 
 @Composable
 fun TvDashboardScreen(onLogout: () -> Unit, graphs: Set<FeatureEntries<DashboardContext>>, onSignIn: () -> Unit = {}) {
