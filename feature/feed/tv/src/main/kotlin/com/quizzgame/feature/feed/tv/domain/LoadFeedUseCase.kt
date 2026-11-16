@@ -1,8 +1,8 @@
 package com.quizzgame.feature.feed.tv.domain
 
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-internal class LoadFeedUseCase @Inject constructor(
-    private val repository: FeedRepository,
-) : suspend () -> FeedResult by repository::load
+internal class LoadFeedUseCase @Inject constructor(private val repository: FeedRepository) {
+    operator fun invoke(scope: CoroutineScope) = repository.load(scope)
+}

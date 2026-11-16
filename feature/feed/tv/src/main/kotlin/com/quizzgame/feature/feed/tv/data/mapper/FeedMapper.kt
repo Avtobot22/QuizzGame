@@ -1,12 +1,18 @@
 package com.quizzgame.feature.feed.tv.data.mapper
 
 import com.quizzgame.core.media.AppearanceMapper
+import com.quizzgame.feature.feed.tv.data.dto.CursorPageInfoDto
 import com.quizzgame.feature.feed.tv.data.dto.FeedDto
+import com.quizzgame.feature.feed.tv.data.dto.IgnoredFeedItemDto
+import com.quizzgame.feature.feed.tv.data.dto.IgnoredFeedSectionDto
 import com.quizzgame.feature.feed.tv.data.dto.QuizCardDto
 import com.quizzgame.feature.feed.tv.data.dto.RailDto
+import com.quizzgame.feature.feed.tv.data.dto.RailItemsDto
+import com.quizzgame.feature.feed.tv.domain.entity.CursorPageInfo
 import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
 import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import com.quizzgame.feature.feed.tv.domain.entity.RailItems
 import com.quizzgame.shared.catalog.data.mapper.catalogId
 import com.quizzgame.shared.catalog.data.mapper.requireCatalog
 import com.quizzgame.shared.catalog.data.mapper.toCatalogBadge
@@ -16,23 +22,43 @@ import javax.inject.Inject
 
 internal class FeedMapper @Inject constructor() {
     fun map(dto: FeedDto): Feed {
-        val rails = dto.sections.map { section ->
+        val rails = dto.sections.mapNotNull { section ->
             when (section) {
                 is RailDto -> mapRail(section)
+                IgnoredFeedSectionDto -> null
             }
         }
         requireCatalog(rails.map { it.id }.distinct().size == rails.size)
-        return Feed(rails.filter { it.cards.isNotEmpty() })
+        return Feed(rails, mapPage(dto.page, dto.sections.isEmpty()))
+    }
+
+    fun mapItems(dto: RailItemsDto, sectionId: String): RailItems {
+        requireCatalog(catalogId(dto.sectionId) == sectionId)
+        val rail = mapRail(RailDto(dto.sectionId, dto.items, dto.page))
+        return RailItems(rail.id, rail.cards, rail.itemsPage)
+    }
+
+    private fun mapPage(dto: CursorPageInfoDto, empty: Boolean): CursorPageInfo {
+        requireCatalog(
+            if (dto.hasMore) {
+                !dto.nextCursor.isNullOrBlank() && dto.nextCursor.length <= MAX_CURSOR_LENGTH
+            } else {
+                dto.nextCursor == null
+            },
+        )
+        requireCatalog(!empty || !dto.hasMore)
+        return CursorPageInfo(dto.hasMore, dto.nextCursor)
     }
 
     private fun mapRail(dto: RailDto): QuizRail {
-        val cards = dto.items.map { item ->
+        val cards = dto.items.mapNotNull { item ->
             when (item) {
                 is QuizCardDto -> mapCard(item)
+                IgnoredFeedItemDto -> null
             }
         }
         requireCatalog(cards.map { it.id }.distinct().size == cards.size)
-        return QuizRail(catalogId(dto.id), dto.title, dto.subtitle, cards)
+        return QuizRail(catalogId(dto.id), dto.title, dto.subtitle, cards, mapPage(dto.itemsPage, dto.items.isEmpty()))
     }
 
     private fun mapCard(dto: QuizCardDto): QuizCard {
@@ -44,3 +70,5 @@ internal class FeedMapper @Inject constructor() {
         )
     }
 }
+
+private const val MAX_CURSOR_LENGTH = 2048

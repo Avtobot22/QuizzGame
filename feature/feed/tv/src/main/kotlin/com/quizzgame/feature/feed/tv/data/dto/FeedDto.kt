@@ -5,4 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 internal data class FeedDto(
     val sections: List<FeedSectionDto>,
+    @Serializable(with = CursorPageInfoSerializer::class)
+    val page: CursorPageInfoDto,
 )

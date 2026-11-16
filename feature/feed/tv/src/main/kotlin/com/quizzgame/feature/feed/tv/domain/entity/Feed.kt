@@ -5,13 +5,18 @@ import com.quizzgame.core.media.MediaSpec
 import com.quizzgame.shared.catalog.domain.entity.CatalogBadge
 import com.quizzgame.shared.catalog.domain.entity.QuizUserState
 
-internal data class Feed(val rails: List<QuizRail>)
+internal data class Feed(
+    val rails: List<QuizRail>,
+    val page: CursorPageInfo = CursorPageInfo(false, null),
+)
 
 internal data class QuizRail(
     val id: String,
     val title: String? = null,
     val subtitle: String? = null,
     val cards: List<QuizCard>,
+    val itemsPage: CursorPageInfo = CursorPageInfo(false, null),
+    val snapshotId: Long = 0,
 )
 
 internal data class QuizCard(

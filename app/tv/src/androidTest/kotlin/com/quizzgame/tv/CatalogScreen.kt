@@ -18,6 +18,6 @@ internal class CatalogScreen(provider: SemanticsNodeInteractionsProvider) : Comp
     val bar = KNode(provider) { hasTestTag(TvDashboardTags.NAVIGATION) }
 
     companion object {
-        const val FIRST_CARD_ID = "18e2b5b5-05e6-43f5-9580-2e88ec71303d"
+        const val FIRST_CARD_ID = "18e2b5b5-05e6-43f5-9580-2e88ec713001"
     }
 }

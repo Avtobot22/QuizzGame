@@ -1,10 +1,9 @@
 package com.quizzgame.feature.feed.tv.data.dto
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonClassDiscriminator
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializable
-@JsonClassDiscriminator("kind")
+@Serializable(with = FeedItemSerializer::class)
 internal sealed interface FeedItemDto
+
+@Serializable
+internal data object IgnoredFeedItemDto : FeedItemDto

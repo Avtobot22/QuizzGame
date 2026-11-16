@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 internal data class RailDto(
     val id: String,
     val items: List<FeedItemDto>,
+    @Serializable(with = CursorPageInfoSerializer::class)
+    val itemsPage: CursorPageInfoDto,
     val title: String? = null,
     val subtitle: String? = null,
 ) : FeedSectionDto

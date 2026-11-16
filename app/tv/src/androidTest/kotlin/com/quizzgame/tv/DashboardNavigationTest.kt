@@ -49,6 +49,47 @@ class DashboardNavigationTest {
         screen.firstCard.assertIsFocused()
     }
 
+    @Test
+    fun appendedCardRestoresAfterQuizEntryAndSwitchingTabs() {
+        openDashboard()
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvFeedTags.card(CatalogScreen.FIRST_CARD_ID))
+        val appended = "18e2b5b5-05e6-43f5-9580-2e88ec713004"
+        repeat(2) { TvRemote.press(KeyEvent.KEYCODE_DPAD_RIGHT) }
+        compose.awaitFocused(TvFeedTags.card(appended))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        awaitVisible(TvQuizEntryTags.CONTENT)
+        screen.bar.assertDoesNotExist()
+        TvRemote.press(KeyEvent.KEYCODE_BACK)
+        compose.awaitFocused(TvFeedTags.card(appended))
+        TvRemote.press(KeyEvent.KEYCODE_BACK)
+        compose.awaitFocused(TvDashboardTags.tab(DashboardTabId.FEED))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_RIGHT)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvDashboardTags.tab(DashboardTabId.LIBRARY))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_LEFT)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvFeedTags.card(appended))
+    }
+
+    @Test
+    fun verticalAppendAndActivityRecreationRestoreTheLastSectionCard() {
+        openDashboard()
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvFeedTags.card(CatalogScreen.FIRST_CARD_ID))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_DOWN)
+        compose.awaitFocused(TvFeedTags.card("18e2b5b5-05e6-43f5-9580-2e88ec713003"))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_DOWN)
+        val last = "18e2b5b5-05e6-43f5-9580-2e88ec713005"
+        compose.awaitFocused(TvFeedTags.card(last))
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        awaitVisible(TvQuizEntryTags.CONTENT)
+        TvRemote.press(KeyEvent.KEYCODE_BACK)
+        compose.awaitFocused(TvFeedTags.card(last))
+        compose.activityRule.scenario.recreate()
+        compose.awaitFocused(TvFeedTags.card(last))
+    }
+
     private fun openDashboard() {
         awaitVisible(TvDashboardTags.NAVIGATION)
         compose.awaitFocused(TvDashboardTags.tab(DashboardTabId.FEED))
