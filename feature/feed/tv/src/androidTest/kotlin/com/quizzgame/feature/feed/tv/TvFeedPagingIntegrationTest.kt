@@ -30,8 +30,8 @@ import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
 import com.quizzgame.feature.feed.tv.domain.entity.RailItems
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
 import com.quizzgame.feature.feed.tv.presentation.TvFeedViewModel
-import com.quizzgame.feature.feed.tv.ui.TvFeedPagingEffects
-import com.quizzgame.feature.feed.tv.ui.TvPagedFeedContent
+import com.quizzgame.feature.feed.tv.ui.content.TvPagedFeedContent
+import com.quizzgame.feature.feed.tv.ui.paging.TvFeedPagingEffects
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
 import kotlinx.coroutines.CompletableDeferred

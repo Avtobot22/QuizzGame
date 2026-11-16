@@ -5,9 +5,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
-import com.quizzgame.feature.feed.tv.ui.TvFeedEmpty
-import com.quizzgame.feature.feed.tv.ui.TvFeedError
-import com.quizzgame.feature.feed.tv.ui.TvFeedLoading
+import com.quizzgame.feature.feed.tv.ui.status.TvFeedEmpty
+import com.quizzgame.feature.feed.tv.ui.status.TvFeedError
+import com.quizzgame.feature.feed.tv.ui.status.TvFeedLoading
 
 @Composable
 internal fun TvFeedPreviewStateContent(

@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.ui
+package com.quizzgame.feature.feed.tv.ui.rail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

@@ -23,9 +23,9 @@ import com.quizzgame.core.media.MediaSpec
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
-import com.quizzgame.feature.feed.tv.ui.TvFeedAppendingSections
-import com.quizzgame.feature.feed.tv.ui.TvFeedRefreshAction
-import com.quizzgame.feature.feed.tv.ui.TvQuizRail
+import com.quizzgame.feature.feed.tv.ui.paging.TvFeedRefreshAction
+import com.quizzgame.feature.feed.tv.ui.rail.TvQuizRail
+import com.quizzgame.feature.feed.tv.ui.status.TvFeedAppendingSections
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 
 @Composable
