@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.data.dto
+package com.quizzgame.feature.feed.tv.data.dto.item
 
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer

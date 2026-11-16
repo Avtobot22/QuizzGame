@@ -1,4 +1,4 @@
-package com.quizzgame.feature.feed.tv.data.dto
+package com.quizzgame.feature.feed.tv.data.dto.pagination
 
 import com.quizzgame.shared.catalog.data.mapper.requireCatalog
 import kotlinx.serialization.json.JsonElement

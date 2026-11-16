@@ -4,7 +4,7 @@ import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.feature.feed.tv.data.FeedRemoteDataSource
 import com.quizzgame.feature.feed.tv.data.dto.FeedDto
-import com.quizzgame.feature.feed.tv.data.dto.RailItemsDto
+import com.quizzgame.feature.feed.tv.data.dto.section.RailItemsDto
 import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
 import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.FeedResult

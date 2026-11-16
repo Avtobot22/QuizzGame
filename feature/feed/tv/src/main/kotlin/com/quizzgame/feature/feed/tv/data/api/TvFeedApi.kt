@@ -2,7 +2,7 @@ package com.quizzgame.feature.feed.tv.data.api
 
 import com.quizzgame.core.network.auth.RequestPolicy
 import com.quizzgame.feature.feed.tv.data.dto.FeedDto
-import com.quizzgame.feature.feed.tv.data.dto.RailItemsDto
+import com.quizzgame.feature.feed.tv.data.dto.section.RailItemsDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

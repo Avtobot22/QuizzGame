@@ -1,5 +1,8 @@
-package com.quizzgame.feature.feed.tv.data.dto
+package com.quizzgame.feature.feed.tv.data.dto.section
 
+import com.quizzgame.feature.feed.tv.data.dto.item.FeedItemDto
+import com.quizzgame.feature.feed.tv.data.dto.pagination.CursorPageInfoDto
+import com.quizzgame.feature.feed.tv.data.dto.pagination.CursorPageInfoSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 

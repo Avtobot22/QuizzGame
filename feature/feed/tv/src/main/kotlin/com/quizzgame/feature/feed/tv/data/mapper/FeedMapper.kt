@@ -1,13 +1,13 @@
 package com.quizzgame.feature.feed.tv.data.mapper
 
 import com.quizzgame.core.media.AppearanceMapper
-import com.quizzgame.feature.feed.tv.data.dto.CursorPageInfoDto
 import com.quizzgame.feature.feed.tv.data.dto.FeedDto
-import com.quizzgame.feature.feed.tv.data.dto.IgnoredFeedItemDto
-import com.quizzgame.feature.feed.tv.data.dto.IgnoredFeedSectionDto
-import com.quizzgame.feature.feed.tv.data.dto.QuizCardDto
-import com.quizzgame.feature.feed.tv.data.dto.RailDto
-import com.quizzgame.feature.feed.tv.data.dto.RailItemsDto
+import com.quizzgame.feature.feed.tv.data.dto.item.IgnoredFeedItemDto
+import com.quizzgame.feature.feed.tv.data.dto.item.QuizCardDto
+import com.quizzgame.feature.feed.tv.data.dto.pagination.CursorPageInfoDto
+import com.quizzgame.feature.feed.tv.data.dto.section.IgnoredFeedSectionDto
+import com.quizzgame.feature.feed.tv.data.dto.section.RailDto
+import com.quizzgame.feature.feed.tv.data.dto.section.RailItemsDto
 import com.quizzgame.feature.feed.tv.domain.entity.CursorPageInfo
 import com.quizzgame.feature.feed.tv.domain.entity.Feed
 import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
