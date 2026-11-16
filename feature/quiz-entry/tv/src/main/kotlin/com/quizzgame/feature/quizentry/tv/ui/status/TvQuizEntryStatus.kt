@@ -1,4 +1,4 @@
-package com.quizzgame.feature.quizentry.tv.ui
+package com.quizzgame.feature.quizentry.tv.ui.status
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier

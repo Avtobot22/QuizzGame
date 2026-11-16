@@ -1,4 +1,4 @@
-package com.quizzgame.feature.quizentry.tv.ui
+package com.quizzgame.feature.quizentry.tv.ui.content
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

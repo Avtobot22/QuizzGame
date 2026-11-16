@@ -8,6 +8,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryIntent
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryViewModel
+import com.quizzgame.feature.quizentry.tv.ui.content.TvQuizEntryStateContent
 
 @Composable
 fun TvQuizEntryScreen(entryId: String, onBack: () -> Unit, modifier: Modifier = Modifier, onSignIn: () -> Unit = {}) {

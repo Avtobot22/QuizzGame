@@ -7,7 +7,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryState
-import com.quizzgame.feature.quizentry.tv.ui.TvQuizEntryStateContent
+import com.quizzgame.feature.quizentry.tv.ui.content.TvQuizEntryStateContent
 
 @Preview(name = "TvQuizEntry", locale = "ru", widthDp = 960, heightDp = 540)
 @Preview(name = "TvQuizEntry EN", locale = "en", widthDp = 960, heightDp = 540)

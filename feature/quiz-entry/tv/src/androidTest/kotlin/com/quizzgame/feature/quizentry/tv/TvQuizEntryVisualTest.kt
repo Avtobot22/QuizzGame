@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.test.platform.app.InstrumentationRegistry
 import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
-import com.quizzgame.feature.quizentry.tv.ui.TvQuizEntryStateContent
+import com.quizzgame.feature.quizentry.tv.ui.content.TvQuizEntryStateContent
 import com.quizzgame.feature.quizentry.tv.ui.preview.TvQuizEntryPreviewProvider
 import com.quizzgame.feature.quizentry.tv.ui.tags.TvVisualTags
 import org.junit.Rule
