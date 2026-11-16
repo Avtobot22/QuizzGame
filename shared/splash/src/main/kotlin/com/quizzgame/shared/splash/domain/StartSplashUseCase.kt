@@ -5,62 +5,62 @@ import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.session.lifecycle.SessionState
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
+import com.quizzgame.shared.splash.domain.entity.SplashResult
 import javax.inject.Inject
 
 class StartSplashUseCase @Inject constructor(
     private val repository: SplashRepository,
 ) {
-    suspend operator fun invoke(): SplashOutcome {
+    suspend operator fun invoke(): SplashResult {
         val initial = repository.currentSession()
         return terminal(initial) ?: prepareStartup(initial)
     }
 
-    private suspend fun prepareStartup(initial: SessionState): SplashOutcome {
+    private suspend fun prepareStartup(initial: SessionState): SplashResult {
         val failure = repository.loadLaunch() ?: repository.refreshFlags()
         return if (failure == null) finishStartup(initial) else resolvedFailure(failure)
     }
 
-    private suspend fun finishStartup(initial: SessionState): SplashOutcome {
+    private suspend fun finishStartup(initial: SessionState): SplashResult {
         val current = repository.currentSession()
         val sessionOutcome = terminal(current)
         return when {
             sessionOutcome != null                -> sessionOutcome
-            current != initial                    -> SplashOutcome.Failed(AppFailure.OperationInterrupted)
+            current != initial                    -> SplashResult.Failed(AppFailure.OperationInterrupted)
             current == SessionState.Guest         -> finishGuestStartup()
             current is SessionState.Authenticated -> finishAuthenticatedStartup(current.sessionGeneration)
-            else                                  -> SplashOutcome.Failed(AppFailure.OperationInterrupted)
+            else                                  -> SplashResult.Failed(AppFailure.OperationInterrupted)
         }
     }
 
-    private fun finishGuestStartup(): SplashOutcome {
+    private fun finishGuestStartup(): SplashResult {
         repository.clearUser()
-        return if (repository.guestAllowed()) SplashOutcome.Continue else SplashOutcome.SignIn
+        return if (repository.guestAllowed()) SplashResult.Continue else SplashResult.SignIn
     }
 
-    private suspend fun finishAuthenticatedStartup(generation: Long): SplashOutcome {
+    private suspend fun finishAuthenticatedStartup(generation: Long): SplashResult {
         val failure = repository.loadUser(generation)
-        return if (failure == null) SplashOutcome.Continue else resolvedFailure(failure)
+        return if (failure == null) SplashResult.Continue else resolvedFailure(failure)
     }
 
-    private suspend fun resolvedFailure(failure: AppFailure): SplashOutcome =
-        terminal(repository.currentSession()) ?: SplashOutcome.Failed(failure)
+    private suspend fun resolvedFailure(failure: AppFailure): SplashResult =
+        terminal(repository.currentSession()) ?: SplashResult.Failed(failure)
 
-    private fun terminal(state: SessionState): SplashOutcome? = when (state) {
-        SessionState.Expired        -> SplashOutcome.SignIn
+    private fun terminal(state: SessionState): SplashResult? = when (state) {
+        SessionState.Expired        -> SplashResult.SignIn
 
         is SessionState.Blocked     -> when (state.kind) {
-            CredentialUnavailableKind.REFRESH_UNCERTAIN   -> SplashOutcome.SignIn
+            CredentialUnavailableKind.REFRESH_UNCERTAIN   -> SplashResult.SignIn
             CredentialUnavailableKind.STORAGE_UNAVAILABLE ->
-                SplashOutcome.Failed(AppFailure.Storage(StorageKind.UNKNOWN))
+                SplashResult.Failed(AppFailure.Storage(StorageKind.UNKNOWN))
 
-            else                                         -> SplashOutcome.Failed(AppFailure.OperationInterrupted)
+            else                                         -> SplashResult.Failed(AppFailure.OperationInterrupted)
         }
 
-        is SessionState.Unavailable -> SplashOutcome.Failed(DefaultErrorClassifier().fromSession(state))
+        is SessionState.Unavailable -> SplashResult.Failed(DefaultErrorClassifier().fromSession(state))
         SessionState.Closed,
         SessionState.Initializing,
-        -> SplashOutcome.Failed(AppFailure.OperationInterrupted)
+        -> SplashResult.Failed(AppFailure.OperationInterrupted)
 
         else                        -> null
     }

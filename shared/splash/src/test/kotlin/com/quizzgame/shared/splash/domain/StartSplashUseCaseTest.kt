@@ -22,7 +22,7 @@ import com.quizzgame.shared.splash.data.dto.ProfileDto
 import com.quizzgame.shared.splash.data.dto.UserDto
 import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
-import com.quizzgame.shared.splash.domain.entity.SplashOutcome
+import com.quizzgame.shared.splash.domain.entity.SplashResult
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -34,20 +34,20 @@ class StartSplashUseCaseTest {
     @Test
     fun guestLaunchRefreshesFlagsInOrderAndNeverLoadsUser() = runTest {
         val fixture = Fixture()
-        assertEquals(SplashOutcome.Continue, fixture.useCase())
+        assertEquals(SplashResult.Continue, fixture.useCase())
         assertEquals(listOf("launch", "flags"), fixture.calls)
     }
 
     @Test
     fun guestPermissionIsDeniedWhenFlagIsOff() = runTest {
         val fixture = Fixture().apply { guest = false }
-        assertEquals(SplashOutcome.SignIn, fixture.useCase())
+        assertEquals(SplashResult.SignIn, fixture.useCase())
     }
 
     @Test
     fun authenticatedLaunchLoadsRequiredUserAndStoresForCurrentGeneration() = runTest {
         val fixture = Fixture().apply { state = SessionState.Authenticated(7) }
-        assertEquals(SplashOutcome.Continue, fixture.useCase())
+        assertEquals(SplashResult.Continue, fixture.useCase())
         assertEquals(listOf("launch", "flags", "user"), fixture.calls)
         assertEquals("719278b4-e7af-4e50-af40-25701f2b2b27", fixture.users.current()?.id.toString())
     }
@@ -57,14 +57,14 @@ class StartSplashUseCaseTest {
         val fixture = Fixture().apply {
             flagsResult = FeatureFlagsLoadResult.Failed(FeatureFlagsLoadFailure.InvalidRemote)
         }
-        assertEquals(SplashOutcome.Failed(AppFailure.InvalidServerData), fixture.useCase())
+        assertEquals(SplashResult.Failed(AppFailure.InvalidServerData), fixture.useCase())
         assertEquals(listOf("launch", "flags"), fixture.calls)
     }
 
     @Test
     fun launchFailureStopsBeforeFlagsAndUser() = runTest {
         val fixture = Fixture().apply { networkFailure = NetworkFailure.Http(503) }
-        assertTrue(fixture.useCase() is SplashOutcome.Failed)
+        assertTrue(fixture.useCase() is SplashResult.Failed)
         assertEquals(emptyList<String>(), fixture.calls)
     }
 
@@ -74,7 +74,7 @@ class StartSplashUseCaseTest {
             state = SessionState.Authenticated(1)
             afterUser = { state = SessionState.Authenticated(2) }
         }
-        assertEquals(SplashOutcome.Failed(AppFailure.OperationInterrupted), fixture.useCase())
+        assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
         assertNull(fixture.users.current())
     }
 
@@ -90,7 +90,7 @@ class StartSplashUseCaseTest {
     fun expiredAndRefreshUncertainSessionsRouteToSignInWithoutRequests() = runTest {
         for (state in listOf(SessionState.Expired, SessionState.Blocked(CredentialUnavailableKind.REFRESH_UNCERTAIN))) {
             val fixture = Fixture().apply { this.state = state }
-            assertEquals(SplashOutcome.SignIn, fixture.useCase())
+            assertEquals(SplashResult.SignIn, fixture.useCase())
             assertEquals(emptyList<String>(), fixture.calls)
         }
     }
@@ -101,7 +101,7 @@ class StartSplashUseCaseTest {
             state = SessionState.Authenticated(1)
             afterLaunch = { state = SessionState.Expired }
         }
-        assertEquals(SplashOutcome.SignIn, fixture.useCase())
+        assertEquals(SplashResult.SignIn, fixture.useCase())
     }
 
     @Test
@@ -122,7 +122,7 @@ class StartSplashUseCaseTest {
         )
         failures.forEach { (reason, failure) ->
             val fixture = Fixture().apply { unavailable = reason }
-            assertEquals(SplashOutcome.Failed(failure), fixture.useCase())
+            assertEquals(SplashResult.Failed(failure), fixture.useCase())
             assertEquals(emptyList<String>(), fixture.calls)
         }
     }
@@ -133,28 +133,28 @@ class StartSplashUseCaseTest {
             state = SessionState.Authenticated(1)
             afterUser = { state = SessionState.Expired }
         }
-        assertEquals(SplashOutcome.SignIn, fixture.useCase())
+        assertEquals(SplashResult.SignIn, fixture.useCase())
         assertNull(fixture.users.current())
     }
 
     @Test
     fun unavailableSessionPreservesTheStorageFailureAndDoesNotStartRequests() = runTest {
         val fixture = Fixture().apply { state = SessionState.Unavailable(SessionStorageFailure.CRYPTO) }
-        assertEquals(SplashOutcome.Failed(AppFailure.Storage(StorageKind.CRYPTO)), fixture.useCase())
+        assertEquals(SplashResult.Failed(AppFailure.Storage(StorageKind.CRYPTO)), fixture.useCase())
         assertEquals(emptyList<String>(), fixture.calls)
     }
 
     @Test
     fun closedFlagsControllerFailsInsteadOfLeavingTheAttemptLoading() = runTest {
         val fixture = Fixture().apply { flagsResult = FeatureFlagsLoadResult.Failed(FeatureFlagsLoadFailure.Closed) }
-        assertEquals(SplashOutcome.Failed(AppFailure.OperationInterrupted), fixture.useCase())
+        assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
         assertEquals(listOf("launch", "flags"), fixture.calls)
     }
 
     @Test
     fun sessionChangeDuringFlagsStopsBeforeLoadingAnotherSessionsUser() = runTest {
         val fixture = Fixture().apply { afterFlags = { state = SessionState.Authenticated(2) } }
-        assertEquals(SplashOutcome.Failed(AppFailure.OperationInterrupted), fixture.useCase())
+        assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
         assertEquals(listOf("launch", "flags"), fixture.calls)
         assertNull(fixture.users.current())
     }
