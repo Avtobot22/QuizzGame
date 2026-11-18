@@ -2,12 +2,16 @@ package com.quizzgame.feature.feed.tv.presentation
 
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import androidx.paging.filter
+import androidx.paging.map
 import com.quizzgame.core.flags.AppFeatureFlags
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.feature.feed.tv.domain.LoadFeedUseCase
-import com.quizzgame.feature.feed.tv.domain.LoadRailItemsUseCase
-import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
+import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.presentation.FeedRailCache
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,8 +21,10 @@ internal class TvFeedViewModel @Inject constructor(
     loadRailItemsUseCase: LoadRailItemsUseCase,
     private val flags: AppFeatureFlags,
 ) : BaseViewModel<TvFeedState, TvFeedIntent, TvFeedEvent>() {
-    val feed = loadFeedUseCase().cachedIn(viewModelScope)
-    private val rails = TvFeedRailCache(viewModelScope, loadRailItemsUseCase::invoke)
+    val feed = loadFeedUseCase().map { pages ->
+        pages.filter { it is QuizRail }.map { it as QuizRail }
+    }.cachedIn(viewModelScope)
+    private val rails = FeedRailCache(viewModelScope, loadRailItemsUseCase::invoke)
 
     override fun createInitialState() = TvFeedState(
         prefetch = flags.catalogPrefetch(),

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
-import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 
 @Composable
 internal fun TvQuizRailHeader(rail: QuizRail, action: (@Composable () -> Unit)?) {

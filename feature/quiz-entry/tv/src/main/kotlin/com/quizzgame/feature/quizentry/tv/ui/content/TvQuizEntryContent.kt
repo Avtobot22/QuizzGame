@@ -33,8 +33,8 @@ import com.quizzgame.core.designsystem.tv.media.QuizzTvMedia
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.quizentry.tv.R
-import com.quizzgame.feature.quizentry.tv.domain.entity.QuizEntry
 import com.quizzgame.feature.quizentry.tv.ui.tags.TvQuizEntryTags
+import com.quizzgame.shared.catalog.domain.entity.QuizEntry
 import com.quizzgame.core.error.ui.common.R as ErrorR
 import com.quizzgame.core.ui.R as UiR
 

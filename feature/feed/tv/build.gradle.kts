@@ -7,6 +7,7 @@ plugins {
 android { namespace = "com.quizzgame.feature.feed.tv" }
 
 dependencies {
+    implementation(projects.shared.feed)
     implementation(libs.androidx.paging.common)
     implementation(libs.androidx.paging.compose)
     testImplementation(libs.androidx.paging.testing)

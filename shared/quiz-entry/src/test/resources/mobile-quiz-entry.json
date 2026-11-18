@@ -1,0 +1,28 @@
+{
+  "entryId": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed008",
+  "title": "История",
+  "subtitle": "Проверьте знания",
+  "description": "Викторина для вечера у телевизора",
+  "cover": {
+    "kind": "asset",
+    "name": "quiz.cover"
+  },
+  "user": {
+    "bookmarked": false,
+    "progress": 0.0,
+    "passingStatus": "notStarted"
+  },
+  "availability": {
+    "status": "available",
+    "requiresAuthentication": false
+  },
+  "stats": {
+    "questionCount": 30,
+    "estimatedDurationSeconds": 1200
+  },
+  "primaryAction": {
+    "kind": "start",
+    "title": "На телевизоре",
+    "enabled": false
+  }
+}

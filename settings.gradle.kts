@@ -50,6 +50,8 @@ include(":core:error:ui-mobile")
 include(":core:error:ui-tv")
 
 include(":shared:catalog")
+include(":shared:feed")
+include(":shared:quiz-entry")
 include(":shared:splash")
 
 include(":feature:splash:tv")

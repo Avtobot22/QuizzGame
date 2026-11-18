@@ -7,6 +7,7 @@ plugins {
 android { namespace = "com.quizzgame.feature.quizentry.tv" }
 
 dependencies {
+    implementation(projects.shared.quizEntry)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(projects.core.coroutines)

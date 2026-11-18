@@ -2,13 +2,14 @@ package com.quizzgame.feature.feed.tv
 
 import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionState
-import com.quizzgame.feature.feed.tv.data.FeedRemoteDataSource
-import com.quizzgame.feature.feed.tv.data.dto.FeedDto
-import com.quizzgame.feature.feed.tv.data.dto.section.RailItemsDto
-import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import com.quizzgame.feature.feed.tv.domain.entity.RailItems
+import com.quizzgame.shared.feed.data.FeedRemoteDataSource
+import com.quizzgame.shared.feed.data.dto.FeedDto
+import com.quizzgame.shared.feed.data.dto.section.RailItemsDto
+import com.quizzgame.shared.feed.data.mapper.FeedMapper
+import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedResult
+import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.RailItems
 
 internal object FeedTestData {
     private val json = createNetworkJson()
@@ -17,7 +18,7 @@ internal object FeedTestData {
     fun feed(name: String = "feed-page-1.json"): Feed = mapper.map(json.decodeFromString<FeedDto>(text(name)))
     fun items(): RailItems {
         val dto = json.decodeFromString<RailItemsDto>(text("feed-rail-a-page-2.json"))
-        return mapper.mapItems(dto, feed().rails.first().id)
+        return mapper.mapItems(dto, feed().sections.filterIsInstance<QuizRail>().first().id)
     }
 }
 

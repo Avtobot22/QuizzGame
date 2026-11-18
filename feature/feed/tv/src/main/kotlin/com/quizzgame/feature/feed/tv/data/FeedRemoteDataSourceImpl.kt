@@ -14,10 +14,11 @@ import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.feature.feed.tv.data.api.TvFeedApi
-import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import com.quizzgame.feature.feed.tv.domain.entity.RailItems
+import com.quizzgame.shared.feed.data.FeedRemoteDataSource
+import com.quizzgame.shared.feed.data.mapper.FeedMapper
+import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedResult
+import com.quizzgame.shared.feed.domain.entity.RailItems
 import kotlinx.coroutines.withContext
 import java.net.HttpURLConnection.HTTP_BAD_REQUEST
 import java.net.HttpURLConnection.HTTP_GONE
@@ -29,6 +30,8 @@ internal class FeedRemoteDataSourceImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val mapper: FeedMapper,
 ) : FeedRemoteDataSource {
+    override val sectionPageSize: Int get() = TvFeedApi.SECTION_LIMIT
+    override val itemPageSize: Int get() = TvFeedApi.ITEM_LIMIT
     override suspend fun load(cursor: String?, owner: SessionState?): FeedResult<Feed> = execute(owner) {
         val dto = load(POLICY, cursor = cursor)
         withContext(dispatchers.default) { mapper.map(dto) }

@@ -36,6 +36,8 @@ tasks.register("ciLint") {
     description = "Runs Android lint for all application and library modules."
     dependsOn(
         ":feature:dashboard:tv:lint",
+        ":shared:feed:lint",
+        ":shared:quiz-entry:lint",
         ":core:media:android:lint",
         ":feature:feed:tv:lint",
         ":feature:quiz-entry:tv:lint",
@@ -66,6 +68,8 @@ tasks.register("ciUnitTestDebug") {
     description = "Runs debug JVM unit tests."
     dependsOn(
         ":feature:dashboard:tv:testDebugUnitTest",
+        ":shared:feed:testDebugUnitTest",
+        ":shared:quiz-entry:testDebugUnitTest",
         ":core:media:android:testDebugUnitTest",
         ":feature:feed:tv:testDebugUnitTest",
         ":feature:quiz-entry:tv:testDebugUnitTest",
@@ -98,6 +102,8 @@ tasks.register("ciUnitTestRelease") {
     description = "Runs release JVM unit tests."
     dependsOn(
         ":feature:dashboard:tv:testReleaseUnitTest",
+        ":shared:feed:testReleaseUnitTest",
+        ":shared:quiz-entry:testReleaseUnitTest",
         ":core:media:android:testReleaseUnitTest",
         ":feature:feed:tv:testReleaseUnitTest",
         ":feature:quiz-entry:tv:testReleaseUnitTest",
@@ -124,6 +130,8 @@ tasks.register("ciAssembleDebug") {
     description = "Builds debug applications and libraries."
     dependsOn(
         ":feature:dashboard:tv:assembleDebug",
+        ":shared:feed:assembleDebug",
+        ":shared:quiz-entry:assembleDebug",
         ":core:media:android:assembleDebug",
         ":feature:feed:tv:assembleDebug",
         ":feature:quiz-entry:tv:assembleDebug",
@@ -151,6 +159,8 @@ tasks.register("ciAssembleRelease") {
     description = "Builds release applications and libraries."
     dependsOn(
         ":feature:dashboard:tv:assembleRelease",
+        ":shared:feed:assembleRelease",
+        ":shared:quiz-entry:assembleRelease",
         ":core:media:android:assembleRelease",
         ":feature:feed:tv:assembleRelease",
         ":feature:quiz-entry:tv:assembleRelease",

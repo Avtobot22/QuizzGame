@@ -8,8 +8,8 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.testTag
 import com.quizzgame.core.navigation.focus.TvEntryFocus
-import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
+import com.quizzgame.shared.catalog.domain.entity.QuizCard
 
 @Composable
 internal fun TvRailCard(

@@ -6,10 +6,10 @@ import com.quizzgame.core.error.presentation.ErrorCopyKey
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.media.MediaSpec
-import com.quizzgame.feature.quizentry.tv.domain.entity.QuizEntry
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryState
 import com.quizzgame.shared.catalog.domain.entity.CatalogBadge
 import com.quizzgame.shared.catalog.domain.entity.PassingStatus
+import com.quizzgame.shared.catalog.domain.entity.QuizEntry
 import com.quizzgame.shared.catalog.domain.entity.QuizUserState
 
 internal class TvQuizEntryPreviewProvider : PreviewParameterProvider<TvQuizEntryState> {

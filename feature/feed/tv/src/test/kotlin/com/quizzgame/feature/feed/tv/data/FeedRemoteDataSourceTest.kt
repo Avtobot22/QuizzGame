@@ -11,8 +11,9 @@ import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.network.result.NetworkResultAdapter
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.feature.feed.tv.data.mapper.FeedMapper
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
+import com.quizzgame.shared.feed.data.mapper.FeedMapper
+import com.quizzgame.shared.feed.domain.entity.FeedResult
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -80,7 +81,7 @@ class FeedRemoteDataSourceTest {
                 mapper,
             )
             val result = repository.load() as FeedResult.Loaded
-            assertTrue(result.content.rails.isEmpty())
+            assertTrue(result.content.sections.filterIsInstance<QuizRail>().isEmpty())
         }
     }
 

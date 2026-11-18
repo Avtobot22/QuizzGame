@@ -1,0 +1,34 @@
+{
+  "sections": [
+    {
+      "kind": "rail",
+      "id": "58e2b5b5-05e6-43f5-9580-8e88ec7130ff",
+      "title": "История",
+      "items": [
+        {
+          "kind": "quiz",
+          "id": "18e2b5b5-05e6-43f5-9580-2e88ec713005",
+          "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713005",
+          "title": "Знатоки истории",
+          "image": {
+            "kind": "asset",
+            "name": "quiz.cover"
+          },
+          "user": {
+            "bookmarked": false,
+            "progress": 0,
+            "passingStatus": "notStarted"
+          }
+        }
+      ],
+      "itemsPage": {
+        "hasMore": false,
+        "nextCursor": null
+      }
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "nextCursor": null
+  }
+}

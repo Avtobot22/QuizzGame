@@ -1,0 +1,24 @@
+{
+  "sectionId": "58e2b5b5-05e6-43f5-9580-8e88ec7130fd",
+  "items": [
+    {
+      "kind": "quiz",
+      "id": "18e2b5b5-05e6-43f5-9580-2e88ec713004",
+      "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713004",
+      "title": "Спорт и рекорды",
+      "image": {
+        "kind": "asset",
+        "name": "quiz.cover"
+      },
+      "user": {
+        "bookmarked": false,
+        "progress": 0,
+        "passingStatus": "notStarted"
+      }
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "nextCursor": null
+  }
+}
