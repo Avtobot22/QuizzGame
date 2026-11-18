@@ -16,7 +16,9 @@ import com.quizzgame.core.session.refresh.api.RefreshFailure
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import okhttp3.mockwebserver.Dispatcher
@@ -104,7 +106,7 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
     }
 
     @Test
-    fun onlyTheExplicitTestRevocationStrategyExpiresTheSession() = runBlocking {
+    fun onlyTheExplicitTestRevocationStrategyReturnsTheAppToGuest() = runBlocking {
         val fixture = fixture(
             TokenPair("fixture-access-1", "fixture-refresh-1"),
             RefreshRevocationPolicy { it == RefreshFailure.Http(401) },
@@ -117,7 +119,7 @@ class FeatureApiIntegrationTest : ApiExecutorTestFixture() {
                 DefaultDispatcherProvider(),
             ).call(Api::class.java) { load(authPolicy()) },
         )
-        assertEquals(SessionState.Expired, fixture.session.state.value)
+        withTimeout(5.seconds) { fixture.session.state.first { it == SessionState.Guest } }
         assertNull(fixture.store.tokens)
     }
 

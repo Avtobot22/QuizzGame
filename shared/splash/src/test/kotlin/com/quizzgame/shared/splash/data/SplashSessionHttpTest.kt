@@ -39,7 +39,6 @@ import okhttp3.ResponseBody
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -80,20 +79,20 @@ class SplashSessionHttpTest {
     }
 
     @Test
-    fun secondUserUnauthorizedStopsWithoutAnotherRefreshOrNavigation() = runTest {
+    fun secondUserUnauthorizedKeepsAuthenticatedSessionWithoutAnotherRefresh() = runTest {
         Fixture.open().use { fixture ->
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             fixture.server.enqueue(MockResponse().setBody(ROTATED))
             fixture.server.enqueue(MockResponse().setResponseCode(401))
-            assertFalse(fixture.useCase() is SplashResult.Continue)
+            assertEquals(SplashResult.Continue, fixture.useCase())
             assertEquals(5, fixture.server.requestCount)
             assertNull(fixture.users.current())
         }
     }
 
     @Test
-    fun confirmedRefreshRevocationExpiresSessionAndRoutesToSignIn() = runTest {
+    fun confirmedRefreshRevocationExpiresSessionBeforeCatalogAdmission() = runTest {
         Fixture.open().use { fixture ->
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))

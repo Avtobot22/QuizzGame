@@ -118,6 +118,20 @@ class SessionManager private constructor(
     override suspend fun signIn(tokens: TokenPair): SessionChangeResult = startSession(tokens).asChange()
     override suspend fun signOut(): SessionChangeResult = logout().asChange()
     override suspend fun recoverStorage(): SessionRecoveryResult = withContext(dispatcher) { recovery.recover() }
+
+    /** Поколение для привязки запроса входа к сессии, даже если access закрыт для refresh. */
+    fun signInEpoch(): Long = access.get().epoch
+
+    suspend fun signInIfCurrent(tokens: TokenPair, epoch: Long): SessionChangeResult = withContext(dispatcher) {
+        lock.withLock {
+            if (access.get().epoch != epoch || state.value is SessionState.Authenticated) {
+                SessionChangeResult.BusyOrBlocked
+            } else {
+                mutations.signIn(tokens).asChange()
+            }
+        }
+    }
+
     suspend fun startSession(tokens: TokenPair): SessionOperation = withContext(dispatcher) { mutations.signIn(tokens) }
     suspend fun logout(): SessionOperation = withContext(dispatcher) { mutations.signOut() }
     suspend fun restoreStoredSession(): SessionOperation = withContext(dispatcher) { recovery.restore() }

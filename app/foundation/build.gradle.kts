@@ -7,6 +7,7 @@ plugins {
 android { namespace = "com.quizzgame.app.foundation" }
 
 dependencies {
+    implementation(projects.shared.auth)
     api(projects.core.coroutines)
     api(projects.core.navigation)
     api(projects.core.network)
