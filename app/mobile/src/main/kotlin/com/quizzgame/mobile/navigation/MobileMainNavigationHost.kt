@@ -4,21 +4,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.only
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailDefaults
-import androidx.compose.material3.NavigationRailItem
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.navigation3.runtime.NavEntry
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.scene.DialogSceneStrategy
@@ -28,11 +18,7 @@ import com.quizzgame.core.navigation.AppNavigator
 import com.quizzgame.core.navigation.NavigationState
 import com.quizzgame.core.navigation.chrome.MainNavigationHost
 import com.quizzgame.core.navigation.chrome.NavigationChromePlacement
-import com.quizzgame.mobile.R
-import com.quizzgame.mobile.navigation.routes.JoinRoomRoute
-import com.quizzgame.mobile.ui.tags.MobileChromeTags
-
-internal val MobileTopLevelItems = listOf(MobileTopLevelItem(JoinRoomRoute, R.string.navigation_join_room))
+import com.quizzgame.feature.dashboard.mobile.domain.entity.NavigationAppearance
 
 @Composable
 internal fun MobileMainNavigationHost(
@@ -41,6 +27,7 @@ internal fun MobileMainNavigationHost(
     entries: List<NavEntry<NavKey>>,
     onBack: () -> Unit,
     items: List<MobileTopLevelItem> = MobileTopLevelItems,
+    appearance: NavigationAppearance = NavigationAppearance(),
     sceneStrategies: List<SceneStrategy<NavKey>> = listOf(DialogSceneStrategy(), SinglePaneSceneStrategy()),
 ) {
     val windowWidth = with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
@@ -58,31 +45,7 @@ internal fun MobileMainNavigationHost(
         onBack = onBack,
     ) { visible ->
         val select: (NavKey) -> Unit = { if (visible) navigator.switchTopLevel(it) }
-        if (useRail) {
-            NavigationRail(Modifier.testTag(MobileChromeTags.RAIL)) {
-                items.forEach { item ->
-                    NavigationRailItem(
-                        selected = state.snapshot.active == item.route,
-                        onClick = { select(item.route) },
-                        icon = { Icon(painterResource(R.drawable.ic_room), contentDescription = null) },
-                        label = { Text(stringResource(item.label), maxLines = 1) },
-                        modifier = Modifier.testTag(MobileChromeTags.item(item.route)),
-                    )
-                }
-            }
-        } else {
-            NavigationBar(Modifier.testTag(MobileChromeTags.BAR)) {
-                items.forEach { item ->
-                    NavigationBarItem(
-                        selected = state.snapshot.active == item.route,
-                        onClick = { select(item.route) },
-                        icon = { Icon(painterResource(R.drawable.ic_room), contentDescription = null) },
-                        label = { Text(stringResource(item.label), maxLines = 1) },
-                        modifier = Modifier.testTag(MobileChromeTags.item(item.route)),
-                    )
-                }
-            }
-        }
+        MobileNavigationChrome(useRail, state.snapshot.active, items, appearance, select)
     }
 }
 

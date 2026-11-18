@@ -17,9 +17,9 @@ class RootNavigationTest {
 
     @Test
     fun successfulSplashResetsToContentAndSurvivesActivityRecreationThenRootBackExits() {
-        awaitVisible(MobileNavigationTags.JOIN_ROOM)
+        awaitVisible(MobileNavigationTags.PLAY)
         compose.activityRule.scenario.recreate()
-        awaitVisible(MobileNavigationTags.JOIN_ROOM)
+        awaitVisible(MobileNavigationTags.PLAY)
         Espresso.pressBackUnconditionally()
         compose.waitUntil(5_000) { compose.activityRule.scenario.state == Lifecycle.State.DESTROYED }
     }

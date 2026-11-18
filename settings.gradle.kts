@@ -35,6 +35,7 @@ include(":app:debug-support")
 
 include(":core:ui")
 include(":core:media")
+include(":core:media:android")
 include(":core:coroutines")
 include(":core:designsystem:mobile")
 include(":core:designsystem:tv")
@@ -49,6 +50,8 @@ include(":core:error:ui-mobile")
 include(":core:error:ui-tv")
 
 include(":shared:catalog")
+include(":shared:feed")
+include(":shared:quiz-entry")
 include(":shared:splash")
 
 include(":feature:splash:tv")
@@ -56,6 +59,10 @@ include(":feature:splash:mobile")
 include(":feature:dashboard:tv")
 include(":feature:feed:tv")
 include(":feature:quiz-entry:tv")
+include(":feature:dashboard:mobile")
+include(":feature:play:mobile")
+include(":feature:feed:mobile")
+include(":feature:quiz-entry:mobile")
 
 val mockSdkDirectory = file("external/android-mock-server")
 check(mockSdkDirectory.resolve("settings.gradle.kts").isFile) {

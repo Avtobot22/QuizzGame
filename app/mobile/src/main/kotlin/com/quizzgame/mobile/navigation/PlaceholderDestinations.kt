@@ -21,15 +21,3 @@ internal fun MobileSignInDestination() {
         )
     }
 }
-
-@Composable
-internal fun MobileJoinRoomDestination() {
-    QuizzScreenScaffold(topBar = { QuizzTopBar(stringResource(R.string.navigation_join_room)) }) { padding ->
-        QuizzMessageScreen(
-            stringResource(R.string.join_room_title),
-            stringResource(R.string.join_room_placeholder),
-            Modifier.padding(padding),
-            icon = QuizzStatusIcon.ROOM,
-        )
-    }
-}

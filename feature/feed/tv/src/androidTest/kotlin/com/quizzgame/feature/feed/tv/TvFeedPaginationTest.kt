@@ -15,6 +15,7 @@ import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewStateContent
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -28,7 +29,13 @@ class TvFeedPaginationTest {
         val content = TvFeedPreviewProvider().values.filterIsInstance<TvFeedPreviewState.Content>().first()
         val state = mutableStateOf(
             content.copy(
-                value = content.value.copy(rails = content.value.rails.map { it.copy(cards = it.cards.take(1)) }),
+                value = content.value.copy(
+                    sections = content.value.sections.filterIsInstance<QuizRail>().map {
+                        it.copy(
+                            cards = it.cards.take(1),
+                        )
+                    },
+                ),
             ),
         )
         var opened = 0

@@ -40,11 +40,11 @@ internal fun MobileFixtureSignInDestination(
 }
 
 @Composable
-internal fun MobileFixtureJoinRoomDestination(
+internal fun MobileFixturePlayDestination(
     onLogout: () -> Unit,
 ) {
     var roomCode by rememberSaveable { mutableStateOf("") }
-    FixturePlaceholder(R.string.join_room_placeholder, listOf(FixtureR.string.fixture_signout to onLogout)) {
+    FixturePlaceholder(R.string.play_placeholder, listOf(FixtureR.string.fixture_signout to onLogout)) {
         QuizzRoomCodeField(
             value = roomCode,
             onValueChange = { roomCode = it },

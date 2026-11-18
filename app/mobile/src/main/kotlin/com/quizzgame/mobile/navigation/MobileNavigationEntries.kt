@@ -10,9 +10,15 @@ import androidx.navigation3.runtime.NavKey
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
 import com.quizzgame.core.navigation.routes.common.SignInRoute
+import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountCallbacks
+import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountEntries
+import com.quizzgame.feature.feed.mobile.navigation.MobileFeedCallbacks
+import com.quizzgame.feature.feed.mobile.navigation.MobileFeedEntries
+import com.quizzgame.feature.play.mobile.navigation.MobilePlayEntries
+import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryCallbacks
+import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryEntries
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashCallbacks
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashEntries
-import com.quizzgame.mobile.navigation.routes.JoinRoomRoute
 import com.quizzgame.mobile.ui.tags.MobileNavigationTags
 import dagger.Module
 import dagger.Provides
@@ -25,6 +31,9 @@ internal data class MobileNavigationContext(
     val onSignIn: () -> Boolean,
     val onRestartSplash: () -> Boolean,
     val onLogout: () -> Unit,
+    val onOpenEntry: (String) -> Boolean = { false },
+    val onPlay: () -> Boolean = { false },
+    val onBack: () -> Unit = {},
 )
 
 internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<MobileNavigationContext>) {
@@ -38,12 +47,17 @@ internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<Mobi
     }
 }
 
-internal fun EntryProviderScope<NavKey>.mobileContentEntries() {
-    entry<JoinRoomRoute> {
-        Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.JOIN_ROOM)) {
-            MobileJoinRoomDestination()
-        }
-    }
+internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<MobileNavigationContext>) {
+    MobilePlayEntries.withContext<MobileNavigationContext, Unit> { Unit }.register(this, context)
+    MobileFeedEntries.withContext<MobileNavigationContext, MobileFeedCallbacks> {
+        MobileFeedCallbacks(it.onOpenEntry, { it.onSignIn() })
+    }.register(this, context)
+    MobileQuizEntryEntries.withContext<MobileNavigationContext, MobileQuizEntryCallbacks> {
+        MobileQuizEntryCallbacks(it.onBack, it.onPlay, { it.onSignIn() })
+    }.register(this, context)
+    MobileAccountEntries.withContext<MobileNavigationContext, MobileAccountCallbacks> {
+        MobileAccountCallbacks({ it.onSignIn() }, it.onLogout)
+    }.register(this, context)
 }
 
 @Module
@@ -57,5 +71,5 @@ internal object MobileNavigationModule {
     @Provides
     @IntoSet
     fun contentEntries(): FeatureEntries<MobileNavigationContext> =
-        FeatureEntries { scope, _ -> scope.mobileContentEntries() }
+        FeatureEntries { scope, context -> scope.mobileContentEntries(context) }
 }

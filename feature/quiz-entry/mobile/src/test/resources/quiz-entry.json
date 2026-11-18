@@ -1,0 +1,24 @@
+{
+  "entryId": "58e2b5b5-05e6-43f5-1580-8e88ec7130fd",
+  "title": "Обо всём на свете",
+  "subtitle": "Проверьте свои знания",
+  "description": "Викторина из нескольких раундов.",
+  "cover": {
+    "kind": "remote",
+    "url": "https://cdn.example.test/quiz/cover.webp"
+  },
+  "user": {
+    "bookmarked": true,
+    "progress": 0.25,
+    "passingStatus": "inProgress"
+  },
+  "availability": {
+    "status": "available",
+    "requiresAuthentication": false
+  },
+  "primaryAction": {
+    "kind": "resume",
+    "title": "Продолжить",
+    "enabled": false
+  }
+}

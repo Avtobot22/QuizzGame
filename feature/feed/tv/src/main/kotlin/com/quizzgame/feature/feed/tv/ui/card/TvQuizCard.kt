@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,11 +31,13 @@ import androidx.tv.material3.CardDefaults
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import com.quizzgame.core.designsystem.tv.media.QuizzTvBadge
+import com.quizzgame.core.designsystem.tv.media.quizzTvCompactBadgeHeight
 import com.quizzgame.core.designsystem.tv.media.readableColor
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.feed.tv.R
-import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
 import com.quizzgame.shared.catalog.domain.entity.PassingStatus
+import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
@@ -71,6 +74,11 @@ internal fun TvQuizCard(card: QuizCard, onClick: () -> Unit, modifier: Modifier 
 private fun TvQuizCardCopy(card: QuizCard) {
     val colors = MaterialTheme.colorScheme
     Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        Box(Modifier.heightIn(min = quizzTvCompactBadgeHeight())) {
+            card.badge?.let {
+                QuizzTvBadge(it.text, it.live, foreground = it.foreground, background = it.background)
+            }
+        }
         Text(
             card.title,
             color = card.titleColor.readableColor(colors.onSurface, colors.surface),

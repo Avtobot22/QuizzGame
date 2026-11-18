@@ -36,6 +36,13 @@ tasks.register("ciLint") {
     description = "Runs Android lint for all application and library modules."
     dependsOn(
         ":feature:dashboard:tv:lint",
+        ":feature:dashboard:mobile:lint",
+        ":feature:play:mobile:lint",
+        ":feature:feed:mobile:lint",
+        ":feature:quiz-entry:mobile:lint",
+        ":shared:feed:lint",
+        ":shared:quiz-entry:lint",
+        ":core:media:android:lint",
         ":feature:feed:tv:lint",
         ":feature:quiz-entry:tv:lint",
         ":app:foundation:lint",
@@ -65,6 +72,13 @@ tasks.register("ciUnitTestDebug") {
     description = "Runs debug JVM unit tests."
     dependsOn(
         ":feature:dashboard:tv:testDebugUnitTest",
+        ":feature:dashboard:mobile:testDebugUnitTest",
+        ":feature:play:mobile:testDebugUnitTest",
+        ":feature:feed:mobile:testDebugUnitTest",
+        ":feature:quiz-entry:mobile:testDebugUnitTest",
+        ":shared:feed:testDebugUnitTest",
+        ":shared:quiz-entry:testDebugUnitTest",
+        ":core:media:android:testDebugUnitTest",
         ":feature:feed:tv:testDebugUnitTest",
         ":feature:quiz-entry:tv:testDebugUnitTest",
         ":core:media:test",
@@ -96,6 +110,13 @@ tasks.register("ciUnitTestRelease") {
     description = "Runs release JVM unit tests."
     dependsOn(
         ":feature:dashboard:tv:testReleaseUnitTest",
+        ":feature:dashboard:mobile:testReleaseUnitTest",
+        ":feature:play:mobile:testReleaseUnitTest",
+        ":feature:feed:mobile:testReleaseUnitTest",
+        ":feature:quiz-entry:mobile:testReleaseUnitTest",
+        ":shared:feed:testReleaseUnitTest",
+        ":shared:quiz-entry:testReleaseUnitTest",
+        ":core:media:android:testReleaseUnitTest",
         ":feature:feed:tv:testReleaseUnitTest",
         ":feature:quiz-entry:tv:testReleaseUnitTest",
         ":core:media:test",
@@ -121,6 +142,13 @@ tasks.register("ciAssembleDebug") {
     description = "Builds debug applications and libraries."
     dependsOn(
         ":feature:dashboard:tv:assembleDebug",
+        ":feature:dashboard:mobile:assembleDebug",
+        ":feature:play:mobile:assembleDebug",
+        ":feature:feed:mobile:assembleDebug",
+        ":feature:quiz-entry:mobile:assembleDebug",
+        ":shared:feed:assembleDebug",
+        ":shared:quiz-entry:assembleDebug",
+        ":core:media:android:assembleDebug",
         ":feature:feed:tv:assembleDebug",
         ":feature:quiz-entry:tv:assembleDebug",
         ":app:foundation:assembleDebug",
@@ -147,6 +175,13 @@ tasks.register("ciAssembleRelease") {
     description = "Builds release applications and libraries."
     dependsOn(
         ":feature:dashboard:tv:assembleRelease",
+        ":feature:dashboard:mobile:assembleRelease",
+        ":feature:play:mobile:assembleRelease",
+        ":feature:feed:mobile:assembleRelease",
+        ":feature:quiz-entry:mobile:assembleRelease",
+        ":shared:feed:assembleRelease",
+        ":shared:quiz-entry:assembleRelease",
+        ":core:media:android:assembleRelease",
         ":feature:feed:tv:assembleRelease",
         ":feature:quiz-entry:tv:assembleRelease",
         ":app:foundation:assembleRelease",
@@ -171,7 +206,11 @@ tasks.register("ciAssembleAndroidTest") {
     group = "verification"
     description = "Builds debug instrumentation test APKs without running them."
     dependsOn(
+        ":core:media:android:assembleDebugAndroidTest",
         ":feature:feed:tv:assembleDebugAndroidTest",
+        ":feature:play:mobile:assembleDebugAndroidTest",
+        ":feature:feed:mobile:assembleDebugAndroidTest",
+        ":feature:quiz-entry:mobile:assembleDebugAndroidTest",
         ":feature:quiz-entry:tv:assembleDebugAndroidTest",
         ":app:debug-support:assembleDebugAndroidTest",
         ":core:navigation:assembleDebugAndroidTest",

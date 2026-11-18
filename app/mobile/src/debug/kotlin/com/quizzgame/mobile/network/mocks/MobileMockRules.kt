@@ -10,6 +10,7 @@ import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
 internal fun mobileMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mockRules(assets) {
+    mobileCatalogMockRules(assets, json)
     rule("splash-feature-toggles", "/api/mobile/feature-toggles") {
         match { method("GET") }
         respondWith { _, _ ->

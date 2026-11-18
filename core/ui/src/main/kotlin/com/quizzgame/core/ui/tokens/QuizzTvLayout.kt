@@ -8,7 +8,7 @@ object QuizzTvLayout {
     const val itemGap = 20f
     const val cardWidth = 252f
     const val cardTextHeight = 100f
-    const val cardImageFadeHeight = 40f
+    const val cardImageFadeHeight = QuizzCatalogDimensions.artworkFadeHeight
     const val buttonHeight = 44f
     const val buttonHorizontalPadding = 20f
     const val actionGap = 16f

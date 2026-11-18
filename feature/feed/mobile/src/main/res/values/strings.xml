@@ -1,0 +1,15 @@
+<resources>
+    <string name="feed_title">Каталог</string>
+    <string name="feed_loading">Загружаем викторины…</string>
+    <string name="feed_refresh">Обновить</string>
+    <string name="feed_empty">Здесь будут викторины</string>
+    <string name="feed_bookmarked">В избранном</string>
+    <string name="feed_in_progress">В процессе</string>
+    <string name="feed_completed">Пройдена</string>
+    <string name="feed_tv_label">Для игры на ТВ</string>
+    <string name="feed_featured">Рекомендуем</string>
+    <string name="feed_empty_description">Сейчас каталог пуст. Загляните позже или обновите страницу.</string>
+    <string name="feed_refreshing">Обновляем каталог</string>
+    <string name="feed_release_refresh">Отпустите, чтобы обновить</string>
+    <string name="feed_pull_refresh">Потяните, чтобы обновить</string>
+</resources>

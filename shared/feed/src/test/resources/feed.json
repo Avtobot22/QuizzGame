@@ -1,0 +1,35 @@
+{
+  "sections": [
+    {
+      "kind": "rail",
+      "id": "58e2b5b5-05e6-43f5-9580-8e88ec7130fd",
+      "title": "Популярные викторины",
+      "items": [
+        {
+          "kind": "quiz",
+          "id": "18e2b5b5-05e6-43f5-9580-2e88ec71303d",
+          "entryId": "58e2b5b5-05e6-43f5-1580-8e88ec7130fd",
+          "title": "Обо всём на свете",
+          "subtitle": "40 минут",
+          "image": {
+            "kind": "remote",
+            "url": "https://cdn.example.test/quiz/cover.webp"
+          },
+          "user": {
+            "bookmarked": true,
+            "progress": 0.25,
+            "passingStatus": "inProgress"
+          }
+        }
+      ],
+      "itemsPage": {
+        "hasMore": false,
+        "nextCursor": null
+      }
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "nextCursor": null
+  }
+}

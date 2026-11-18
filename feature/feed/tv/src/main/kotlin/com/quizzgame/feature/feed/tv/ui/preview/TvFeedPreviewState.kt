@@ -2,7 +2,7 @@ package com.quizzgame.feature.feed.tv.ui.preview
 
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.flags.CatalogPrefetch
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.Feed
 
 internal sealed interface TvFeedPreviewState {
     data object Loading : TvFeedPreviewState

@@ -2,6 +2,7 @@ package com.quizzgame.feature.feed.tv.ui.tags
 
 object TvFeedTags {
     fun card(id: String): String = "feed:card:$id"
+    fun artwork(id: String): String = "feed:artwork:$id"
     fun appendingRail(id: String): String = "feed:appending:$id"
     const val APPENDING_SECTIONS = "feed:appending-sections"
     const val CONTENT = "feed:content"

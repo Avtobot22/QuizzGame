@@ -28,7 +28,7 @@ import com.quizzgame.feature.splash.mobile.ui.tags.MobileSplashTags
 
 @Composable
 fun MobileSplashScreen(
-    onJoinRoom: () -> Boolean,
+    onContinue: () -> Boolean,
     onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier = Modifier,
@@ -38,7 +38,7 @@ fun MobileSplashScreen(
     MobileSplashContent(
         state = state,
         onIntent = viewModel::onIntent,
-        onJoinRoom = onJoinRoom,
+        onContinue = onContinue,
         onSignIn = onSignIn,
         onExit = onExit,
         modifier = modifier,
@@ -49,7 +49,7 @@ fun MobileSplashScreen(
 internal fun MobileSplashContent(
     state: MobileSplashUiState,
     onIntent: (MobileSplashIntent) -> Unit,
-    onJoinRoom: () -> Boolean,
+    onContinue: () -> Boolean,
     onSignIn: () -> Boolean,
     onExit: () -> Unit,
     modifier: Modifier,
@@ -60,7 +60,7 @@ internal fun MobileSplashContent(
         onHandled = { onIntent(NavigationHandled) },
     ) {
         when (it.destination) {
-            MobileSplashDestination.JOIN_ROOM -> onJoinRoom()
+            MobileSplashDestination.PLAY -> onContinue()
             MobileSplashDestination.SIGN_IN   -> onSignIn()
         }
     }

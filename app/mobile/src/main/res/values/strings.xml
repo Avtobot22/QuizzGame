@@ -4,8 +4,10 @@
     <string name="app_network_configuration_required">Приложение ещё не настроено для подключения к серверу.</string>
     <string name="splash_placeholder">Splash — экран запуска в разработке</string>
     <string name="signin_placeholder">Вход в аккаунт скоро появится. Подключаться к игре с телефона можно будет гостем.</string>
-    <string name="join_room_placeholder">Выберите квиз на телевизоре и подключайтесь с телефона. Подключение к комнате скоро появится.</string>
-    <string name="navigation_join_room">Комната</string>
+    <string name="play_placeholder">Выберите квиз на телевизоре и подключайтесь с телефона. Подключение к комнате скоро появится.</string>
+    <string name="navigation_play">Играть</string>
     <string name="signin_title">Вход в Quizz</string>
-    <string name="join_room_title">Большой экран. Ваша компания.</string>
+    <string name="navigation_explore">Каталог</string>
+    <string name="navigation_library">Моё</string>
+    <string name="navigation_profile">Профиль</string>
 </resources>

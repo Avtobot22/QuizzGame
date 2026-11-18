@@ -27,6 +27,7 @@ import com.quizzgame.feature.feed.tv.ui.paging.TvFeedRefreshAction
 import com.quizzgame.feature.feed.tv.ui.rail.TvQuizRail
 import com.quizzgame.feature.feed.tv.ui.status.TvFeedAppendingSections
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 
 @Composable
 internal fun TvFeedPreviewContent(
@@ -41,7 +42,9 @@ internal fun TvFeedPreviewContent(
     val images = if (state.prefetch.enabled) LocalTvMediaLoader.current else null
     LaunchedEffect(state.value, state.prefetch) {
         if (images != null) {
-            val candidates = state.value.rails.take(state.prefetch.depth).flatMap { rail ->
+            val candidates = state.value.sections.filterIsInstance<QuizRail>().take(
+                state.prefetch.depth,
+            ).flatMap { rail ->
                 rail.cards.take(state.prefetch.depth).mapNotNull { (it.image as? MediaSpec.Remote)?.url }
             }
             images.prefetch(candidates, state.prefetch.maxConcurrent)
@@ -88,7 +91,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.feedRails(
     focus: FocusRequester,
     firstRailFocus: FocusRequester,
 ) {
-    itemsIndexed(state.value.rails, key = { _, rail -> rail.id }) { index, rail ->
+    itemsIndexed(state.value.sections.filterIsInstance<QuizRail>(), key = { _, rail -> rail.id }) { index, rail ->
         TvQuizRail(
             rail,
             onOpen = {

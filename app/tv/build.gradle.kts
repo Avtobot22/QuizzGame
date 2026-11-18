@@ -11,9 +11,6 @@ android {
     namespace = "com.quizzgame.tv"
     defaultConfig {
         applicationId = "com.quizzgame.tv"
-        val imageHosts = providers.gradleProperty("quizz.catalog.imageHosts").orElse("").get()
-        require(imageHosts.matches(Regex("[A-Za-z0-9.,-]*")))
-        buildConfigField("String", "CATALOG_IMAGE_HOSTS", "\"$imageHosts\"")
     }
 }
 

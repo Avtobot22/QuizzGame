@@ -9,6 +9,9 @@ fun MediaDto?.toCatalogMedia(): MediaSpec = AppearanceMapper.media(this, ICON_KE
 
 private val ICON_KEYS = setOf(
     "navigation.home",
+    "navigation.play",
+    "navigation.explore",
+    "navigation.profile",
     "navigation.library",
     "navigation.settings",
     "action.back",

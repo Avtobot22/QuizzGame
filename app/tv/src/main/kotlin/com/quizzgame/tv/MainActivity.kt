@@ -16,7 +16,7 @@ import com.quizzgame.app.navigation.ExternalNavigationRouter
 import com.quizzgame.app.presentation.AppRootViewModel
 import com.quizzgame.core.designsystem.tv.QuizzTvTheme
 import com.quizzgame.core.designsystem.tv.media.LocalTvMediaLoader
-import com.quizzgame.core.designsystem.tv.media.TvMediaLoader
+import com.quizzgame.core.media.android.CatalogMediaLoader
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.tv.navigation.TvNavigationContext
@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
     lateinit var navigationPolicies: Set<@JvmSuppressWildcards NavigationPolicy>
 
     @Inject
-    lateinit var mediaLoader: TvMediaLoader
+    lateinit var mediaLoader: CatalogMediaLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

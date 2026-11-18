@@ -6,16 +6,16 @@ import com.quizzgame.core.error.presentation.ErrorCopyKey
 import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.media.MediaSpec
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
-import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
-import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
 import com.quizzgame.shared.catalog.domain.entity.CatalogBadge
 import com.quizzgame.shared.catalog.domain.entity.PassingStatus
+import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.shared.catalog.domain.entity.QuizUserState
+import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 
 internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedPreviewState> {
     private val feed = Feed(
-        rails = listOf(
+        sections = listOf(
             QuizRail(
                 id = "popular",
                 title = "Популярные квизы",
@@ -53,7 +53,7 @@ internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedPreviewSta
         TvFeedPreviewState.Content(feed, refreshing = true),
         TvFeedPreviewState.Content(feed, appendingSections = true),
         TvFeedPreviewState.Content(
-            feed.copy(rails = feed.rails.map { it.copy(cards = it.cards.take(1)) }),
+            feed.copy(sections = feed.sections.filterIsInstance<QuizRail>().map { it.copy(cards = it.cards.take(1)) }),
             appendingRails = setOf("popular"),
         ),
         TvFeedPreviewState.Content(

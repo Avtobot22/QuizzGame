@@ -1,0 +1,55 @@
+{
+  "sections": [
+    {
+      "kind": "hero",
+      "id": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed001",
+      "item": {
+        "kind": "quiz",
+        "id": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed002",
+        "entryId": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed003",
+        "title": "Вечерняя викторина",
+        "image": {
+          "kind": "asset",
+          "name": "quiz.cover"
+        },
+        "user": {
+          "bookmarked": false,
+          "progress": 0.0,
+          "passingStatus": "notStarted"
+        },
+        "subtitle": "Играйте на ТВ с друзьями"
+      }
+    },
+    {
+      "kind": "rail",
+      "id": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed004",
+      "title": "Популярное",
+      "subtitle": "Выберите тему",
+      "items": [
+        {
+          "kind": "quiz",
+          "id": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed005",
+          "entryId": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed006",
+          "title": "Космос",
+          "image": {
+            "kind": "asset",
+            "name": "quiz.cover"
+          },
+          "user": {
+            "bookmarked": false,
+            "progress": 0.0,
+            "passingStatus": "notStarted"
+          }
+        }
+      ],
+      "itemsPage": {
+        "hasMore": true,
+        "nextCursor": "opaque-mobile-rail-2"
+      }
+    }
+  ],
+  "page": {
+    "hasMore": true,
+    "nextCursor": "opaque-mobile-feed-2"
+  }
+}

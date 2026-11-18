@@ -1,7 +1,7 @@
 package com.quizzgame.feature.quizentry.tv.data.api
 
 import com.quizzgame.core.network.auth.RequestPolicy
-import com.quizzgame.feature.quizentry.tv.data.dto.QuizEntryDto
+import com.quizzgame.shared.catalog.data.dto.entry.QuizEntryDto
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Tag

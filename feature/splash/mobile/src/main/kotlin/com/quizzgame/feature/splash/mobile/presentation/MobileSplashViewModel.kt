@@ -48,7 +48,7 @@ internal class MobileSplashViewModel @Inject constructor(private val startSplash
         updateState { MobileSplashUiState.Loading }
         job = viewModelScope.launch {
             val next = when (val result = startSplashUseCase()) {
-                SplashResult.Continue  -> MobileSplashUiState.NavigationPending(MobileSplashDestination.JOIN_ROOM)
+                SplashResult.Continue  -> MobileSplashUiState.NavigationPending(MobileSplashDestination.PLAY)
                 SplashResult.SignIn    -> MobileSplashUiState.NavigationPending(MobileSplashDestination.SIGN_IN)
                 is SplashResult.Failed -> MobileSplashUiState.Error(
                     DefaultErrorDecisionPolicy().decide(

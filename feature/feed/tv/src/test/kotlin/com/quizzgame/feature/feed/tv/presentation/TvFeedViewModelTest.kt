@@ -10,12 +10,12 @@ import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.feature.feed.tv.FakeFeedRemoteDataSource
 import com.quizzgame.feature.feed.tv.FeedTestData
-import com.quizzgame.feature.feed.tv.data.FeedRepositoryImpl
-import com.quizzgame.feature.feed.tv.domain.LoadFeedUseCase
-import com.quizzgame.feature.feed.tv.domain.LoadRailItemsUseCase
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import com.quizzgame.feature.feed.tv.domain.entity.QuizRail
+import com.quizzgame.shared.feed.data.FeedRepositoryImpl
+import com.quizzgame.shared.feed.domain.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
+import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedResult
+import com.quizzgame.shared.feed.domain.entity.QuizRail
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
@@ -175,7 +175,7 @@ class TvFeedViewModelTest {
         val store = ViewModelStore()
         try {
             val remote = FakeFeedRemoteDataSource()
-            val seed = FeedTestData.feed().rails.first()
+            val seed = FeedTestData.feed().sections.filterIsInstance<QuizRail>().first()
             remote.feedReply = {
                 FeedResult.Loaded(
                     Feed(List(14) { seed.copy(id = "rail-$it") }),

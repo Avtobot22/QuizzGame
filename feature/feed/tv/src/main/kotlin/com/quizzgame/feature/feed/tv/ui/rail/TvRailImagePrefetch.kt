@@ -7,7 +7,7 @@ import androidx.paging.compose.LazyPagingItems
 import com.quizzgame.core.designsystem.tv.media.LocalTvMediaLoader
 import com.quizzgame.core.flags.CatalogPrefetch
 import com.quizzgame.core.media.MediaSpec
-import com.quizzgame.feature.feed.tv.domain.entity.QuizCard
+import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 

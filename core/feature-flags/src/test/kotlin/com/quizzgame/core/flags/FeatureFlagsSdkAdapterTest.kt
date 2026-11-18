@@ -100,7 +100,7 @@ class FeatureFlagsSdkAdapterTest {
     @Test
     fun guestKeysArePlatformSpecificAndCaseSensitive() = runTest {
         val adapter = adapter(remote = {
-            """{"featureToggles":[{"feature":"joinRoom.guestMode","enabled":true},""" +
+            """{"featureToggles":[{"feature":"mobile.guestMode","enabled":true},""" +
                 """{"feature":"Dashboard.guestMode","enabled":true}]}"""
         })
         assertEquals(FeatureFlagsLoadResult.Applied, adapter.refresh())

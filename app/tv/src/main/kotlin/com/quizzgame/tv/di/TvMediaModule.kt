@@ -2,7 +2,7 @@ package com.quizzgame.tv.di
 
 import android.content.Context
 import com.quizzgame.core.coroutines.DispatcherProvider
-import com.quizzgame.core.designsystem.tv.media.TvMediaLoader
+import com.quizzgame.core.media.android.CatalogMediaLoader
 import com.quizzgame.tv.BuildConfig
 import dagger.Module
 import dagger.Provides
@@ -16,8 +16,8 @@ import javax.inject.Singleton
 internal object TvMediaModule {
     @Provides
     @Singleton
-    fun imageLoader(@ApplicationContext context: Context, dispatchers: DispatcherProvider): TvMediaLoader =
-        TvMediaLoader(
+    fun imageLoader(@ApplicationContext context: Context, dispatchers: DispatcherProvider): CatalogMediaLoader =
+        CatalogMediaLoader(
             context,
             BuildConfig.CATALOG_IMAGE_HOSTS.split(',').filter { it.isNotBlank() }.toSet(),
             dispatchers,

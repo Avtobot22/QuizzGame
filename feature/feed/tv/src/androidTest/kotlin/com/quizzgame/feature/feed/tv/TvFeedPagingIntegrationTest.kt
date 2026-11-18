@@ -20,20 +20,21 @@ import com.quizzgame.core.designsystem.tv.preview.QuizzTvPreviewScreen
 import com.quizzgame.core.flags.AppFeatureFlags
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.feature.feed.tv.data.FeedRemoteDataSource
-import com.quizzgame.feature.feed.tv.data.FeedRepositoryImpl
-import com.quizzgame.feature.feed.tv.domain.LoadFeedUseCase
-import com.quizzgame.feature.feed.tv.domain.LoadRailItemsUseCase
-import com.quizzgame.feature.feed.tv.domain.entity.CursorPageInfo
-import com.quizzgame.feature.feed.tv.domain.entity.Feed
-import com.quizzgame.feature.feed.tv.domain.entity.FeedResult
-import com.quizzgame.feature.feed.tv.domain.entity.RailItems
 import com.quizzgame.feature.feed.tv.presentation.TvFeedIntent
 import com.quizzgame.feature.feed.tv.presentation.TvFeedViewModel
 import com.quizzgame.feature.feed.tv.ui.content.TvPagedFeedContent
 import com.quizzgame.feature.feed.tv.ui.paging.TvFeedPagingEffects
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
+import com.quizzgame.shared.catalog.domain.entity.CursorPageInfo
+import com.quizzgame.shared.feed.data.FeedRemoteDataSource
+import com.quizzgame.shared.feed.data.FeedRepositoryImpl
+import com.quizzgame.shared.feed.domain.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
+import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedResult
+import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.RailItems
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -51,7 +52,9 @@ class TvFeedPagingIntegrationTest {
     @Test
     fun delayedAppendKeepsFocusAndAppendedCardOpensItsEntryId() {
         val preview = TvFeedPreviewProvider().values.filterIsInstance<TvFeedPreviewState.Content>().first().value
-        val seed = preview.rails.first().copy(itemsPage = CursorPageInfo(true, "after-preview"))
+        val seed = preview.sections.filterIsInstance<QuizRail>().first().copy(
+            itemsPage = CursorPageInfo(true, "after-preview"),
+        )
         val appended = seed.cards.first().copy(id = "appended-snippet", entryId = "appended-entry")
         val gate = CompletableDeferred<RailItems>()
         val repository = object : FeedRemoteDataSource {
@@ -74,7 +77,8 @@ class TvFeedPagingIntegrationTest {
     @Test
     fun failedRailAppendKeepsCardsAndCanRetryWithDpad() {
         val seed = TvFeedPreviewProvider()
-            .values.filterIsInstance<TvFeedPreviewState.Content>().first().value.rails.first()
+            .values.filterIsInstance<TvFeedPreviewState.Content>().first()
+            .value.sections.filterIsInstance<QuizRail>().first()
             .copy(itemsPage = CursorPageInfo(true, "after-preview"))
         val appended = seed.cards.first().copy(id = "retried-snippet", entryId = "retried-entry")
         var calls = 0
@@ -126,16 +130,16 @@ class TvFeedPagingIntegrationTest {
         }
         val model = showFeed(remote)
         val screen = FeedPagingScreen(compose)
-        screen.card(seed.rails.first().cards.first().id).assertIsDisplayed()
+        screen.card(seed.sections.filterIsInstance<QuizRail>().first().cards.first().id).assertIsDisplayed()
         compose.runOnIdle {
             assertEquals(1, calls)
             model.onIntent(TvFeedIntent.Refresh)
         }
         compose.runOnIdle { assertEquals(2, calls) }
-        screen.card(seed.rails.first().cards.first().id).assertIsDisplayed()
+        screen.card(seed.sections.filterIsInstance<QuizRail>().first().cards.first().id).assertIsDisplayed()
         compose.runOnIdle { model.onIntent(TvFeedIntent.Retry) }
         compose.runOnIdle { assertEquals(3, calls) }
-        screen.card(seed.rails.first().cards.first().id).assertIsDisplayed()
+        screen.card(seed.sections.filterIsInstance<QuizRail>().first().cards.first().id).assertIsDisplayed()
     }
 
     private fun showFeed(remote: FeedRemoteDataSource): TvFeedViewModel {

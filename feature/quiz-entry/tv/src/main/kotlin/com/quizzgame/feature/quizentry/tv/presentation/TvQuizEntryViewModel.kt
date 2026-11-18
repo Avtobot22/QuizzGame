@@ -7,8 +7,8 @@ import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.feature.quizentry.tv.domain.LoadQuizEntryUseCase
-import com.quizzgame.feature.quizentry.tv.domain.entity.QuizEntryResult
+import com.quizzgame.shared.quizentry.domain.LoadQuizEntryUseCase
+import com.quizzgame.shared.quizentry.domain.entity.QuizEntryResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

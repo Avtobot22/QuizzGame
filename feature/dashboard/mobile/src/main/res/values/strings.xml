@@ -1,0 +1,12 @@
+<resources>
+    <string name="account_library">Моё</string>
+    <string name="account_profile">Профиль</string>
+    <string name="library_guest">Войдите, чтобы видеть свои викторины.</string>
+    <string name="profile_guest">Вы играете как гость. Можно войти в свой аккаунт.</string>
+    <string name="account_sign_in">Войти</string>
+    <string name="account_logout">Выйти</string>
+    <string name="account_signed_in">Ваш аккаунт</string>
+    <string name="library_pending">Личная библиотека ещё в разработке.</string>
+    <string name="account_unavailable">Не удалось проверить состояние аккаунта.</string>
+    <string name="account_retry">Повторить</string>
+</resources>

@@ -1,0 +1,52 @@
+{
+  "id": "f8b2d4ab-e5f0-4057-a998-6ebec7692e41",
+  "tabs": [
+    {
+      "id": "play",
+      "title": "Играть",
+      "enabled": true,
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.play"
+      }
+    },
+    {
+      "id": "explore",
+      "title": "Каталог",
+      "enabled": true,
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.explore"
+      }
+    },
+    {
+      "id": "library",
+      "title": "Моё",
+      "enabled": true,
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.library"
+      }
+    },
+    {
+      "id": "profile",
+      "title": "Профиль",
+      "enabled": true,
+      "icon": {
+        "kind": "icon",
+        "name": "navigation.profile"
+      }
+    }
+  ],
+  "navigationAppearance": {
+    "background": "solid",
+    "selectedColor": {
+      "kind": "token",
+      "name": "accent.primary"
+    },
+    "unselectedColor": {
+      "kind": "token",
+      "name": "text.secondary"
+    }
+  }
+}

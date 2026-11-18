@@ -17,7 +17,7 @@ object MobileSplashEntries : FeatureEntries<MobileSplashCallbacks> {
         scope.entry<MobileSplashRoute> {
             val activity = LocalActivity.current
             MobileSplashScreen(
-                onJoinRoom = { context.value.onContinue() },
+                onContinue = { context.value.onContinue() },
                 onSignIn = { context.value.onSignIn() },
                 onExit = { activity?.finish() },
                 modifier = Modifier.testTag(MobileSplashTags.ROOT),

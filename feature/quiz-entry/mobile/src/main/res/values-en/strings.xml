@@ -1,0 +1,17 @@
+<resources>
+    <string name="entry_title">About this quiz</string>
+    <string name="entry_loading">Loading quiz…</string>
+    <string name="entry_connect">Connect to TV</string>
+    <string name="entry_unavailable">This quiz is currently unavailable.</string>
+    <plurals name="entry_questions">
+        <item quantity="one">%d question</item>
+        <item quantity="other">%d questions</item>
+    </plurals>
+    <plurals name="entry_minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+    <string name="entry_bookmarked">Bookmarked</string>
+    <string name="entry_in_progress">In progress</string>
+    <string name="entry_completed">Quiz completed</string>
+</resources>
