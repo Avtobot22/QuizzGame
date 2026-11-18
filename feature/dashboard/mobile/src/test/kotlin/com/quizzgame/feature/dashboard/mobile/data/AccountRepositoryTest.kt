@@ -1,11 +1,11 @@
 package com.quizzgame.feature.dashboard.mobile.data
 
+import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.feature.dashboard.mobile.domain.entity.Account
 import com.quizzgame.shared.splash.domain.ReadAccountUseCase
 import com.quizzgame.shared.splash.domain.SplashRepository
-import com.quizzgame.core.error.failure.AppFailure
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test

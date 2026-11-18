@@ -42,7 +42,10 @@ internal fun MobileAccountContent(
                 Account.Loading -> QuizzAccountSkeleton(title)
                 Account.Guest -> {
                     Text(stringResource(if (library) R.string.library_guest else R.string.profile_guest))
-                    QuizzButton(onSignIn) { Text(stringResource(R.string.account_sign_in)) }
+                    QuizzButton(
+                        onSignIn,
+                        Modifier.testTag(MobileAccountTags.SIGN_IN),
+                    ) { Text(stringResource(R.string.account_sign_in)) }
                 }
                 is Account.SignedIn -> {
                     Text(
@@ -58,7 +61,10 @@ internal fun MobileAccountContent(
                                 Text(stringResource(R.string.account_retry))
                             }
                         }
-                        QuizzButton(onLogout) { Text(stringResource(R.string.account_logout)) }
+                        QuizzButton(
+                            onLogout,
+                            Modifier.testTag(MobileAccountTags.SIGN_OUT),
+                        ) { Text(stringResource(R.string.account_logout)) }
                     }
                 }
                 Account.Unavailable -> {

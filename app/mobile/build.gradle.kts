@@ -9,7 +9,11 @@ plugins {
 
 android {
     namespace = "com.quizzgame.mobile"
-    defaultConfig { applicationId = "com.quizzgame.mobile" }
+    defaultConfig {
+        applicationId = "com.quizzgame.mobile"
+        manifestPlaceholders["yandexLinkHost"] =
+            providers.gradleProperty("quizz.auth.yandexLinkHost").orElse("disabled.invalid").get()
+    }
 }
 
 quizzNetwork {
@@ -30,6 +34,7 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.mobile)
+    implementation(projects.feature.auth.mobile)
     implementation(projects.shared.catalog)
     implementation(projects.feature.dashboard.mobile)
     implementation(projects.feature.play.mobile)

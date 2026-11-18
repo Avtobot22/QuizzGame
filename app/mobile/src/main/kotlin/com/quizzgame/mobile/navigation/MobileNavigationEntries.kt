@@ -1,15 +1,13 @@
 package com.quizzgame.mobile.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.State
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
+import com.quizzgame.app.navigation.AuthReturnTarget
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
-import com.quizzgame.core.navigation.routes.common.SignInRoute
+import com.quizzgame.feature.auth.mobile.navigation.MobileSignInCallbacks
+import com.quizzgame.feature.auth.mobile.navigation.MobileSignInEntries
 import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountCallbacks
 import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountEntries
 import com.quizzgame.feature.feed.mobile.navigation.MobileFeedCallbacks
@@ -19,7 +17,6 @@ import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryCallback
 import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryEntries
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashCallbacks
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashEntries
-import com.quizzgame.mobile.ui.tags.MobileNavigationTags
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,6 +28,9 @@ internal data class MobileNavigationContext(
     val onSignIn: () -> Boolean,
     val onRestartSplash: () -> Boolean,
     val onLogout: () -> Unit,
+    val onCancelAuth: () -> Unit = {},
+    val authRecovery: Boolean = false,
+    val onAuthFor: (AuthReturnTarget) -> Boolean = { onSignIn() },
     val onOpenEntry: (String) -> Boolean = { false },
     val onPlay: () -> Boolean = { false },
     val onBack: () -> Unit = {},
@@ -40,11 +40,9 @@ internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<Mobi
     MobileSplashEntries.withContext<MobileNavigationContext, MobileSplashCallbacks> {
         MobileSplashCallbacks(it.onContentReady, it.onSignIn)
     }.register(this, context)
-    entry<SignInRoute> {
-        Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.SIGN_IN)) {
-            MobileSignInDestination()
-        }
-    }
+    MobileSignInEntries.withContext<MobileNavigationContext, MobileSignInCallbacks> {
+        MobileSignInCallbacks(it.onCancelAuth, it.authRecovery)
+    }.register(this, context)
 }
 
 internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<MobileNavigationContext>) {
@@ -53,10 +51,10 @@ internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<Mobi
         MobileFeedCallbacks(it.onOpenEntry, { it.onSignIn() })
     }.register(this, context)
     MobileQuizEntryEntries.withContext<MobileNavigationContext, MobileQuizEntryCallbacks> {
-        MobileQuizEntryCallbacks(it.onBack, it.onPlay, { it.onSignIn() })
+        MobileQuizEntryCallbacks(it.onBack, it.onPlay, { id -> it.onAuthFor(AuthReturnTarget.QuizEntry(id)) })
     }.register(this, context)
     MobileAccountEntries.withContext<MobileNavigationContext, MobileAccountCallbacks> {
-        MobileAccountCallbacks({ it.onSignIn() }, it.onLogout)
+        MobileAccountCallbacks({ it.onAuthFor(AuthReturnTarget.Profile) }, it.onLogout)
     }.register(this, context)
 }
 
