@@ -10,7 +10,9 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.unit.dp
+import com.quizzgame.core.ui.LocalQuizzCatalogColors
 import com.quizzgame.core.ui.LocalQuizzGameColors
+import com.quizzgame.core.ui.QuizzCatalogPalettes
 import com.quizzgame.core.ui.QuizzGameColors
 import com.quizzgame.core.ui.tokens.QuizzShape
 import com.quizzgame.core.ui.tokens.QuizzTypography
@@ -180,6 +182,7 @@ private val MobileShapes = Shapes(
 @Composable
 fun QuizzMobileTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
     CompositionLocalProvider(
+        LocalQuizzCatalogColors provides if (darkTheme) QuizzCatalogPalettes.Dark else QuizzCatalogPalettes.Light,
         LocalQuizzGameColors provides if (darkTheme) MobileDarkGameColors else MobileLightGameColors,
     ) {
         MaterialTheme(

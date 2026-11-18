@@ -1,4 +1,4 @@
-package com.quizzgame.core.designsystem.tv.media
+package com.quizzgame.core.media.android
 
 import android.content.Context
 import coil3.ImageLoader
@@ -15,7 +15,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /** Настройка принадлежит окружению приложения; пустой список запрещает сетевые изображения. */
-class TvMediaLoader(
+class CatalogMediaLoader(
     context: Context,
     allowedHosts: Set<String>,
     private val dispatchers: DispatcherProvider,
@@ -43,7 +43,7 @@ class TvMediaLoader(
         }
     }
 
-    internal val loader: ImageLoader = ImageLoader.Builder(context.applicationContext)
+    val loader: ImageLoader = ImageLoader.Builder(context.applicationContext)
         .components { add(OkHttpNetworkFetcherFactory(callFactory = { isolatedImageClient(hosts) })) }
         .build()
 }

@@ -33,18 +33,7 @@ internal fun ErrorCopy(model: ErrorUiModel, heading: Boolean = false) {
             style = if (heading) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium,
             textAlign = if (heading) TextAlign.Center else TextAlign.Start,
         )
-        val message = model.message ?: if (heading) {
-            stringResource(
-                when (model.icon) {
-                    QuizzStatusIcon.NETWORK -> UiR.string.quizz_status_network_help
-                    QuizzStatusIcon.SERVER -> UiR.string.quizz_status_server_help
-                    QuizzStatusIcon.AUTH -> UiR.string.quizz_status_auth_help
-                    else -> UiR.string.quizz_status_generic_help
-                },
-            )
-        } else {
-            null
-        }
+        val message = model.message ?: if (heading) errorSupportingMessage(model) else null
         message?.let {
             Text(
                 it,
@@ -80,3 +69,13 @@ internal fun ErrorActions(
         }
     }
 }
+
+@Composable
+internal fun errorSupportingMessage(model: ErrorUiModel): String = model.message ?: stringResource(
+    when (model.icon) {
+        QuizzStatusIcon.NETWORK -> UiR.string.quizz_status_network_help
+        QuizzStatusIcon.SERVER -> UiR.string.quizz_status_server_help
+        QuizzStatusIcon.AUTH -> UiR.string.quizz_status_auth_help
+        else -> UiR.string.quizz_status_generic_help
+    },
+)

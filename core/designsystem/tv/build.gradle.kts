@@ -7,6 +7,7 @@ android {
 }
 
 dependencies {
+    api(projects.core.media.android)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(projects.core.coroutines)
     api(projects.core.media)

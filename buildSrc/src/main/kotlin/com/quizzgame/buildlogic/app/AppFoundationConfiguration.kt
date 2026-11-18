@@ -14,6 +14,7 @@ fun Project.configureAppFoundation(platform: String) {
         failNetworkOnce.convention(false)
     }
     val baseUrl = deploymentBaseUrl(platform)
+    val imageHosts = providers.gradleProperty("quizz.catalog.imageHosts").orElse("")
     val mode = providers.gradleProperty("quizz.$platform.debugNetworkMode")
         .map { DebugNetworkMode.valueOf(it) }.orElse(debug.networkMode)
     val scenario = providers.gradleProperty("quizz.$platform.debugSessionScenario")
@@ -26,7 +27,7 @@ fun Project.configureAppFoundation(platform: String) {
     }
     extensions.configure<ApplicationAndroidComponentsExtension> {
         finalizeDsl { android ->
-            android.configureNetwork(network, baseUrl.get())
+            android.configureNetwork(network, baseUrl.get(), imageHosts.get())
             android.buildTypes.getByName("debug") {
                 buildConfigField("String", "NETWORK_MODE", mode.get().name.javaString())
                 buildConfigField("String", "DEBUG_SESSION_SCENARIO", scenario.get().name.javaString())
@@ -37,9 +38,11 @@ fun Project.configureAppFoundation(platform: String) {
     }
 }
 
-private fun ApplicationExtension.configureNetwork(network: NetworkBuildSettings, baseUrl: String) {
+private fun ApplicationExtension.configureNetwork(network: NetworkBuildSettings, baseUrl: String, imageHosts: String) {
+    require(imageHosts.matches(Regex("[A-Za-z0-9.,-]*")))
     defaultConfig {
         buildConfigField("String", "API_BASE_URL", baseUrl.javaString())
+        buildConfigField("String", "CATALOG_IMAGE_HOSTS", imageHosts.javaString())
         buildConfigField("String", "CLIENT_PLATFORM", network.clientPlatform.get().headerValue("clientPlatform"))
         buildConfigField("String", "USER_AGENT", network.userAgent.get().headerValue("userAgent"))
         buildConfigField("int", "CONNECT_TIMEOUT_MS", network.connectTimeoutMs.get().positive("connectTimeoutMs"))

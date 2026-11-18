@@ -1,4 +1,4 @@
-package com.quizzgame.core.designsystem.tv.media
+package com.quizzgame.core.media.android
 
 import android.graphics.BitmapFactory
 import android.util.Base64

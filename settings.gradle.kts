@@ -35,6 +35,7 @@ include(":app:debug-support")
 
 include(":core:ui")
 include(":core:media")
+include(":core:media:android")
 include(":core:coroutines")
 include(":core:designsystem:mobile")
 include(":core:designsystem:tv")

@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
+import com.quizzgame.core.designsystem.tv.media.quizzTvCompactBadgeHeight
 import com.quizzgame.core.ui.QuizzSkeleton
 import com.quizzgame.core.ui.quizzSkeleton
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
@@ -93,6 +94,7 @@ fun QuizzTvSkeletonCard(modifier: Modifier = Modifier) {
     ) {
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).quizzSkeleton(MaterialTheme.shapes.medium))
         Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Box(Modifier.width(68.dp).height(quizzTvCompactBadgeHeight()).quizzSkeleton())
             Column(Modifier.height(48.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Box(Modifier.fillMaxWidth(0.85f).height(20.dp).quizzSkeleton())
                 Box(Modifier.fillMaxWidth(0.6f).height(20.dp).quizzSkeleton())

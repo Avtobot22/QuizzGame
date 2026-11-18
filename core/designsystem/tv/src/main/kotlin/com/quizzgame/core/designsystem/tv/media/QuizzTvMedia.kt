@@ -24,10 +24,12 @@ import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.quizzgame.core.media.MediaSpec
+import com.quizzgame.core.media.android.CatalogMediaLoader
+import com.quizzgame.core.ui.LocalQuizzCatalogColors
 import com.quizzgame.core.ui.QuizzSceneIllustration
 import com.quizzgame.core.ui.R as UiR
 
-val LocalTvMediaLoader = staticCompositionLocalOf<TvMediaLoader> {
+val LocalTvMediaLoader = staticCompositionLocalOf<CatalogMediaLoader> {
     error("Image loader must be provided by the application")
 }
 
@@ -59,7 +61,8 @@ fun QuizzTvMedia(
         return
     }
     val colors = MaterialTheme.colorScheme
-    val brush = placeholderBrush ?: androidx.compose.ui.graphics.SolidColor(colors.surfaceVariant.copy(alpha = 0.35f))
+    val catalogColors = LocalQuizzCatalogColors.current
+    val brush = placeholderBrush ?: Brush.linearGradient(listOf(catalogColors.artworkStart, catalogColors.artworkEnd))
     BoxWithConstraints(
         modifier.background(brush),
         contentAlignment = Alignment.Center,

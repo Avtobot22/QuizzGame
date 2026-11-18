@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.quizzgame.core.ui.R
-import com.quizzgame.core.ui.status.QuizzStatusDimensions
 
 /**
  * Подтверждение произвольного действия. Confirm или Cancel доставляются один раз за показ.
@@ -53,17 +52,19 @@ fun QuizzConfirmationDialog(
     }
     Dialog(
         onDismissRequest = dismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = true),
+        properties = DialogProperties(usePlatformDefaultWidth = false),
     ) {
         val colors = MaterialTheme.colorScheme
         Surface(
-            modifier = modifier.widthIn(max = QuizzStatusDimensions.mobileWidth.dp).fillMaxWidth(),
+            modifier = Modifier.padding(
+                horizontal = 28.dp,
+            ).widthIn(max = QuizzMobileLayout.dialogWidth).fillMaxWidth().then(modifier),
             shape = MaterialTheme.shapes.extraLarge,
-            color = colors.surface,
+            color = colors.surfaceContainerHigh,
             contentColor = colors.onSurface,
         ) {
             Column(
-                modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
+                modifier = Modifier.padding(24.dp).verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Text(title, style = MaterialTheme.typography.headlineSmall)

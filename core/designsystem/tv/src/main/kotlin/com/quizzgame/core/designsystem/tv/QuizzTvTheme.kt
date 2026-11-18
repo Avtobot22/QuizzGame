@@ -8,7 +8,9 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Shapes
 import androidx.tv.material3.Typography
 import androidx.tv.material3.darkColorScheme
+import com.quizzgame.core.ui.LocalQuizzCatalogColors
 import com.quizzgame.core.ui.LocalQuizzGameColors
+import com.quizzgame.core.ui.QuizzCatalogPalettes
 import com.quizzgame.core.ui.QuizzGameColors
 import com.quizzgame.core.ui.tokens.QuizzShape
 import com.quizzgame.core.ui.tokens.QuizzTvTypography
@@ -90,7 +92,10 @@ private val TvShapes = Shapes(
 
 @Composable
 fun QuizzTvTheme(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalQuizzGameColors provides TvDarkGameColors) {
+    CompositionLocalProvider(
+        LocalQuizzGameColors provides TvDarkGameColors,
+        LocalQuizzCatalogColors provides QuizzCatalogPalettes.Dark,
+    ) {
         MaterialTheme(colorScheme = TvDarkColors, typography = TvTypography, shapes = TvShapes, content = content)
     }
 }

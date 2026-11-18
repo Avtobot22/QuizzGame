@@ -1,4 +1,4 @@
-package com.quizzgame.core.designsystem.tv.media
+package com.quizzgame.core.media.android
 
 import com.quizzgame.core.media.MediaSpec
 import org.junit.Assert.assertNotNull
