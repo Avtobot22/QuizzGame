@@ -1,0 +1,21 @@
+<resources>
+    <string name="entry_title">О викторине</string>
+    <string name="entry_loading">Загружаем викторину…</string>
+    <string name="entry_connect">Подключиться к ТВ</string>
+    <string name="entry_unavailable">Эта викторина сейчас недоступна.</string>
+    <plurals name="entry_questions">
+        <item quantity="one">%d вопрос</item>
+        <item quantity="few">%d вопроса</item>
+        <item quantity="many">%d вопросов</item>
+        <item quantity="other">%d вопроса</item>
+    </plurals>
+    <plurals name="entry_minutes">
+        <item quantity="one">%d минута</item>
+        <item quantity="few">%d минуты</item>
+        <item quantity="many">%d минут</item>
+        <item quantity="other">%d минуты</item>
+    </plurals>
+    <string name="entry_bookmarked">В избранном</string>
+    <string name="entry_in_progress">В процессе</string>
+    <string name="entry_completed">Викторина пройдена</string>
+</resources>

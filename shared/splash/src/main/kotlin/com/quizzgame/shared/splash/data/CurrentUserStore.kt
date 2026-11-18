@@ -2,12 +2,13 @@ package com.quizzgame.shared.splash.data
 
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
+import com.quizzgame.shared.splash.domain.CurrentUserReader
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-internal class CurrentUserStore @Inject constructor(private val session: SessionStateReader) {
+internal class CurrentUserStore @Inject constructor(private val session: SessionStateReader) : CurrentUserReader {
 
     @Volatile
     private var record: Pair<Long, CurrentUser>? = null
@@ -18,7 +19,7 @@ internal class CurrentUserStore @Inject constructor(private val session: Session
         return true
     }
 
-    suspend fun current(): CurrentUser? {
+    override suspend fun current(): CurrentUser? {
         val saved = record ?: return null
         if (session.current() == SessionState.Authenticated(saved.first)) return saved.second
         record = null

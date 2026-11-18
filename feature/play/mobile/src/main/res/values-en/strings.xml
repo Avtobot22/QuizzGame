@@ -1,0 +1,12 @@
+<resources>
+    <string name="play_title">Play</string>
+    <string name="play_heading">Join a game</string>
+    <string name="play_description">Enter the code shown on the TV or scan its QR code.</string>
+    <string name="play_code">Room code</string>
+    <string name="play_connect">Connect</string>
+    <string name="play_scan">Scan QR</string>
+    <string name="play_pending">Code entry and QR scanning are still in development. You can explore quizzes in the catalog for now.</string>
+    <string name="play_not_connected">Room connections are coming soon</string>
+    <string name="play_close">Got it</string>
+    <string name="play_or">or</string>
+</resources>

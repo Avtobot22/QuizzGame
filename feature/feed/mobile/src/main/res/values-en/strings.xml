@@ -1,0 +1,15 @@
+<resources>
+    <string name="feed_title">Explore</string>
+    <string name="feed_loading">Loading quizzes…</string>
+    <string name="feed_refresh">Refresh</string>
+    <string name="feed_empty">Your next quiz starts here</string>
+    <string name="feed_bookmarked">Bookmarked</string>
+    <string name="feed_in_progress">In progress</string>
+    <string name="feed_completed">Completed</string>
+    <string name="feed_tv_label">Play on TV</string>
+    <string name="feed_featured">Featured</string>
+    <string name="feed_empty_description">The catalog is empty for now. Check back later or refresh the page.</string>
+    <string name="feed_refreshing">Refreshing catalog</string>
+    <string name="feed_release_refresh">Release to refresh</string>
+    <string name="feed_pull_refresh">Pull to refresh</string>
+</resources>

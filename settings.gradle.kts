@@ -59,6 +59,10 @@ include(":feature:splash:mobile")
 include(":feature:dashboard:tv")
 include(":feature:feed:tv")
 include(":feature:quiz-entry:tv")
+include(":feature:dashboard:mobile")
+include(":feature:play:mobile")
+include(":feature:feed:mobile")
+include(":feature:quiz-entry:mobile")
 
 val mockSdkDirectory = file("external/android-mock-server")
 check(mockSdkDirectory.resolve("settings.gradle.kts").isFile) {
