@@ -4,7 +4,7 @@ import com.quizzgame.feature.dashboard.tv.domain.entity.DashboardTabId
 
 object TvDashboardTags {
     const val NAVIGATION = "dashboard:navigation"
-    const val SIGN_OUT = "dashboard:sign-out"
+    const val PROFILE = "dashboard:profile"
     fun tab(id: DashboardTabId): String = "dashboard:tab:${id.name.lowercase()}"
     const val CONTENT = "dashboard:content"
     const val LOADING = "dashboard:loading"

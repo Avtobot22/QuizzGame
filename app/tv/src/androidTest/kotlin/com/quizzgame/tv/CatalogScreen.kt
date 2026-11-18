@@ -12,7 +12,7 @@ internal class CatalogScreen(provider: SemanticsNodeInteractionsProvider) : Comp
     val feedTab = KNode(provider) { hasTestTag(TvDashboardTags.tab(DashboardTabId.FEED)) }
     val libraryTab = KNode(provider) { hasTestTag(TvDashboardTags.tab(DashboardTabId.LIBRARY)) }
     val settingsTab = KNode(provider) { hasTestTag(TvDashboardTags.tab(DashboardTabId.SETTINGS)) }
-    val signOut = KNode(provider) { hasTestTag(TvDashboardTags.SIGN_OUT) }
+    val profile = KNode(provider) { hasTestTag(TvDashboardTags.PROFILE) }
     val firstCard = KNode(provider) { hasTestTag(TvFeedTags.card(FIRST_CARD_ID)) }
     val details = KNode(provider) { hasTestTag(TvQuizEntryTags.CONTENT) }
     val bar = KNode(provider) { hasTestTag(TvDashboardTags.NAVIGATION) }

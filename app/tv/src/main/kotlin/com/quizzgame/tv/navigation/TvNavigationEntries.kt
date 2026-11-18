@@ -10,6 +10,8 @@ import androidx.navigation3.runtime.NavKey
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
 import com.quizzgame.core.navigation.routes.common.SignInRoute
+import com.quizzgame.feature.account.tv.navigation.TvProfileRoute
+import com.quizzgame.feature.account.tv.ui.TvProfileScreen
 import com.quizzgame.feature.splash.tv.navigation.TvSplashCallbacks
 import com.quizzgame.feature.splash.tv.navigation.TvSplashEntries
 import com.quizzgame.tv.navigation.routes.DashboardRoute
@@ -25,6 +27,8 @@ internal data class TvNavigationContext(
     val onSignIn: () -> Boolean,
     val onRestartSplash: () -> Boolean,
     val onLogout: () -> Unit,
+    val onProfile: () -> Unit = {},
+    val onSettings: () -> Unit = {},
 )
 
 internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNavigationContext>) {
@@ -39,10 +43,13 @@ internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNaviga
 }
 
 internal fun EntryProviderScope<NavKey>.tvContentEntries(context: State<TvNavigationContext>) {
+    entry<TvProfileRoute> {
+        TvProfileScreen({ context.value.onSignIn() }, context.value.onLogout, context.value.onSettings)
+    }
     entry<DashboardRoute> {
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.DASHBOARD)) {
-            TvCatalogDashboard(current.onLogout, current.onSignIn)
+            TvCatalogDashboard(current.onProfile, current.onSignIn)
         }
     }
 }

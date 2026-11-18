@@ -14,7 +14,7 @@ internal fun TvDashboardStateContent(
     state: TvDashboardState,
     onIntent: (TvDashboardIntent) -> Unit,
     graphs: Set<FeatureEntries<DashboardContext>>,
-    onLogout: () -> Unit,
+    onProfile: () -> Unit,
     onSignIn: () -> Unit,
 ) {
     when (val current = state) {
@@ -25,6 +25,6 @@ internal fun TvDashboardStateContent(
             { onIntent(TvDashboardIntent.Retry) },
             onSignIn,
         )
-        is TvDashboardState.Content -> TvDashboardContent(current.value, graphs, onLogout)
+        is TvDashboardState.Content -> TvDashboardContent(current.value, graphs, onProfile)
     }
 }

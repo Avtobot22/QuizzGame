@@ -17,7 +17,7 @@ import com.quizzgame.feature.quizentry.tv.ui.TvQuizEntryScreen
 import com.quizzgame.tv.R
 
 @Composable
-internal fun TvCatalogDashboard(onLogout: () -> Unit, onSignIn: () -> Boolean = { false }) {
+internal fun TvCatalogDashboard(onProfile: () -> Unit, onSignIn: () -> Boolean = { false }) {
     val graphs = remember(onSignIn) {
         setOf(
             FeatureEntries<DashboardContext> { scope, current ->
@@ -44,5 +44,5 @@ internal fun TvCatalogDashboard(onLogout: () -> Unit, onSignIn: () -> Boolean = 
             },
         )
     }
-    TvDashboardScreen(onLogout, graphs, onSignIn = { onSignIn() })
+    TvDashboardScreen(onProfile, graphs, onSignIn = { onSignIn() })
 }

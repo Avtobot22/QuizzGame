@@ -23,7 +23,6 @@ import androidx.tv.material3.MaterialTheme
 import com.quizzgame.core.designsystem.tv.QuizzTvActionLabel
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
-import com.quizzgame.core.designsystem.tv.QuizzTvButtonTone
 import com.quizzgame.core.designsystem.tv.QuizzTvNavigationBar
 import com.quizzgame.core.designsystem.tv.media.QuizzTvBadge
 import com.quizzgame.core.designsystem.tv.media.QuizzTvMedia
@@ -44,7 +43,7 @@ internal fun TvDashboardBar(
     selected: DashboardTabId,
     focus: FocusRequester,
     requestFocus: Boolean,
-    onLogout: () -> Unit,
+    onProfile: () -> Unit,
     onSelect: (DashboardTabId) -> Unit,
     onBarFocus: () -> Unit,
 ) {
@@ -70,13 +69,12 @@ internal fun TvDashboardBar(
         label = { id -> TvDashboardTabLabel(dashboard.tabs.first { it.id == id }) },
         trailingContent = {
             QuizzTvButton(
-                onLogout,
-                Modifier.width(QuizzTvLayout.navigationActionWidth.dp).testTag(TvDashboardTags.SIGN_OUT),
+                onProfile,
+                Modifier.width(QuizzTvLayout.navigationActionWidth.dp).testTag(TvDashboardTags.PROFILE),
                 style = QuizzTvButtonStyle.QUIET,
-                tone = QuizzTvButtonTone.DANGER,
             ) {
-                Icon(painterResource(UiR.drawable.ic_quizz_logout), null, Modifier.size(18.dp))
-                QuizzTvActionLabel(stringResource(R.string.dashboard_logout), Modifier.padding(start = 8.dp))
+                Icon(painterResource(UiR.drawable.ic_quizz_profile), null, Modifier.size(18.dp))
+                QuizzTvActionLabel(stringResource(R.string.dashboard_profile), Modifier.padding(start = 8.dp))
             }
         },
     )

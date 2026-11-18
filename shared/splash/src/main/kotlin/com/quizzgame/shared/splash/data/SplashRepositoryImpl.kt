@@ -4,6 +4,7 @@ import com.quizzgame.core.error.classification.DefaultErrorClassifier
 import com.quizzgame.core.error.classification.classifyApiUnavailable
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.StorageKind
+import com.quizzgame.core.flags.AppFeatureFlags
 import com.quizzgame.core.flags.FeatureFlagsController
 import com.quizzgame.core.flags.FeatureFlagsLoadFailure
 import com.quizzgame.core.flags.FeatureFlagsLoadResult
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 internal class SplashRepositoryImpl @Inject constructor(
     private val remote: SplashRemoteDataSource,
+    private val flags: AppFeatureFlags,
     private val controller: FeatureFlagsController,
     private val session: SessionStateReader,
     private val users: CurrentUserStore,
@@ -41,6 +43,8 @@ internal class SplashRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun guestAllowed(): Boolean = flags.guestAllowed()
 
     override fun clearUser() {
         users.clear()

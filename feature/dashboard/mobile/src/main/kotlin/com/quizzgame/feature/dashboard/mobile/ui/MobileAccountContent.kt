@@ -52,6 +52,12 @@ internal fun MobileAccountContent(
                     if (library) {
                         Text(stringResource(R.string.library_pending))
                     } else {
+                        if (current.profileUnavailable) {
+                            Text(stringResource(R.string.account_unavailable))
+                            QuizzButton({ onIntent(MobileAccountIntent.RETRY) }) {
+                                Text(stringResource(R.string.account_retry))
+                            }
+                        }
                         QuizzButton(onLogout) { Text(stringResource(R.string.account_logout)) }
                     }
                 }

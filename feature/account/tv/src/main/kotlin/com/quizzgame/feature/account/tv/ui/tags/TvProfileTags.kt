@@ -1,0 +1,8 @@
+package com.quizzgame.feature.account.tv.ui.tags
+
+
+object TvProfileTags {
+    const val SCREEN = "tv-profile"
+    const val SIGN_IN = "tv-profile:sign-in"
+    const val SIGN_OUT = "tv-profile:sign-out"
+}

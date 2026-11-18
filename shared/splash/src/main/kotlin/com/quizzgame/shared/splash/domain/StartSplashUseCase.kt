@@ -35,7 +35,7 @@ class StartSplashUseCase @Inject constructor(
 
     private fun finishGuestStartup(): SplashResult {
         repository.clearUser()
-        return SplashResult.Continue
+        return if (repository.guestAllowed()) SplashResult.Continue else SplashResult.SignIn
     }
 
     private suspend fun finishAuthenticatedStartup(generation: Long): SplashResult {

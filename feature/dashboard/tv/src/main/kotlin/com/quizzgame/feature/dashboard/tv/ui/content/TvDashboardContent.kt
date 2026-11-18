@@ -32,7 +32,7 @@ import com.quizzgame.feature.dashboard.tv.ui.navigation.TvDashboardBar
 internal fun TvDashboardContent(
     dashboard: Dashboard,
     graphs: Set<FeatureEntries<DashboardContext>>,
-    onLogout: () -> Unit,
+    onProfile: () -> Unit,
 ) {
     val primary = dashboard.tabs.first { it.enabled }
     val roots = dashboard.tabs.map { DashboardTabRoute(it.id) }
@@ -69,7 +69,7 @@ internal fun TvDashboardContent(
             selected.id,
             focus,
             visible && !contentFocused,
-            onLogout,
+            onProfile,
             onSelect = {
                 navigator.switchTopLevel(DashboardTabRoute(it))
                 contentFocused = true

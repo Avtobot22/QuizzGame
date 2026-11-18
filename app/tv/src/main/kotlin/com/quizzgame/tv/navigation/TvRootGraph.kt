@@ -11,6 +11,7 @@ import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.request.NavigationRequest
 import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.feature.account.tv.navigation.TvProfileRoute
 import com.quizzgame.feature.splash.tv.navigation.TvSplashRoute
 import com.quizzgame.tv.navigation.routes.DashboardRoute
 
@@ -31,7 +32,7 @@ internal fun TvRootGraph(
             TvSplashRoute,
             SignInRoute,
             policy = NavigationPolicy { destination ->
-                if (destination == DashboardRoute) {
+                if (destination == DashboardRoute || destination == TvProfileRoute) {
                     DestinationAccess.PUBLIC
                 } else {
                     policies.map { it.access(destination) }.filter { it != DestinationAccess.DENIED }
@@ -50,6 +51,8 @@ internal fun TvRootGraph(
                 onSignIn = { isCurrentGraph() && coordinator.requireSignIn() },
                 onRestartSplash = { isCurrentGraph() && coordinator.restartSplash() },
                 onLogout = onLogout,
+                onProfile = { coordinator.navigator.navigate(TvProfileRoute) },
+                onSettings = { coordinator.navigator.back() },
             )
         },
     )

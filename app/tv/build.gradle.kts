@@ -28,6 +28,7 @@ quizzDebug {
 dependencies {
     implementation(projects.core.designsystem.tv)
     implementation(projects.feature.dashboard.tv)
+    implementation(projects.feature.account.tv)
     implementation(projects.feature.feed.tv)
     implementation(projects.feature.quizEntry.tv)
     implementation(projects.app.foundation)

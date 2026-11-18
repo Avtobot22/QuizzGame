@@ -165,6 +165,7 @@ class SplashSessionHttpTest {
             SplashRepositoryImpl(
                 remote,
                 flags,
+                flags,
                 reader,
                 users,
             ),
