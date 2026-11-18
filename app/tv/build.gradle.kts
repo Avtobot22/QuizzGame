@@ -35,6 +35,7 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.tv)
+    implementation(projects.feature.auth.tv)
     implementation(projects.core.network)
     implementation(projects.core.session)
     implementation(projects.core.error.uiTv)

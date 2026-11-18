@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -41,12 +42,13 @@ import com.quizzgame.core.ui.R as UiR
 internal fun TvDashboardBar(
     dashboard: Dashboard,
     selected: DashboardTabId,
-    focus: FocusRequester,
     requestFocus: Boolean,
     onProfile: () -> Unit,
+    profileFocused: Boolean,
     onSelect: (DashboardTabId) -> Unit,
-    onBarFocus: () -> Unit,
+    onBarFocus: (Boolean) -> Unit,
 ) {
+    val focus = remember { FocusRequester() }
     val appearance = dashboard.appearance
     val background = appearance.backgroundColor.themeColor(MaterialTheme.colorScheme.background)
     QuizzTvNavigationBar(
@@ -63,14 +65,17 @@ internal fun TvDashboardBar(
         ).padding(horizontal = QuizzTvLayout.screenInset.dp, vertical = QuizzTvLayout.verticalInset.dp)
             .testTag(TvDashboardTags.NAVIGATION),
         itemModifier = { id ->
-            Modifier.testTag(TvDashboardTags.tab(id)).onFocusChanged { if (it.isFocused) onBarFocus() }
-                .then(if (id == selected) Modifier.focusRequester(focus) else Modifier)
+            Modifier.testTag(TvDashboardTags.tab(id)).onFocusChanged { if (it.isFocused) onBarFocus(false) }
+                .then(if (id == selected && !profileFocused) Modifier.focusRequester(focus) else Modifier)
         },
         label = { id -> TvDashboardTabLabel(dashboard.tabs.first { it.id == id }) },
         trailingContent = {
             QuizzTvButton(
                 onProfile,
-                Modifier.width(QuizzTvLayout.navigationActionWidth.dp).testTag(TvDashboardTags.PROFILE),
+                Modifier.width(QuizzTvLayout.navigationActionWidth.dp)
+                    .testTag(TvDashboardTags.PROFILE)
+                    .onFocusChanged { if (it.isFocused) onBarFocus(true) }
+                    .then(if (profileFocused) Modifier.focusRequester(focus) else Modifier),
                 style = QuizzTvButtonStyle.QUIET,
             ) {
                 Icon(painterResource(UiR.drawable.ic_quizz_profile), null, Modifier.size(18.dp))

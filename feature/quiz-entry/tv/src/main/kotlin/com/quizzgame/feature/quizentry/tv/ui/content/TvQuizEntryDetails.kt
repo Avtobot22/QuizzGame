@@ -32,7 +32,7 @@ import com.quizzgame.shared.catalog.domain.entity.QuizEntry
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun TvQuizEntryDetails(entry: QuizEntry) {
+internal fun TvQuizEntryDetails(entry: QuizEntry, onSignIn: (() -> Unit)?) {
     val colors = MaterialTheme.colorScheme
     Box(Modifier.heightIn(min = QuizzTvLayout.badgeHeight.dp)) {
         entry.badge?.let {
@@ -68,18 +68,24 @@ internal fun TvQuizEntryDetails(entry: QuizEntry) {
             EntryMetadata(UiR.drawable.ic_quizz_bookmark, stringResource(R.string.quiz_entry_bookmarked))
         }
     }
-    entry.actionTitle?.let { title ->
-        QuizzTvButton(
-            {},
-            Modifier.padding(top = 8.dp),
-            enabled = false,
-            style = QuizzTvButtonStyle.PRIMARY,
-        ) { QuizzTvActionLabel(title) }
-        Text(
-            stringResource(R.string.quiz_entry_launch_soon),
-            color = colors.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-        )
+    if (onSignIn != null) {
+        QuizzTvButton(onSignIn, Modifier.padding(top = 8.dp)) {
+            QuizzTvActionLabel(stringResource(R.string.quiz_entry_sign_in))
+        }
+    } else {
+        entry.actionTitle?.let { title ->
+            QuizzTvButton(
+                {},
+                Modifier.padding(top = 8.dp),
+                enabled = false,
+                style = QuizzTvButtonStyle.PRIMARY,
+            ) { QuizzTvActionLabel(title) }
+            Text(
+                stringResource(R.string.quiz_entry_launch_soon),
+                color = colors.onSurfaceVariant,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 

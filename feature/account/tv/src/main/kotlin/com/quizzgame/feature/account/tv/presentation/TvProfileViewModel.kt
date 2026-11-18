@@ -1,6 +1,5 @@
 package com.quizzgame.feature.account.tv.presentation
 
-
 import androidx.lifecycle.viewModelScope
 import com.quizzgame.core.presentation.BaseViewModel
 import com.quizzgame.shared.splash.domain.ReadAccountUseCase

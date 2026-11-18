@@ -11,9 +11,15 @@ import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryViewModel
 import com.quizzgame.feature.quizentry.tv.ui.content.TvQuizEntryStateContent
 
 @Composable
-fun TvQuizEntryScreen(entryId: String, onBack: () -> Unit, modifier: Modifier = Modifier, onSignIn: () -> Unit = {}) {
+fun TvQuizEntryScreen(
+    entryId: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier,
+    onSignIn: () -> Unit = {},
+    authenticated: Boolean = false,
+) {
     val viewModel: TvQuizEntryViewModel = hiltViewModel(key = entryId)
     val state by viewModel.state.collectAsStateWithLifecycle()
     LaunchedEffect(entryId) { viewModel.onIntent(TvQuizEntryIntent.Load(entryId)) }
-    TvQuizEntryStateContent(state, viewModel::onIntent, onBack, modifier, onSignIn)
+    TvQuizEntryStateContent(state, viewModel::onIntent, onBack, modifier, onSignIn, authenticated)
 }

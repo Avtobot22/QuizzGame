@@ -14,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import com.quizzgame.core.navigation.AppNavigator
 import com.quizzgame.core.navigation.chrome.MainNavigationHost
@@ -24,6 +23,7 @@ import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.rememberFeatureEntryProvider
 import com.quizzgame.core.navigation.rememberNavigationState
 import com.quizzgame.feature.dashboard.tv.domain.entity.Dashboard
+import com.quizzgame.feature.dashboard.tv.domain.entity.DashboardTabId
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardContext
 import com.quizzgame.feature.dashboard.tv.navigation.DashboardTabRoute
 import com.quizzgame.feature.dashboard.tv.ui.navigation.TvDashboardBar
@@ -40,7 +40,7 @@ internal fun TvDashboardContent(
     val navigator = remember(state) { AppNavigator(state) }
     val selected = state.snapshot.active as DashboardTabRoute
     var contentFocused by rememberSaveable { mutableStateOf(false) }
-    val focus = remember { FocusRequester() }
+    var profileFocused by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(dashboard.tabs, selected) {
         if (dashboard.tabs.none { it.id == selected.id && it.enabled }) {
             navigator.switchTopLevel(DashboardTabRoute(primary.id))
@@ -48,14 +48,7 @@ internal fun TvDashboardContent(
     }
     val provider = rememberFeatureEntryProvider(
         graphs,
-        DashboardContext(
-            contentFocused,
-            open = {
-                navigator.navigate(it)
-                true
-            },
-            back = { navigator.back() },
-        ),
+        dashboardContext(dashboard, navigator, contentFocused) { contentFocused = true },
     )
     MainNavigationHost(
         entries = state.decoratedEntries(provider),
@@ -67,17 +60,53 @@ internal fun TvDashboardContent(
         TvDashboardBar(
             dashboard,
             selected.id,
-            focus,
             visible && !contentFocused,
             onProfile,
+            profileFocused = profileFocused,
             onSelect = {
                 navigator.switchTopLevel(DashboardTabRoute(it))
                 contentFocused = true
             },
-            onBarFocus = { contentFocused = false },
+            onBarFocus = { isProfile ->
+                profileFocused = isProfile
+                contentFocused = false
+            },
         )
     }
     BackHandler(enabled = state.snapshot.activeEntries.size > 1 || contentFocused) {
         if (state.snapshot.activeEntries.size > 1) navigator.back() else contentFocused = false
     }
+}
+
+private fun dashboardContext(
+    dashboard: Dashboard,
+    navigator: AppNavigator,
+    contentFocused: Boolean,
+    onRequestFocus: () -> Unit,
+): DashboardContext {
+    val settings = DashboardTabRoute(DashboardTabId.SETTINGS)
+    val feed = DashboardTabRoute(DashboardTabId.FEED)
+    return DashboardContext(
+        contentFocused,
+        open = {
+            navigator.navigate(it)
+            true
+        },
+        back = { navigator.back() },
+        openInFeed = { destination ->
+            if (dashboard.tabs.any { it.id == feed.id && it.enabled }) {
+                if (navigator.state.snapshot.active != feed) navigator.switchTopLevel(feed)
+                navigator.navigate(destination)
+                true
+            } else {
+                false
+            }
+        },
+        openSettings = {
+            if (dashboard.tabs.any { it.id == settings.id && it.enabled }) {
+                navigator.switchTopLevel(settings)
+                onRequestFocus()
+            }
+        },
+    )
 }

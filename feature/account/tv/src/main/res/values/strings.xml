@@ -1,6 +1,6 @@
 <resources>
     <string name="profile_title">Профиль</string>
-    <string name="profile_guest">Войдите, чтобы сохранять прогресс и пользоваться аккаунтом на телевизоре.</string>
+    <string name="profile_guest">Войдите, чтобы открыть свой профиль на телевизоре.</string>
     <string name="profile_sign_in">Войти</string>
     <string name="profile_signed_in">Вы вошли</string>
     <string name="profile_unavailable">Профиль недоступен</string>

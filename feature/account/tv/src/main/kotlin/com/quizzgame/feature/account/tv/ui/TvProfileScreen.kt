@@ -1,24 +1,29 @@
 package com.quizzgame.feature.account.tv.ui
 
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
+import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
 import com.quizzgame.core.designsystem.tv.QuizzTvCatalogSkeleton
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.feature.account.tv.R
@@ -27,6 +32,7 @@ import com.quizzgame.feature.account.tv.presentation.TvProfileState
 import com.quizzgame.feature.account.tv.presentation.TvProfileViewModel
 import com.quizzgame.feature.account.tv.ui.tags.TvProfileTags
 import com.quizzgame.shared.splash.domain.entity.AccountProfile
+import com.quizzgame.core.ui.R as UiR
 
 @Composable
 fun TvProfileScreen(onSignIn: () -> Unit, onLogout: () -> Unit, onSettings: () -> Unit) {
@@ -37,7 +43,18 @@ fun TvProfileScreen(onSignIn: () -> Unit, onLogout: () -> Unit, onSettings: () -
         Modifier.fillMaxSize().padding(horizontal = 48.dp, vertical = 28.dp).testTag(TvProfileTags.SCREEN),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        Text(title, style = MaterialTheme.typography.headlineMedium)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            Icon(
+                painterResource(UiR.drawable.ic_quizz_profile),
+                contentDescription = null,
+                Modifier.size(34.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Text(title, style = MaterialTheme.typography.headlineMedium)
+        }
         when (val current = state) {
             TvProfileState.Loading -> QuizzTvCatalogSkeleton(title)
             is TvProfileState.Loaded -> ProfileActions(
@@ -77,7 +94,11 @@ private fun ProfileActions(
             QuizzTvButton(onSettings, if (profile.user != null) first else Modifier) {
                 Text(stringResource(R.string.profile_settings))
             }
-            QuizzTvButton(onLogout, Modifier.testTag(TvProfileTags.SIGN_OUT)) {
+            QuizzTvButton(
+                onLogout,
+                Modifier.testTag(TvProfileTags.SIGN_OUT),
+                style = QuizzTvButtonStyle.SECONDARY,
+            ) {
                 Text(stringResource(R.string.profile_sign_out))
             }
         }

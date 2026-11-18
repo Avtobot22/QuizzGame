@@ -1,6 +1,5 @@
 package com.quizzgame.shared.splash.domain
 
-
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.shared.splash.domain.entity.AccountProfile

@@ -7,4 +7,10 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class DashboardTabRoute(val id: DashboardTabId) : NavKey
 
-data class DashboardContext(val requestFocus: Boolean, val open: (NavKey) -> Boolean, val back: () -> Unit)
+data class DashboardContext(
+    val requestFocus: Boolean,
+    val open: (NavKey) -> Boolean,
+    val back: () -> Unit,
+    val openInFeed: (NavKey) -> Boolean = { false },
+    val openSettings: () -> Unit = {},
+)
