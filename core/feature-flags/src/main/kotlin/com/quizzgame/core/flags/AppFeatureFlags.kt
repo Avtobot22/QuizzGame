@@ -21,7 +21,7 @@ object AppFeatureDefinitions {
     }
     val tvParallax = Feature.boolean("dashboard.parallax", default = false)
     val tvGuest = Feature.boolean("dashboard.guestMode", default = false)
-    val mobileGuest = Feature.boolean("joinRoom.guestMode", default = false)
+    val mobileGuest = Feature.boolean("mobile.guestMode", default = false)
 }
 
 data class CatalogPrefetch(val enabled: Boolean = false, val depth: Int = 2, val maxConcurrent: Int = 2)

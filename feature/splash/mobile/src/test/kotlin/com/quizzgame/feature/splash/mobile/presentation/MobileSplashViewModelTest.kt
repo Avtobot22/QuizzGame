@@ -35,7 +35,7 @@ class MobileSplashViewModelTest {
     @Test
     fun startupOutcomeSelectsTheConcreteDestinationBeforeUiHandlesNavigation() = runTest(dispatcher) {
         val destinations = mapOf(
-            SplashResult.Continue to MobileSplashDestination.JOIN_ROOM,
+            SplashResult.Continue to MobileSplashDestination.PLAY,
             SplashResult.SignIn to MobileSplashDestination.SIGN_IN,
         )
         destinations.forEach { (result, destination) ->

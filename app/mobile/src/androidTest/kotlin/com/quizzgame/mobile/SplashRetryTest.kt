@@ -34,8 +34,8 @@ class SplashRetryTest {
         assertEquals(1, failure.attempt.count(SplashMockScenario.Stage.LAUNCH))
         assertEquals(1, failure.attempt.count(SplashMockScenario.Stage.FLAGS))
         clickTwiceBeforeNextFrame(compose, compose.activity.getString(ErrorR.string.quizz_error_action_retry))
-        compose.waitUntil(10_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
-        screen.tag(MobileNavigationTags.JOIN_ROOM).assertIsDisplayed()
+        compose.waitUntil(10_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
+        screen.tag(MobileNavigationTags.PLAY).assertIsDisplayed()
         assertEquals(2, failure.attempt.count(SplashMockScenario.Stage.LAUNCH))
         assertEquals(2, failure.attempt.count(SplashMockScenario.Stage.FLAGS))
         Espresso.pressBackUnconditionally()

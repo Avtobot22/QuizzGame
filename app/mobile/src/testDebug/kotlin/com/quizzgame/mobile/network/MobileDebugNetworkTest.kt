@@ -96,7 +96,7 @@ class MobileDebugNetworkTest {
             PlatformHeaders("test-mobile", "mobile-debug-tests/1"),
         ),
         bodyAssets = DebugMockAssets { path ->
-            fixture?.let { ByteArrayInputStream(it.toByteArray()) }
+            fixture?.takeIf { path == "mock/bodies/mobile-probe.json" }?.let { ByteArrayInputStream(it.toByteArray()) }
                 ?: checkNotNull(javaClass.classLoader!!.getResourceAsStream(path))
         },
         credentialsProvider = credentialsProvider,

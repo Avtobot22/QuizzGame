@@ -1,0 +1,24 @@
+{
+  "sectionId": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed004",
+  "items": [
+    {
+      "kind": "quiz",
+      "id": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed007",
+      "entryId": "ebc9675e-2cd9-4ed7-a4b4-1d279d2ed008",
+      "title": "История",
+      "image": {
+        "kind": "asset",
+        "name": "quiz.cover"
+      },
+      "user": {
+        "bookmarked": false,
+        "progress": 0.0,
+        "passingStatus": "notStarted"
+      }
+    }
+  ],
+  "page": {
+    "hasMore": false,
+    "nextCursor": null
+  }
+}

@@ -43,17 +43,17 @@ class MobileShellStateTest {
     }
 
     @Test
-    fun singleRoomDestinationSurvivesRecreationWithoutRedundantNavigation() {
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
-        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+    fun playDestinationSurvivesRecreationWithFourSectionNavigation() {
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertIsDisplayed()
         compose.activityRule.scenario.recreate()
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
-        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertIsDisplayed()
     }
 
     @Test
-    fun keyboardKeepsTheRoomFieldVisibleWithoutRedundantNavigation() {
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
+    fun keyboardKeepsTheRoomFieldVisibleAndTemporarilyHidesChrome() {
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
         screen.tag(MobileFixtureTags.ROOM_CODE).performClick()
         compose.waitUntil(5_000) {
             ViewCompat.getRootWindowInsets(compose.activity.window.decorView)
@@ -68,20 +68,20 @@ class MobileShellStateTest {
             with(compose.density) { assertTrue(bounds.bottom.toPx() <= view.height - keyboard.bottom) }
         }
         Espresso.closeSoftKeyboard()
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileFixtureTags.ROOM_CODE).isDisplayed() }
-        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileChromeTags.BAR).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertIsDisplayed()
     }
 
     @Test
     fun explicitGuestLogoutDiscardsNavigation() {
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
         screen.tag(MobileFixtureTags.ROOM_CODE).performTextInput("abc123")
         screen.tag(MobileFixtureTags.ROOM_CODE).assertTextContains("ABC123")
         val root = ViewModelProvider(compose.activity)[AppRootViewModel::class.java]
         val previousRevision = root.logoutRevision.value
         screen.tag(MobileFixtureTags.action(0)).performClick()
         compose.waitUntil(5_000) { root.logoutRevision.value > previousRevision }
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
-        screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
+        screen.tag(MobileChromeTags.BAR).assertIsDisplayed()
     }
 }

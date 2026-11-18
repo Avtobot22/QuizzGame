@@ -35,10 +35,19 @@ internal fun startupTestEntries(): FeatureEntries<MobileNavigationContext> = Fea
 }
 
 internal fun fixtureContentEntries(): FeatureEntries<MobileNavigationContext> = FeatureEntries { scope, context ->
-    scope.entry<com.quizzgame.mobile.navigation.routes.JoinRoomRoute> {
+    scope.entry<com.quizzgame.feature.feed.mobile.navigation.ExploreRoute> {
+        androidx.compose.material3.Text("Fixture")
+    }
+    scope.entry<com.quizzgame.feature.dashboard.mobile.navigation.LibraryRoute> {
+        androidx.compose.material3.Text("Fixture")
+    }
+    scope.entry<com.quizzgame.feature.dashboard.mobile.navigation.ProfileRoute> {
+        androidx.compose.material3.Text("Fixture")
+    }
+    scope.entry<com.quizzgame.feature.play.mobile.navigation.PlayRoute> {
         val current = context.value
-        Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.JOIN_ROOM)) {
-            com.quizzgame.mobile.navigation.MobileFixtureJoinRoomDestination(
+        Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.PLAY)) {
+            com.quizzgame.mobile.navigation.MobileFixturePlayDestination(
                 current.onLogout,
             )
         }

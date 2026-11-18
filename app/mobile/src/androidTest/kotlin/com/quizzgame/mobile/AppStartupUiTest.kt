@@ -72,12 +72,12 @@ class AppStartupUiTest {
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileFixtureTags.action(1)).performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
+        screen.tag(MobileNavigationTags.PLAY).assertDoesNotExist()
     }
 
     @Test
@@ -103,7 +103,7 @@ class AppStartupUiTest {
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
-        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
+        screen.tag(MobileNavigationTags.PLAY).assertDoesNotExist()
     }
 
     @Test
@@ -123,7 +123,7 @@ class AppStartupUiTest {
         }
         screen.tag(AppRootTags.ENTRY_FAILED).assertIsDisplayed()
         screen.tag(MobileNavigationTags.SPLASH).assertDoesNotExist()
-        screen.tag(MobileNavigationTags.JOIN_ROOM).assertDoesNotExist()
+        screen.tag(MobileNavigationTags.PLAY).assertDoesNotExist()
     }
 
     @Test
@@ -146,7 +146,7 @@ class AppStartupUiTest {
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
         screen.tag(MobileFixtureTags.action(1)).performClick()
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.JOIN_ROOM).isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
         screen.tag(MobileFixtureTags.action(0)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_FAILED).isDisplayed() }
         screen.tag(MobileNavigationTags.SIGN_IN).assertDoesNotExist()

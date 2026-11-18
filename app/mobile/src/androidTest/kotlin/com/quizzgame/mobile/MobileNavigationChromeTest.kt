@@ -133,8 +133,8 @@ class MobileNavigationChromeTest {
                     onBack = { current.back() },
                     sceneStrategies = listOf(SheetStrategy, DialogSceneStrategy(), SinglePaneSceneStrategy()),
                     items = listOf(
-                        MobileTopLevelItem(Key.HOME, R.string.navigation_join_room),
-                        MobileTopLevelItem(Key.LIBRARY, R.string.navigation_join_room),
+                        MobileTopLevelItem(Key.HOME, R.string.navigation_play),
+                        MobileTopLevelItem(Key.LIBRARY, R.string.navigation_play),
                     ),
                 )
             }
