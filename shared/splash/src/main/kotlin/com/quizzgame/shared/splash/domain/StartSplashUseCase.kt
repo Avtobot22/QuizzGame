@@ -35,19 +35,24 @@ class StartSplashUseCase @Inject constructor(
 
     private fun finishGuestStartup(): SplashResult {
         repository.clearUser()
-        return if (repository.guestAllowed()) SplashResult.Continue else SplashResult.SignIn
+        return SplashResult.Continue
     }
 
     private suspend fun finishAuthenticatedStartup(generation: Long): SplashResult {
-        val failure = repository.loadUser(generation)
-        return if (failure == null) SplashResult.Continue else resolvedFailure(failure)
+        repository.loadUser(generation)
+        val current = repository.currentSession()
+        return terminal(current) ?: if (current == SessionState.Authenticated(generation)) {
+            SplashResult.Continue
+        } else {
+            SplashResult.Failed(AppFailure.OperationInterrupted)
+        }
     }
 
     private suspend fun resolvedFailure(failure: AppFailure): SplashResult =
         terminal(repository.currentSession()) ?: SplashResult.Failed(failure)
 
     private fun terminal(state: SessionState): SplashResult? = when (state) {
-        SessionState.Expired        -> SplashResult.SignIn
+        SessionState.Expired        -> SplashResult.Failed(AppFailure.OperationInterrupted)
 
         is SessionState.Blocked     -> when (state.kind) {
             CredentialUnavailableKind.REFRESH_UNCERTAIN   -> SplashResult.SignIn

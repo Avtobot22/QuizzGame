@@ -8,6 +8,5 @@ interface SplashRepository {
     suspend fun loadLaunch(): AppFailure?
     suspend fun refreshFlags(): AppFailure?
     suspend fun loadUser(expectedGeneration: Long): AppFailure?
-    fun guestAllowed(): Boolean
     fun clearUser()
 }

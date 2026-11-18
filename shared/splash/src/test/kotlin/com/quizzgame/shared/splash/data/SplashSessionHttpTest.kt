@@ -1,5 +1,6 @@
 package com.quizzgame.shared.splash.data
 
+import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.flags.AppFeatureDefinitions
 import com.quizzgame.core.flags.ExecutorFeatureFlagsSource
 import com.quizzgame.core.flags.FeatureFlagsSdkAdapter
@@ -100,7 +101,7 @@ class SplashSessionHttpTest {
                 MockResponse().setResponseCode(400)
                     .setBody("""{"reasonCode":21001,"debugMessage":"invalid","userFriendlyMessage":null}"""),
             )
-            assertEquals(SplashResult.SignIn, fixture.useCase())
+            assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
             assertEquals(SessionState.Expired, fixture.session.state.value)
             assertEquals(4, fixture.server.requestCount)
             assertNull(fixture.store.record.tokens)
@@ -163,7 +164,6 @@ class SplashSessionHttpTest {
         val useCase = StartSplashUseCase(
             SplashRepositoryImpl(
                 remote,
-                flags,
                 flags,
                 reader,
                 users,

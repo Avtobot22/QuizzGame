@@ -39,7 +39,7 @@ internal fun appEntryState(
         is SessionState.Authenticated,
         -> AppEntryState.Ready(identity, AppEntryScreen.SPLASH, owner)
 
-        SessionState.Expired        -> AppEntryState.Ready(identity, AppEntryScreen.SIGN_IN, owner)
+        SessionState.Expired        -> AppEntryState.Waiting
 
         is SessionState.Blocked     -> when (session.kind) {
             CredentialUnavailableKind.REFRESH_UNCERTAIN   -> AppEntryState.Ready(

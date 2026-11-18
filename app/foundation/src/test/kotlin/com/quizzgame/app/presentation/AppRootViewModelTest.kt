@@ -99,7 +99,7 @@ class AppRootViewModelTest {
             startup.sessionState.value = SessionState.Expired
             assertFalse(viewModel.isCurrentEntry(initial))
             runCurrent()
-            assertEquals(AppEntryScreen.SIGN_IN, (viewModel.entryState.value as AppEntryState.Ready).screen)
+            assertEquals(AppEntryState.Waiting, viewModel.entryState.value)
             startup.sessionState.value = SessionState.Unavailable(SessionStorageFailure.WRITE)
             runCurrent()
             assertTrue(viewModel.entryState.value is AppEntryState.Blocked)

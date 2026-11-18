@@ -129,6 +129,8 @@ class SessionManagerTest {
         val manager = SessionManager.open(store)
         assertEquals(SessionOperation.Applied, manager.expireIfCurrentBlocking(manager.snapshot()))
         assertEquals(SessionState.Expired, manager.state.value)
+        manager.continueAsGuestAfterRevocation()
+        assertEquals(SessionState.Guest, manager.state.value)
         assertNull(manager.snapshot().accessToken)
         assertNull(store.tokens)
     }

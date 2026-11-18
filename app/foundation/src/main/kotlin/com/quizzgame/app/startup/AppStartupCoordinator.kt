@@ -163,6 +163,7 @@ class AppStartupCoordinator(
             }
             return null
         }
+        manager.continueAsGuestAfterRevocation()
         val current = manager.state.value
         return lock.withLock {
             if (closed) return@withLock null
@@ -202,6 +203,7 @@ class AppStartupCoordinator(
     private fun observeSession(manager: SessionManager) {
         scope.launch {
             manager.state.collect {
+                if (it == SessionState.Expired) manager.continueAsGuestAfterRevocation()
                 lock.withLock {
                     if (!closed) {
                         val current = manager.state.value

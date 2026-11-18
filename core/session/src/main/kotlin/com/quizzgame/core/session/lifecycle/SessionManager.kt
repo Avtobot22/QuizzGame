@@ -106,6 +106,15 @@ class SessionManager private constructor(
             }
         }
 
+    /** Завершает отзыв сессии после записи состояния без токенов. */
+    fun continueAsGuestAfterRevocation() = lock.withLock {
+        val current = access.get()
+        if (current is CredentialAccess.Ready && current.expired && pending == null) {
+            check(current.record.tokens == null)
+            publish(current.record)
+        }
+    }
+
     override suspend fun signIn(tokens: TokenPair): SessionChangeResult = startSession(tokens).asChange()
     override suspend fun signOut(): SessionChangeResult = logout().asChange()
     override suspend fun recoverStorage(): SessionRecoveryResult = withContext(dispatcher) { recovery.recover() }
