@@ -2,8 +2,8 @@ package com.quizzgame.shared.splash.data
 
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.shared.splash.domain.CurrentUserReader
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
+import com.quizzgame.shared.splash.domain.repository.CurrentUserReader
 import javax.inject.Inject
 import javax.inject.Singleton
 

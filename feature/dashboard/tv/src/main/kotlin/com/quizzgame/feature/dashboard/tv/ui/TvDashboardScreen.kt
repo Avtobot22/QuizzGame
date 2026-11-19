@@ -10,8 +10,8 @@ import com.quizzgame.feature.dashboard.tv.presentation.TvDashboardViewModel
 import com.quizzgame.feature.dashboard.tv.ui.content.TvDashboardStateContent
 
 @Composable
-fun TvDashboardScreen(onLogout: () -> Unit, graphs: Set<FeatureEntries<DashboardContext>>, onSignIn: () -> Unit = {}) {
+fun TvDashboardScreen(onProfile: () -> Unit, graphs: Set<FeatureEntries<DashboardContext>>, onSignIn: () -> Unit = {}) {
     val viewModel: TvDashboardViewModel = hiltViewModel()
     val state by viewModel.state.collectAsStateWithLifecycle()
-    TvDashboardStateContent(state, viewModel::onIntent, graphs, onLogout, onSignIn)
+    TvDashboardStateContent(state, viewModel::onIntent, graphs, onProfile, onSignIn)
 }

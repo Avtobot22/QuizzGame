@@ -37,6 +37,7 @@ internal fun TvAppRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val externalRequest by viewModel.pendingNavigation.collectAsStateWithLifecycle()
+    val pendingAuthReturn by viewModel.pendingAuthReturn.collectAsStateWithLifecycle()
     val entryState by viewModel.entryState.collectAsStateWithLifecycle()
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         when (val current = state) {
@@ -83,6 +84,7 @@ internal fun TvAppRoot(
                             entry.restorationOwner,
                             session = { viewModel.sessionState.value },
                             isCurrent = { viewModel.isCurrentEntry(entry) },
+                            auth = viewModel.authNavigation(pendingAuthReturn),
                         ),
                     )
                 }

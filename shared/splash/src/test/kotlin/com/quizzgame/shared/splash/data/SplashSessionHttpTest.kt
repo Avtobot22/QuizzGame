@@ -1,5 +1,6 @@
 package com.quizzgame.shared.splash.data
 
+import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.flags.AppFeatureDefinitions
 import com.quizzgame.core.flags.ExecutorFeatureFlagsSource
 import com.quizzgame.core.flags.FeatureFlagsSdkAdapter
@@ -29,16 +30,18 @@ import com.quizzgame.shared.splash.data.dto.LaunchDto
 import com.quizzgame.shared.splash.data.dto.UserDto
 import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.data.mapper.validated
-import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.scenario.StartSplashScenario
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashPolicyUseCase
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashUserUseCase
+import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import io.github.avtobot22.featureflags.FeatureFlagsSource
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -79,20 +82,20 @@ class SplashSessionHttpTest {
     }
 
     @Test
-    fun secondUserUnauthorizedStopsWithoutAnotherRefreshOrNavigation() = runTest {
+    fun secondUserUnauthorizedKeepsAuthenticatedSessionWithoutAnotherRefresh() = runTest {
         Fixture.open().use { fixture ->
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             fixture.server.enqueue(MockResponse().setBody(ROTATED))
             fixture.server.enqueue(MockResponse().setResponseCode(401))
-            assertFalse(fixture.useCase() is SplashResult.Continue)
+            assertEquals(SplashResult.Continue, fixture.useCase())
             assertEquals(5, fixture.server.requestCount)
             assertNull(fixture.users.current())
         }
     }
 
     @Test
-    fun confirmedRefreshRevocationExpiresSessionAndRoutesToSignIn() = runTest {
+    fun confirmedRefreshRevocationExpiresSessionBeforeCatalogAdmission() = runTest {
         Fixture.open().use { fixture ->
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))
@@ -100,7 +103,7 @@ class SplashSessionHttpTest {
                 MockResponse().setResponseCode(400)
                     .setBody("""{"reasonCode":21001,"debugMessage":"invalid","userFriendlyMessage":null}"""),
             )
-            assertEquals(SplashResult.SignIn, fixture.useCase())
+            assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
             assertEquals(SessionState.Expired, fixture.session.state.value)
             assertEquals(4, fixture.server.requestCount)
             assertNull(fixture.store.record.tokens)
@@ -160,14 +163,12 @@ class SplashSessionHttpTest {
                 currentUser(RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE)).toDomain()
             }
         }
-        val useCase = StartSplashUseCase(
-            SplashRepositoryImpl(
-                remote,
-                flags,
-                flags,
-                reader,
-                users,
-            ),
+        private val repository = SplashRepositoryImpl(remote, flags, flags, reader, users)
+        val useCase = StartSplashScenario(
+            repository,
+            LoadSplashPolicyUseCase(repository),
+            RefreshSplashFlagsUseCase(repository),
+            LoadSplashUserUseCase(repository),
         )
 
         fun enqueueBootstrap() {

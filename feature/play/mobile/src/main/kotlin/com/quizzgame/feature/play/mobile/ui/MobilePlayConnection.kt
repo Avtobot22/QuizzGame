@@ -4,15 +4,13 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -24,12 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
+import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.feature.play.mobile.R
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayIntent
 import com.quizzgame.feature.play.mobile.ui.tags.MobilePlayTags
@@ -90,8 +88,8 @@ private fun MobilePlayQrOption(onScan: () -> Unit) {
         Modifier.fillMaxWidth().testTag(MobilePlayTags.SCAN),
         style = QuizzButtonStyle.OUTLINED,
     ) {
-        Icon(painterResource(UiR.drawable.ic_quizz_scan), null, Modifier.size(20.dp))
-        Spacer(Modifier.size(8.dp))
-        Text(stringResource(R.string.play_scan))
+        QuizzIconLabel(UiR.drawable.ic_quizz_scan, tint = LocalContentColor.current) {
+            Text(stringResource(R.string.play_scan))
+        }
     }
 }

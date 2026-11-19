@@ -2,11 +2,11 @@ package com.quizzgame.feature.dashboard.mobile.presentation
 
 import androidx.lifecycle.ViewModelStore
 import com.quizzgame.core.error.failure.AppFailure
-import com.quizzgame.feature.dashboard.mobile.domain.DashboardRepository
-import com.quizzgame.feature.dashboard.mobile.domain.LoadDashboardUseCase
 import com.quizzgame.feature.dashboard.mobile.domain.entity.DashboardResult
 import com.quizzgame.feature.dashboard.mobile.domain.entity.MobileTabId
 import com.quizzgame.feature.dashboard.mobile.domain.entity.localDashboard
+import com.quizzgame.feature.dashboard.mobile.domain.repository.DashboardRepository
+import com.quizzgame.feature.dashboard.mobile.domain.usecase.LoadDashboardUseCase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi

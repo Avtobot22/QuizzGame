@@ -4,6 +4,7 @@ import com.quizzgame.app.graph.AppGraph
 import com.quizzgame.app.network.AppNetworkConfigurationException
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.core.error.presentation.ErrorActionKind
+import com.quizzgame.core.session.lifecycle.SessionChangeResult
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.lifecycle.SessionOperation
 import com.quizzgame.core.session.lifecycle.SessionState
@@ -72,7 +73,7 @@ class AppStartupCoordinator(
                 CompletableDeferred(blocked)
             } else {
                 logoutFlight?.takeUnless { it.isCompleted }
-                    ?: scope.async { requireNotNull(manager).logout() }.also { logoutFlight = it }
+                    ?: scope.async { requireNotNull(manager).signOut().asOperation() }.also { logoutFlight = it }
             }
         }
         return task.await()
@@ -163,6 +164,7 @@ class AppStartupCoordinator(
             }
             return null
         }
+        manager.continueAsGuestAfterRevocation()
         val current = manager.state.value
         return lock.withLock {
             if (closed) return@withLock null
@@ -202,6 +204,7 @@ class AppStartupCoordinator(
     private fun observeSession(manager: SessionManager) {
         scope.launch {
             manager.state.collect {
+                if (it == SessionState.Expired) manager.continueAsGuestAfterRevocation()
                 lock.withLock {
                     if (!closed) {
                         val current = manager.state.value
@@ -252,3 +255,10 @@ private data class ShutdownWork(
     val pendingLogout: Deferred<SessionOperation>?,
     val ownsCleanup: Boolean,
 )
+
+private fun SessionChangeResult.asOperation(): SessionOperation = when (this) {
+    SessionChangeResult.Committed -> SessionOperation.Applied
+    SessionChangeResult.BusyOrBlocked -> SessionOperation.Busy
+    is SessionChangeResult.NeedsStorageRecovery -> SessionOperation.Failed(reason)
+    SessionChangeResult.Closed -> SessionOperation.Closed
+}

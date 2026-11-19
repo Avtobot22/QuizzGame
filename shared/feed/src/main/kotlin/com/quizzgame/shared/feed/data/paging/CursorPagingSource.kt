@@ -3,7 +3,7 @@ package com.quizzgame.shared.feed.data.paging
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.quizzgame.core.error.failure.AppFailure
-import com.quizzgame.shared.feed.domain.FeedPagingException
+import com.quizzgame.shared.feed.domain.entity.FeedPagingException
 import com.quizzgame.shared.feed.domain.entity.FeedResult
 import kotlinx.coroutines.CancellationException
 import java.io.IOException

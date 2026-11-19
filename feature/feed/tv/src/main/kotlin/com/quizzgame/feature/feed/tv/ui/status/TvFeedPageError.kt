@@ -16,7 +16,7 @@ import com.quizzgame.core.error.presentation.ErrorSurface
 import com.quizzgame.core.error.ui.tv.components.QuizzTvErrorBanner
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
-import com.quizzgame.shared.feed.domain.FeedPagingException
+import com.quizzgame.shared.feed.domain.entity.FeedPagingException
 
 @Composable
 internal fun TvFeedPageError(

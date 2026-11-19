@@ -19,6 +19,7 @@ import androidx.tv.material3.ButtonColors
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.LocalTextStyle
 import androidx.tv.material3.MaterialTheme
+import com.quizzgame.core.ui.tokens.QuizzProviderColors
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 
 @Composable
@@ -33,30 +34,29 @@ fun QuizzTvButton(
     val colors = MaterialTheme.colorScheme
     val shape = RoundedCornerShape(QuizzTvLayout.cornerRadius.dp)
     val primary = style == QuizzTvButtonStyle.PRIMARY
+    val focusColor = if (tone == QuizzTvButtonTone.DANGER && style != QuizzTvButtonStyle.BRANDED) {
+        colors.error
+    } else {
+        colors.onSurface
+    }
     Button(
         onClick = onClick,
         modifier = modifier,
         enabled = enabled,
         shape = ButtonDefaults.shape(shape = shape),
-        colors = if (tone == QuizzTvButtonTone.DANGER) dangerButtonColors(style) else standardButtonColors(style),
+        colors = when {
+            style == QuizzTvButtonStyle.BRANDED -> brandedButtonColors()
+            tone == QuizzTvButtonTone.DANGER    -> dangerButtonColors(style)
+            else                              -> standardButtonColors(style)
+        },
         scale = ButtonDefaults.scale(focusedScale = 1.025f),
         border = ButtonDefaults.border(
-            border = if (style == QuizzTvButtonStyle.SECONDARY) {
-                Border(
-                    BorderStroke(
-                        1.dp,
-                        (if (tone == QuizzTvButtonTone.DANGER) colors.error else colors.border).copy(alpha = 0.4f),
-                    ),
-                    shape = shape,
-                )
-            } else {
-                Border.None
-            },
+            border = defaultButtonBorder(style, tone, shape),
             focusedBorder = if (primary) {
                 Border.None
             } else {
                 Border(
-                    BorderStroke(2.dp, if (tone == QuizzTvButtonTone.DANGER) colors.error else colors.onSurface),
+                    BorderStroke(2.dp, focusColor),
                     shape = shape,
                 )
             },
@@ -85,7 +85,7 @@ private fun standardButtonColors(style: QuizzTvButtonStyle): ButtonColors {
         containerColor = when (style) {
             QuizzTvButtonStyle.PRIMARY -> colors.primaryContainer
             QuizzTvButtonStyle.SECONDARY -> colors.surfaceVariant.copy(alpha = 0.45f)
-            QuizzTvButtonStyle.QUIET -> Color.Transparent
+            QuizzTvButtonStyle.QUIET, QuizzTvButtonStyle.BRANDED -> Color.Transparent
         },
         contentColor = if (primary) colors.onPrimaryContainer else colors.onSurface,
         focusedContainerColor = if (primary) colors.primary else colors.surfaceVariant,
@@ -105,7 +105,7 @@ private fun dangerButtonColors(style: QuizzTvButtonStyle): ButtonColors {
         containerColor = when (style) {
             QuizzTvButtonStyle.PRIMARY -> colors.errorContainer
             QuizzTvButtonStyle.SECONDARY -> colors.errorContainer.copy(alpha = 0.25f)
-            QuizzTvButtonStyle.QUIET -> Color.Transparent
+            QuizzTvButtonStyle.QUIET, QuizzTvButtonStyle.BRANDED -> Color.Transparent
         },
         contentColor = if (primary) colors.onErrorContainer else colors.error,
         focusedContainerColor = if (primary) colors.error else colors.errorContainer,
@@ -114,5 +114,39 @@ private fun dangerButtonColors(style: QuizzTvButtonStyle): ButtonColors {
         pressedContentColor = colors.onErrorContainer,
         disabledContainerColor = colors.surfaceVariant.copy(alpha = 0.25f),
         disabledContentColor = colors.onSurface.copy(alpha = 0.38f),
+    )
+}
+
+@Composable
+private fun defaultButtonBorder(
+    style: QuizzTvButtonStyle,
+    tone: QuizzTvButtonTone,
+    shape: RoundedCornerShape,
+): Border {
+    val colors = MaterialTheme.colorScheme
+    val outline = when (style) {
+        QuizzTvButtonStyle.BRANDED -> QuizzProviderColors.DarkOutline
+        QuizzTvButtonStyle.SECONDARY -> {
+            val color = if (tone == QuizzTvButtonTone.DANGER) colors.error else colors.border
+            color.copy(alpha = 0.4f)
+        }
+        else -> return Border.None
+    }
+    return Border(BorderStroke(1.dp, outline), shape = shape)
+}
+
+@Composable
+private fun brandedButtonColors(): ButtonColors {
+    val colors = MaterialTheme.colorScheme
+    val provider = QuizzProviderColors
+    return ButtonDefaults.colors(
+        containerColor = provider.DarkSurface,
+        contentColor = provider.DarkText,
+        focusedContainerColor = colors.surfaceVariant,
+        focusedContentColor = colors.onSurface,
+        pressedContainerColor = colors.surfaceVariant,
+        pressedContentColor = colors.onSurface,
+        disabledContainerColor = provider.DarkSurface,
+        disabledContentColor = provider.DarkText.copy(alpha = 0.38f),
     )
 }

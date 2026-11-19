@@ -25,35 +25,32 @@ import com.quizzgame.feature.dashboard.mobile.ui.tags.MobileAccountTags
 @Composable
 internal fun MobileAccountContent(
     account: Account,
-    library: Boolean,
     onIntent: (MobileAccountIntent) -> Unit,
     onSignIn: () -> Unit,
-    onLogout: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val title = stringResource(if (library) R.string.account_library else R.string.account_profile)
+    val title = stringResource(R.string.account_library)
     QuizzScreenScaffold(modifier, topBar = { QuizzTopBar(title) }) { padding ->
         Column(
             Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()).padding(24.dp)
-                .testTag(if (library) MobileAccountTags.LIBRARY else MobileAccountTags.PROFILE),
+                .testTag(MobileAccountTags.LIBRARY),
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             when (val current = account) {
                 Account.Loading -> QuizzAccountSkeleton(title)
                 Account.Guest -> {
-                    Text(stringResource(if (library) R.string.library_guest else R.string.profile_guest))
-                    QuizzButton(onSignIn) { Text(stringResource(R.string.account_sign_in)) }
+                    Text(stringResource(R.string.library_guest))
+                    QuizzButton(
+                        onSignIn,
+                        Modifier.testTag(MobileAccountTags.SIGN_IN),
+                    ) { Text(stringResource(R.string.account_sign_in)) }
                 }
                 is Account.SignedIn -> {
                     Text(
                         current.displayName ?: stringResource(R.string.account_signed_in),
                         style = MaterialTheme.typography.headlineSmall,
                     )
-                    if (library) {
-                        Text(stringResource(R.string.library_pending))
-                    } else {
-                        QuizzButton(onLogout) { Text(stringResource(R.string.account_logout)) }
-                    }
+                    Text(stringResource(R.string.library_pending))
                 }
                 Account.Unavailable -> {
                     Text(stringResource(R.string.account_unavailable))

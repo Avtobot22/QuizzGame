@@ -16,6 +16,8 @@ class NavigationCoordinator(
     private val session: () -> SessionState,
     private val policy: NavigationPolicy,
     private val checkpoint: MutableState<NavigationCheckpoint> = mutableStateOf(NavigationCheckpoint()),
+    private val onAuthRequested: (AuthReturnTarget) -> Unit = {},
+    private val onAuthCancelled: () -> Unit = {},
 ) {
     val state: NavigationCheckpoint get() = checkpoint.value
 
@@ -66,7 +68,9 @@ class NavigationCoordinator(
         return true
     }
 
-    fun requireSignIn(): Boolean {
+    fun requireSignIn(target: AuthReturnTarget = AuthReturnTarget.Home): Boolean {
+        if (session() is SessionState.Authenticated) return false
+        if (state.admitted) onAuthRequested(target)
         navigator.showFlow(signIn)
         return true
     }
@@ -78,6 +82,7 @@ class NavigationCoordinator(
     }
 
     fun cancelAuthentication(): Boolean {
+        onAuthCancelled()
         checkpoint.value = state.copy(pending = null)
         return if (state.admitted) {
             navigator.completeFlow()

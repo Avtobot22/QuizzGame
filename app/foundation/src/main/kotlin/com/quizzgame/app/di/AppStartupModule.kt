@@ -3,12 +3,14 @@ package com.quizzgame.app.di
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.StartupApiCallExecutor
 import com.quizzgame.app.session.SessionManagerFactory
+import com.quizzgame.app.session.StartupSessionActions
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupCoordinator
 import com.quizzgame.app.startup.GraphAccessResult
 import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiCallExecutor
 import com.quizzgame.core.network.config.createNetworkJson
+import com.quizzgame.core.session.lifecycle.SessionActions
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import dagger.Module
 import dagger.Provides
@@ -33,6 +35,10 @@ object AppStartupModule {
                 else -> startup.sessionState.value
             }
         }
+
+    @Provides
+    @Singleton
+    fun sessionActions(startup: AppStartup): SessionActions = StartupSessionActions(startup)
 
     @Provides
     @Singleton

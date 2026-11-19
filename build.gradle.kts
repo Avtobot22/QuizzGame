@@ -35,6 +35,11 @@ tasks.register("ciLint") {
     group = "verification"
     description = "Runs Android lint for all application and library modules."
     dependsOn(
+        ":shared:auth:lint",
+        ":feature:auth:mobile:lint",
+        ":feature:auth:tv:lint",
+        ":feature:auth-provider:mobile:lint",
+        ":feature:auth-provider:tv:lint",
         ":feature:dashboard:tv:lint",
         ":feature:dashboard:mobile:lint",
         ":feature:play:mobile:lint",
@@ -71,6 +76,8 @@ tasks.register("ciUnitTestDebug") {
     group = "verification"
     description = "Runs debug JVM unit tests."
     dependsOn(
+        ":shared:auth:testDebugUnitTest",
+        ":feature:auth-provider:mobile:testDebugUnitTest",
         ":feature:dashboard:tv:testDebugUnitTest",
         ":feature:dashboard:mobile:testDebugUnitTest",
         ":feature:play:mobile:testDebugUnitTest",
@@ -109,6 +116,8 @@ tasks.register("ciUnitTestRelease") {
     group = "verification"
     description = "Runs release JVM unit tests."
     dependsOn(
+        ":shared:auth:testReleaseUnitTest",
+        ":feature:auth-provider:mobile:testReleaseUnitTest",
         ":feature:dashboard:tv:testReleaseUnitTest",
         ":feature:dashboard:mobile:testReleaseUnitTest",
         ":feature:play:mobile:testReleaseUnitTest",

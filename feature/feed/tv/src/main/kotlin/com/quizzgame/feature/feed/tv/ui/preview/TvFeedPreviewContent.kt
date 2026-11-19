@@ -27,7 +27,7 @@ import com.quizzgame.feature.feed.tv.ui.paging.TvFeedRefreshAction
 import com.quizzgame.feature.feed.tv.ui.rail.TvQuizRail
 import com.quizzgame.feature.feed.tv.ui.status.TvFeedAppendingSections
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 
 @Composable
 internal fun TvFeedPreviewContent(

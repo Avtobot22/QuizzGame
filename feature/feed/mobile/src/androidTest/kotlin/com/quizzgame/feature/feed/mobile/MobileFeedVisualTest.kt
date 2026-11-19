@@ -25,7 +25,7 @@ import com.quizzgame.feature.feed.mobile.ui.preview.MobileFeedPreviewProvider
 import com.quizzgame.feature.feed.mobile.ui.preview.MobileFeedPreviewState
 import com.quizzgame.feature.feed.mobile.ui.preview.MobileFeedPreviewStateContent
 import com.quizzgame.feature.feed.mobile.ui.tags.MobileFeedTags
-import com.quizzgame.shared.feed.domain.entity.QuizHero
+import com.quizzgame.shared.feed.domain.entity.section.QuizHero
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test

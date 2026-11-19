@@ -29,12 +29,12 @@ import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
 import com.quizzgame.shared.catalog.domain.entity.CursorPageInfo
 import com.quizzgame.shared.feed.data.FeedRemoteDataSource
 import com.quizzgame.shared.feed.data.FeedRepositoryImpl
-import com.quizzgame.shared.feed.domain.LoadFeedUseCase
-import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
 import com.quizzgame.shared.feed.domain.entity.Feed
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.QuizRail
 import com.quizzgame.shared.feed.domain.entity.RailItems
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
+import com.quizzgame.shared.feed.domain.usecase.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.usecase.LoadRailItemsUseCase
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
 import org.junit.Assert.assertEquals

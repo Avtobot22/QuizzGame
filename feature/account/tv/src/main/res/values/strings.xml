@@ -1,0 +1,12 @@
+<resources>
+    <string name="profile_title">Профиль</string>
+    <string name="profile_guest">Войдите, чтобы открыть свой профиль на телевизоре.</string>
+    <string name="profile_sign_in">Войти</string>
+    <string name="profile_signed_in">Вы вошли</string>
+    <string name="profile_unavailable">Профиль недоступен</string>
+    <string name="profile_retry">Повторить</string>
+    <string name="profile_settings">Настройки</string>
+    <string name="profile_sign_out">Выйти</string>
+    <string name="profile_loading">Профиль загружается</string>
+    <string name="profile_guest_title">Гостевой профиль</string>
+</resources>

@@ -39,7 +39,12 @@ import com.quizzgame.core.error.ui.common.R as ErrorR
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun TvQuizEntryContent(entry: QuizEntry, onBack: () -> Unit, modifier: Modifier) {
+internal fun TvQuizEntryContent(
+    entry: QuizEntry,
+    onBack: () -> Unit,
+    modifier: Modifier,
+    onSignIn: (() -> Unit)?,
+) {
     val focus = remember { FocusRequester() }
     val colors = MaterialTheme.colorScheme
     Box(modifier.fillMaxSize().testTag(TvQuizEntryTags.CONTENT)) {
@@ -80,7 +85,7 @@ internal fun TvQuizEntryContent(entry: QuizEntry, onBack: () -> Unit, modifier: 
                     .padding(top = QuizzTvLayout.detailHeaderGap.dp, bottom = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                TvQuizEntryDetails(entry)
+                TvQuizEntryDetails(entry, onSignIn)
             }
         }
     }

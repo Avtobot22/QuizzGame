@@ -7,9 +7,12 @@ import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashDestination
-import com.quizzgame.shared.splash.domain.SplashRepository
-import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.repository.SplashRepository
+import com.quizzgame.shared.splash.domain.scenario.StartSplashScenario
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashPolicyUseCase
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashUserUseCase
+import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -145,6 +148,12 @@ class MobileSplashViewModelTest {
             override fun guestAllowed(): Boolean = result == SplashResult.Continue
             override fun clearUser() = Unit
         }
-        return MobileSplashViewModel(StartSplashUseCase(repository))
+        val scenario = StartSplashScenario(
+            repository,
+            LoadSplashPolicyUseCase(repository),
+            RefreshSplashFlagsUseCase(repository),
+            LoadSplashUserUseCase(repository),
+        )
+        return MobileSplashViewModel(scenario)
     }
 }

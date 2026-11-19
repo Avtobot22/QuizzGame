@@ -8,7 +8,7 @@ import com.quizzgame.core.navigation.chrome.navigationChrome
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.feature.quizentry.mobile.ui.MobileQuizEntryScreen
 
-data class MobileQuizEntryCallbacks(val onBack: () -> Unit, val onPlay: () -> Boolean, val onSignIn: () -> Unit)
+data class MobileQuizEntryCallbacks(val onBack: () -> Unit, val onPlay: () -> Boolean, val onSignIn: (String) -> Unit)
 object MobileQuizEntryEntries : FeatureEntries<MobileQuizEntryCallbacks> {
     override fun register(scope: EntryProviderScope<NavKey>, context: State<MobileQuizEntryCallbacks>) {
         scope.entry<MobileQuizEntryRoute>(metadata = navigationChrome(NavigationChromePolicy.HIDDEN)) { route ->
@@ -16,7 +16,7 @@ object MobileQuizEntryEntries : FeatureEntries<MobileQuizEntryCallbacks> {
                 route.entryId,
                 { context.value.onBack() },
                 { context.value.onPlay() },
-                { context.value.onSignIn() },
+                { context.value.onSignIn(route.entryId) },
             )
         }
     }

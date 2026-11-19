@@ -9,15 +9,15 @@ import com.quizzgame.core.error.presentation.ErrorPresentationSpec
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
 import com.quizzgame.feature.splash.tv.navigation.TvSplashDestination
-import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.scenario.StartSplashScenario
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class TvSplashViewModel @Inject constructor(private val startSplashUseCase: StartSplashUseCase) :
+internal class TvSplashViewModel @Inject constructor(private val startSplashScenario: StartSplashScenario) :
     BaseViewModel<TvSplashUiState, TvSplashIntent, Nothing>() {
     private var job: Job? = null
 
@@ -46,7 +46,7 @@ internal class TvSplashViewModel @Inject constructor(private val startSplashUseC
         if (job?.isActive == true) return
         updateState { TvSplashUiState.Loading }
         job = viewModelScope.launch {
-            val next = when (val result = startSplashUseCase()) {
+            val next = when (val result = startSplashScenario()) {
                 SplashResult.Continue  -> TvSplashUiState.NavigationPending(TvSplashDestination.DASHBOARD)
                 SplashResult.SignIn    -> TvSplashUiState.NavigationPending(TvSplashDestination.SIGN_IN)
                 is SplashResult.Failed -> TvSplashUiState.Error(

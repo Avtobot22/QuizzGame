@@ -5,7 +5,11 @@ import com.quizzgame.core.network.auth.RefreshFailureReason
 import com.quizzgame.core.network.diagnostic.MockFailureReason
 
 sealed interface NetworkFailure {
-    data class Http(val status: Int, val backend: BackendErrorDetails? = null) : NetworkFailure {
+    data class Http(
+        val status: Int,
+        val backend: BackendErrorDetails? = null,
+        val retryAfterSeconds: Long? = null,
+    ) : NetworkFailure {
 
         override fun toString(): String = "Http(status=$status, backend=${backend != null})"
     }

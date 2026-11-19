@@ -7,7 +7,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.quizzgame.feature.feed.tv.presentation.TvFeedState
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.flow.Flow
 
 @Composable

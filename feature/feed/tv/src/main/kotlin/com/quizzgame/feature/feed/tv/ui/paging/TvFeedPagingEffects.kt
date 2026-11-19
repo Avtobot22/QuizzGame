@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.quizzgame.feature.feed.tv.presentation.TvFeedEvent
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.flow.Flow
 
 @Composable

@@ -3,8 +3,8 @@ package com.quizzgame.shared.feed.data.mapper
 import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.shared.feed.data.dto.FeedDto
 import com.quizzgame.shared.feed.data.dto.section.RailItemsDto
-import com.quizzgame.shared.feed.domain.entity.QuizHero
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizHero
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.serialization.SerializationException
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

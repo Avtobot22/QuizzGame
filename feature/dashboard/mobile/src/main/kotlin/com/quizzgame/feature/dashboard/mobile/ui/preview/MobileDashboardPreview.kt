@@ -18,6 +18,6 @@ private fun MobileDashboardPreview(
     ) state: MobileDashboardState,
 ) {
     QuizzMobilePreviewScreen {
-        MobileDashboardContent(state, {}, {}) { MobileAccountContent(Account.Guest, false, {}, {}, {}) }
+        MobileDashboardContent(state, {}, {}) { MobileAccountContent(Account.Guest, {}, {}) }
     }
 }

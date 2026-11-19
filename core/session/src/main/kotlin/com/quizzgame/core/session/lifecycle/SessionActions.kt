@@ -2,11 +2,9 @@ package com.quizzgame.core.session.lifecycle
 
 import com.quizzgame.core.session.model.TokenPair
 import com.quizzgame.core.session.storage.SessionStorageFailure
-import kotlinx.coroutines.flow.StateFlow
 
 interface SessionActions {
-    val state: StateFlow<SessionState>
-    val recoveryAction: StateFlow<SessionRecoveryAction>
+    suspend fun beginSignIn(): SessionSignInAttempt?
     suspend fun signIn(tokens: TokenPair): SessionChangeResult
     suspend fun signOut(): SessionChangeResult
     suspend fun recoverStorage(): SessionRecoveryResult

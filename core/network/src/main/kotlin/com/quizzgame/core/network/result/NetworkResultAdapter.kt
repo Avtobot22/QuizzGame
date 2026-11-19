@@ -86,6 +86,7 @@ class NetworkResultAdapter(private val json: Json) {
         } finally {
             response.errorBody()?.close()
         }
-        return NetworkFailure.Http(response.code(), backend)
+        val retryAfter = response.headers()["Retry-After"]?.trim()?.toLongOrNull()?.takeIf { it >= 0 }
+        return NetworkFailure.Http(response.code(), backend, retryAfter)
     }
 }

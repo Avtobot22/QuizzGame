@@ -22,7 +22,7 @@ import com.quizzgame.feature.feed.tv.ui.card.TvRailCard
 import com.quizzgame.feature.feed.tv.ui.status.TvFeedPageError
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 
 @Composable
 internal fun TvQuizRail(

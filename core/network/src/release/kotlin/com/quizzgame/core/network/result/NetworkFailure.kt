@@ -4,7 +4,11 @@ import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.network.auth.RefreshFailureReason
 
 sealed interface NetworkFailure {
-    data class Http(val status: Int, val backend: BackendErrorDetails? = null) : NetworkFailure {
+    data class Http(
+        val status: Int,
+        val backend: BackendErrorDetails? = null,
+        val retryAfterSeconds: Long? = null,
+    ) : NetworkFailure {
 
         override fun toString(): String = "Http(status=$status, backend=${backend != null})"
     }

@@ -30,6 +30,7 @@ data class AppNavigationEnvironment(
     val owner: String,
     val session: () -> SessionState,
     val isCurrent: () -> Boolean = { true },
+    val auth: AuthNavigation = AuthNavigation(),
 )
 
 /**
@@ -56,6 +57,7 @@ fun <C> AppNavigationGraph(
     context: (NavigationCoordinator) -> C,
     externalRequest: NavigationRequest? = null,
     onRequestHandled: (NavigationRequest) -> Unit = {},
+    onAuthReturn: (AppNavigator, PendingAuthReturn) -> Unit = { _, _ -> },
     mainContent: @Composable (NavigationState, AppNavigator, List<NavEntry<NavKey>>, () -> Unit) -> Unit =
         { _, _, entries, onBack -> NavDisplay(entries = entries, onBack = onBack) },
 ) {
@@ -73,6 +75,8 @@ fun <C> AppNavigationGraph(
             session = { currentEnvironment.value.session() },
             policy = { currentConfiguration.value.policy.access(it) },
             checkpoint = checkpoint,
+            onAuthRequested = { currentEnvironment.value.auth.begin(it) },
+            onAuthCancelled = { currentEnvironment.value.auth.cancel() },
         )
     }
     LaunchedEffect(environment.identity) {
@@ -89,19 +93,27 @@ fun <C> AppNavigationGraph(
             onRequestHandled(it)
         }
     }
+    LaunchedEffect(environment.auth.pending, coordinator.state.admitted, environment.identity) {
+        val pending = environment.auth.pending
+        val session = environment.session() as? SessionState.Authenticated
+        if (pending == null || !coordinator.state.admitted) return@LaunchedEffect
+        if (pending.generation == session?.sessionGeneration && environment.isCurrent()) {
+            onAuthReturn(coordinator.navigator, pending)
+        }
+    }
     val activity = LocalActivity.current
     val entries = state.decoratedEntries(rememberFeatureEntryProvider(graphs, context(coordinator)))
     val onBack: () -> Unit = { if (!coordinator.back()) activity?.finish() }
+    val current = state.snapshot
+    val isSecondaryRoot = current.flow.isEmpty() && current.active != current.primary && current.activeEntries.size == 1
+    if (isSecondaryRoot || current.flow.lastOrNull() == configuration.signIn) {
+        BackHandler(onBack = onBack)
+    }
     key(state.snapshot.generation, state.snapshot.flow.isEmpty()) {
         if (state.snapshot.flow.isNotEmpty()) {
             NavDisplay(modifier = Modifier.fillMaxSize(), entries = entries, onBack = onBack)
         } else {
             mainContent(state, coordinator.navigator, entries, onBack)
         }
-    }
-    val current = state.snapshot
-    val isSecondaryRoot = current.flow.isEmpty() && current.active != current.primary && current.activeEntries.size == 1
-    if (isSecondaryRoot || current.flow.lastOrNull() == configuration.signIn) {
-        BackHandler { if (!coordinator.back()) activity?.finish() }
     }
 }

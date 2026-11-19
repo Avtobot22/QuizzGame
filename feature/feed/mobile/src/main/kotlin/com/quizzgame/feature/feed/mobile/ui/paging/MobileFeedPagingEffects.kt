@@ -7,7 +7,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.paging.compose.LazyPagingItems
 import com.quizzgame.feature.feed.mobile.presentation.MobileFeedEvent
-import com.quizzgame.shared.feed.domain.entity.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
 import kotlinx.coroutines.flow.Flow
 
 @Composable

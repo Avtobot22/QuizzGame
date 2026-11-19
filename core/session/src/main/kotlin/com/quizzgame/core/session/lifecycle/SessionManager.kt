@@ -31,9 +31,9 @@ class SessionManager private constructor(
     )
     internal var pending: PendingSessionMutation? = PendingSessionMutation.Read
     private val mutableState = MutableStateFlow<SessionState>(SessionState.Initializing)
-    override val state = mutableState.asStateFlow()
+    val state = mutableState.asStateFlow()
     private val mutableRecoveryAction = MutableStateFlow(SessionRecoveryAction.NONE)
-    override val recoveryAction = mutableRecoveryAction.asStateFlow()
+    val recoveryAction = mutableRecoveryAction.asStateFlow()
     val deviceIdProvider = DeviceIdProvider {
         access.get().record?.deviceId ?: throw SessionUnavailableException(
             if (access.get() == CredentialAccess.Closed) {
@@ -106,9 +106,39 @@ class SessionManager private constructor(
             }
         }
 
+    /** Завершает отзыв сессии после записи состояния без токенов. */
+    fun continueAsGuestAfterRevocation() = lock.withLock {
+        val current = access.get()
+        if (current is CredentialAccess.Ready && current.expired && pending == null) {
+            check(current.record.tokens == null)
+            publish(current.record)
+        }
+    }
+
     override suspend fun signIn(tokens: TokenPair): SessionChangeResult = startSession(tokens).asChange()
     override suspend fun signOut(): SessionChangeResult = logout().asChange()
     override suspend fun recoverStorage(): SessionRecoveryResult = withContext(dispatcher) { recovery.recover() }
+
+    override suspend fun beginSignIn(): SessionSignInAttempt? = lock.withLock {
+        if (state.value != SessionState.Guest && recoveryAction.value != SessionRecoveryAction.REAUTHENTICATE) {
+            return@withLock null
+        }
+        val current = access.get()
+        val deviceId = current.record?.deviceId ?: return@withLock null
+        val epoch = current.epoch
+        SessionSignInAttempt(deviceId) { tokens -> signInIfCurrent(tokens, epoch) }
+    }
+
+    private suspend fun signInIfCurrent(tokens: TokenPair, epoch: Long): SessionChangeResult = withContext(dispatcher) {
+        lock.withLock {
+            if (access.get().epoch != epoch || state.value is SessionState.Authenticated) {
+                SessionChangeResult.BusyOrBlocked
+            } else {
+                mutations.signIn(tokens).asChange()
+            }
+        }
+    }
+
     suspend fun startSession(tokens: TokenPair): SessionOperation = withContext(dispatcher) { mutations.signIn(tokens) }
     suspend fun logout(): SessionOperation = withContext(dispatcher) { mutations.signOut() }
     suspend fun restoreStoredSession(): SessionOperation = withContext(dispatcher) { recovery.restore() }

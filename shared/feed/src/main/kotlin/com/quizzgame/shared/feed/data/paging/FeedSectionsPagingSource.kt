@@ -3,8 +3,8 @@ package com.quizzgame.shared.feed.data.paging
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.shared.feed.data.FeedRemoteDataSource
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 
 class FeedSectionsPagingSource(
     private val remote: FeedRemoteDataSource,

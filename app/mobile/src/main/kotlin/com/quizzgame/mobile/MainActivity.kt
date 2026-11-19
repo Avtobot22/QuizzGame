@@ -17,6 +17,8 @@ import com.quizzgame.core.designsystem.mobile.media.LocalMobileMediaLoader
 import com.quizzgame.core.media.android.CatalogMediaLoader
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
+import com.quizzgame.feature.authprovider.mobile.navigation.YandexAppLink
+import com.quizzgame.feature.authprovider.mobile.navigation.YandexLinkInbox
 import com.quizzgame.mobile.navigation.MobileCatalogNavigationHost
 import com.quizzgame.mobile.navigation.MobileNavigationContext
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,6 +38,9 @@ class MainActivity : ComponentActivity() {
     lateinit var navigationPolicies: Set<@JvmSuppressWildcards NavigationPolicy>
 
     @Inject
+    lateinit var yandexLinkInbox: YandexLinkInbox
+
+    @Inject
     lateinit var mediaLoader: CatalogMediaLoader
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +48,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         if (savedInstanceState == null) acceptNavigationIntent(intent)
         setContent {
-            CompositionLocalProvider(LocalMobileMediaLoader provides mediaLoader) {
+            CompositionLocalProvider(
+                LocalMobileMediaLoader provides mediaLoader,
+            ) {
                 QuizzMobileTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
@@ -70,6 +77,11 @@ class MainActivity : ComponentActivity() {
 
     private fun acceptNavigationIntent(intent: Intent) {
         val uri = intent.dataString ?: return
+        val attempt = YandexAppLink.attemptId(this, uri)
+        if (intent.action == Intent.ACTION_VIEW && attempt != null) {
+            yandexLinkInbox.accept(attempt)
+            return
+        }
         externalNavigationRouter.parse(uri)?.let(rootViewModel::requestNavigation)
     }
 }

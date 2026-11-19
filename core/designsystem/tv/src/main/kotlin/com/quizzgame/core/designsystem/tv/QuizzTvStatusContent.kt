@@ -26,7 +26,6 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
 import com.quizzgame.core.ui.QuizzConnectionIllustration
 import com.quizzgame.core.ui.QuizzSceneIllustration
-import com.quizzgame.core.ui.R
 import com.quizzgame.core.ui.status.QuizzNoticeTone
 import com.quizzgame.core.ui.status.QuizzStatusDimensions
 import com.quizzgame.core.ui.status.QuizzStatusIcon
@@ -117,16 +116,8 @@ fun QuizzTvStatusSymbol(
     modifier: Modifier = Modifier,
     tone: QuizzNoticeTone = QuizzNoticeTone.NEUTRAL,
 ) {
-    val resource = when (icon) {
-        QuizzStatusIcon.NETWORK -> R.drawable.ic_quizz_status_network
-        QuizzStatusIcon.SERVER -> R.drawable.ic_quizz_status_server
-        QuizzStatusIcon.AUTH -> R.drawable.ic_quizz_status_auth
-        QuizzStatusIcon.GENERIC -> R.drawable.ic_quizz_status_generic
-        QuizzStatusIcon.ROOM -> R.drawable.ic_quizz_room
-        QuizzStatusIcon.CATALOG -> R.drawable.ic_quizz_quiz
-    }
     Icon(
-        painterResource(resource),
+        painterResource(icon.resource),
         contentDescription = null,
         modifier = modifier.size(QuizzStatusDimensions.tvIcon.dp),
         tint = if (tone == QuizzNoticeTone.ERROR) {

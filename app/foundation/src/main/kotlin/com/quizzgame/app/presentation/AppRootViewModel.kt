@@ -3,6 +3,10 @@ package com.quizzgame.app.presentation
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.quizzgame.app.navigation.AuthContinuation
+import com.quizzgame.app.navigation.AuthNavigation
+import com.quizzgame.app.navigation.AuthReturnTarget
+import com.quizzgame.app.navigation.PendingAuthReturn
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupState
 import com.quizzgame.core.error.presentation.ErrorActionKind
@@ -17,6 +21,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -41,8 +46,14 @@ class AppRootViewModel @Inject constructor(
     )
     val pendingNavigation = navigationRequest.asStateFlow()
 
+    private val authContinuation = AuthContinuation()
+    val pendingAuthReturn = authContinuation.ready
+
     init {
         viewModelScope.launch { startup.ensureStarted() }
+        viewModelScope.launch {
+            sessionState.collect { authContinuation.sessionChanged(it, elapsedMillis()) }
+        }
     }
 
     fun onAction(action: ErrorActionKind) {
@@ -69,10 +80,18 @@ class AppRootViewModel @Inject constructor(
         }
     }
 
+    fun authNavigation(pending: PendingAuthReturn?): AuthNavigation = AuthNavigation(
+        pending,
+        { target: AuthReturnTarget -> authContinuation.begin(target, elapsedMillis()) },
+        authContinuation::cancel,
+        authContinuation::acknowledge,
+    )
+
     fun logout() {
         if (logoutJob?.isActive == true) return
         logoutJob = viewModelScope.launch {
             if (startup.logout() == SessionOperation.Applied) {
+                authContinuation.cancel()
                 savedStateHandle[NAVIGATION_REQUEST] = null
                 navigationRequest.value = null
                 val revision = Math.incrementExact(mutableLogoutRevision.value)
@@ -81,6 +100,8 @@ class AppRootViewModel @Inject constructor(
             }
         }
     }
+
+    private fun elapsedMillis() = TimeUnit.NANOSECONDS.toMillis(System.nanoTime())
 
     private companion object {
         const val NAVIGATION_REQUEST = "navigation-request"

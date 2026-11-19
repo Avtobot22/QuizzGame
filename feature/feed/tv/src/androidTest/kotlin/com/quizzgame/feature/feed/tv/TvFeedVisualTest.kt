@@ -20,7 +20,7 @@ import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewStateContent
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import com.quizzgame.feature.feed.tv.ui.tags.TvVisualTags
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import io.github.kakaocup.compose.node.element.KNode
 import org.junit.Assert.assertTrue
 import org.junit.Rule

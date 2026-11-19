@@ -1,7 +1,7 @@
 package com.quizzgame.shared.quizentry.di
 
 import com.quizzgame.shared.quizentry.data.QuizEntryRepositoryImpl
-import com.quizzgame.shared.quizentry.domain.QuizEntryRepository
+import com.quizzgame.shared.quizentry.domain.repository.QuizEntryRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

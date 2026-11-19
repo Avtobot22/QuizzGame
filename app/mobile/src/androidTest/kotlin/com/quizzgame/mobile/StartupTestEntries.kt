@@ -41,7 +41,7 @@ internal fun fixtureContentEntries(): FeatureEntries<MobileNavigationContext> = 
     scope.entry<com.quizzgame.feature.dashboard.mobile.navigation.LibraryRoute> {
         androidx.compose.material3.Text("Fixture")
     }
-    scope.entry<com.quizzgame.feature.dashboard.mobile.navigation.ProfileRoute> {
+    scope.entry<com.quizzgame.feature.account.mobile.navigation.ProfileRoute> {
         androidx.compose.material3.Text("Fixture")
     }
     scope.entry<com.quizzgame.feature.play.mobile.navigation.PlayRoute> {

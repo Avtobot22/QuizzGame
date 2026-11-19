@@ -13,8 +13,8 @@ import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.feature.dashboard.mobile.data.api.MobileDashboardApi
 import com.quizzgame.feature.dashboard.mobile.data.mapper.DashboardMapper
-import com.quizzgame.feature.dashboard.mobile.domain.DashboardRepository
 import com.quizzgame.feature.dashboard.mobile.domain.entity.DashboardResult
+import com.quizzgame.feature.dashboard.mobile.domain.repository.DashboardRepository
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

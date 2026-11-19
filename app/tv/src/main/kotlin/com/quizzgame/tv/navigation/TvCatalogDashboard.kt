@@ -1,8 +1,11 @@
 package com.quizzgame.tv.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.res.stringResource
+import com.quizzgame.app.navigation.AuthReturnTarget
 import com.quizzgame.core.designsystem.tv.QuizzTvMessageScreen
 import com.quizzgame.core.navigation.chrome.NavigationChromePolicy
 import com.quizzgame.core.navigation.chrome.navigationChrome
@@ -17,17 +20,32 @@ import com.quizzgame.feature.quizentry.tv.ui.TvQuizEntryScreen
 import com.quizzgame.tv.R
 
 @Composable
-internal fun TvCatalogDashboard(onLogout: () -> Unit, onSignIn: () -> Boolean = { false }) {
-    val graphs = remember(onSignIn) {
+internal fun TvCatalogDashboard(navigation: TvNavigationContext) {
+    val latest = rememberUpdatedState(navigation)
+    val graphs = remember {
         setOf(
             FeatureEntries<DashboardContext> { scope, current ->
                 scope.entry<DashboardTabRoute> { route ->
+                    val pending = latest.value.authReturn
+                    val quiz = pending?.target as? AuthReturnTarget.QuizEntry
+                    LaunchedEffect(pending?.id) {
+                        if (quiz != null && current.value.openInFeed(QuizEntryRoute(quiz.entryId))) {
+                            latest.value.acknowledgeReturn(pending.id)
+                        }
+                    }
+                    val settingsRequested = latest.value.openSettings
+                    LaunchedEffect(settingsRequested) {
+                        if (settingsRequested) {
+                            current.value.openSettings()
+                            latest.value.settingsHandled()
+                        }
+                    }
                     when (route.id) {
                         DashboardTabId.FEED -> {
                             TvFeedScreen(
                                 { current.value.open(QuizEntryRoute(it)) },
                                 current.value.requestFocus,
-                                onSignIn = { onSignIn() },
+                                onSignIn = { latest.value.onSignIn() },
                             )
                         }
                         DashboardTabId.LIBRARY, DashboardTabId.SETTINGS -> {
@@ -39,10 +57,15 @@ internal fun TvCatalogDashboard(onLogout: () -> Unit, onSignIn: () -> Boolean = 
                     }
                 }
                 scope.entry<QuizEntryRoute>(metadata = navigationChrome(NavigationChromePolicy.HIDDEN)) { route ->
-                    TvQuizEntryScreen(route.entryId, current.value.back, onSignIn = { onSignIn() })
+                    TvQuizEntryScreen(
+                        route.entryId,
+                        current.value.back,
+                        onSignIn = { latest.value.onAuthFor(AuthReturnTarget.QuizEntry(route.entryId)) },
+                        authenticated = latest.value.authenticated,
+                    )
                 }
             },
         )
     }
-    TvDashboardScreen(onLogout, graphs, onSignIn = { onSignIn() })
+    TvDashboardScreen(navigation.onProfile, graphs, onSignIn = { latest.value.onSignIn() })
 }

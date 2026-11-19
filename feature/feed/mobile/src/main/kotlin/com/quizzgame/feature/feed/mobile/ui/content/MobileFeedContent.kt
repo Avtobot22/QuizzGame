@@ -12,8 +12,8 @@ import com.quizzgame.feature.feed.mobile.ui.status.MobileFeedPageError
 import com.quizzgame.feature.feed.mobile.ui.status.MobileFeedSkeleton
 import com.quizzgame.feature.feed.mobile.ui.tags.MobileFeedTags
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.flow.Flow
 
 @Composable

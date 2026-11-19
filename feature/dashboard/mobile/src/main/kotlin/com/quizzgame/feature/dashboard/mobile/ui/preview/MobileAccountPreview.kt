@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import com.quizzgame.core.designsystem.mobile.preview.QuizzMobilePreviewScreen
+import com.quizzgame.feature.dashboard.mobile.domain.entity.Account
 import com.quizzgame.feature.dashboard.mobile.ui.MobileAccountContent
 
 @Preview(name = "Account light", locale = "ru", widthDp = 390, heightDp = 844)
@@ -13,7 +14,7 @@ import com.quizzgame.feature.dashboard.mobile.ui.MobileAccountContent
 private fun MobileAccountPreview(
     @PreviewParameter(
         MobileAccountPreviewProvider::class,
-    ) state: MobileAccountPreviewState,
+    ) state: Account,
 ) {
-    QuizzMobilePreviewScreen { MobileAccountContent(state.account, state.library, {}, {}, {}) }
+    QuizzMobilePreviewScreen { MobileAccountContent(state, {}, {}) }
 }

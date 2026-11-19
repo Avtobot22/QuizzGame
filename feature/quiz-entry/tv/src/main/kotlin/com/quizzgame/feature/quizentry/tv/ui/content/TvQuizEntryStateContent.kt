@@ -16,6 +16,7 @@ internal fun TvQuizEntryStateContent(
     onBack: () -> Unit,
     modifier: Modifier,
     onSignIn: () -> Unit,
+    authenticated: Boolean = false,
 ) {
     Box(modifier.fillMaxSize()) {
         when (state) {
@@ -25,7 +26,12 @@ internal fun TvQuizEntryStateContent(
                 { onIntent(TvQuizEntryIntent.Retry) },
                 onSignIn,
             )
-            is TvQuizEntryState.Content -> TvQuizEntryContent(state.value, onBack, Modifier.fillMaxSize())
+            is TvQuizEntryState.Content -> TvQuizEntryContent(
+                state.value,
+                onBack,
+                Modifier.fillMaxSize(),
+                onSignIn = onSignIn.takeIf { state.value.requiresAuthentication && !authenticated },
+            )
         }
     }
 }

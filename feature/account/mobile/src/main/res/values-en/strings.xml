@@ -1,0 +1,13 @@
+<resources>
+    <string name="mobile_profile_title">Profile</string>
+    <string name="mobile_profile_guest">Guest profile</string>
+    <string name="mobile_profile_guest_description">Sign in to your QuizzGame account. You can join games as a guest.</string>
+    <string name="mobile_profile_member">QuizzGame account</string>
+    <string name="mobile_profile_member_description">You’re signed in.</string>
+    <string name="mobile_profile_unavailable">Profile unavailable</string>
+    <string name="mobile_profile_retry_description">Couldn’t load account details.</string>
+    <string name="mobile_profile_sign_in">Sign in</string>
+    <string name="mobile_profile_sign_out">Sign out</string>
+    <string name="mobile_profile_retry">Try again</string>
+    <string name="mobile_profile_loading">Loading profile</string>
+</resources>

@@ -8,8 +8,8 @@ import androidx.paging.PagingData
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.shared.feed.data.FeedRemoteDataSource
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow

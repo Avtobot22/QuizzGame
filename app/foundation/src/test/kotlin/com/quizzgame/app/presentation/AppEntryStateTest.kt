@@ -21,8 +21,9 @@ class AppEntryStateTest {
     }
 
     @Test
-    fun expiredAndUncertainSessionsRequireSignInRatherThanContentOrAnotherRefresh() {
-        listOf(SessionState.Expired, SessionState.Blocked(CredentialUnavailableKind.REFRESH_UNCERTAIN)).forEach {
+    fun expiredAwaitsGuestTransitionAndUncertainRequiresSignIn() {
+        assertEquals(AppEntryState.Waiting, appEntryState(SessionState.Expired, 0))
+        listOf(SessionState.Blocked(CredentialUnavailableKind.REFRESH_UNCERTAIN)).forEach {
             assertEquals(AppEntryScreen.SIGN_IN, (appEntryState(it, 0) as AppEntryState.Ready).screen)
         }
     }

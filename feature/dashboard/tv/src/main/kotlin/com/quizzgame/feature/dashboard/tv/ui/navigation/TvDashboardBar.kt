@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -23,7 +24,6 @@ import androidx.tv.material3.MaterialTheme
 import com.quizzgame.core.designsystem.tv.QuizzTvActionLabel
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
-import com.quizzgame.core.designsystem.tv.QuizzTvButtonTone
 import com.quizzgame.core.designsystem.tv.QuizzTvNavigationBar
 import com.quizzgame.core.designsystem.tv.media.QuizzTvBadge
 import com.quizzgame.core.designsystem.tv.media.QuizzTvMedia
@@ -42,12 +42,13 @@ import com.quizzgame.core.ui.R as UiR
 internal fun TvDashboardBar(
     dashboard: Dashboard,
     selected: DashboardTabId,
-    focus: FocusRequester,
     requestFocus: Boolean,
-    onLogout: () -> Unit,
+    onProfile: () -> Unit,
+    profileFocused: Boolean,
     onSelect: (DashboardTabId) -> Unit,
-    onBarFocus: () -> Unit,
+    onBarFocus: (Boolean) -> Unit,
 ) {
+    val focus = remember { FocusRequester() }
     val appearance = dashboard.appearance
     val background = appearance.backgroundColor.themeColor(MaterialTheme.colorScheme.background)
     QuizzTvNavigationBar(
@@ -64,19 +65,21 @@ internal fun TvDashboardBar(
         ).padding(horizontal = QuizzTvLayout.screenInset.dp, vertical = QuizzTvLayout.verticalInset.dp)
             .testTag(TvDashboardTags.NAVIGATION),
         itemModifier = { id ->
-            Modifier.testTag(TvDashboardTags.tab(id)).onFocusChanged { if (it.isFocused) onBarFocus() }
-                .then(if (id == selected) Modifier.focusRequester(focus) else Modifier)
+            Modifier.testTag(TvDashboardTags.tab(id)).onFocusChanged { if (it.isFocused) onBarFocus(false) }
+                .then(if (id == selected && !profileFocused) Modifier.focusRequester(focus) else Modifier)
         },
         label = { id -> TvDashboardTabLabel(dashboard.tabs.first { it.id == id }) },
         trailingContent = {
             QuizzTvButton(
-                onLogout,
-                Modifier.width(QuizzTvLayout.navigationActionWidth.dp).testTag(TvDashboardTags.SIGN_OUT),
+                onProfile,
+                Modifier.width(QuizzTvLayout.navigationActionWidth.dp)
+                    .testTag(TvDashboardTags.PROFILE)
+                    .onFocusChanged { if (it.isFocused) onBarFocus(true) }
+                    .then(if (profileFocused) Modifier.focusRequester(focus) else Modifier),
                 style = QuizzTvButtonStyle.QUIET,
-                tone = QuizzTvButtonTone.DANGER,
             ) {
-                Icon(painterResource(UiR.drawable.ic_quizz_logout), null, Modifier.size(18.dp))
-                QuizzTvActionLabel(stringResource(R.string.dashboard_logout), Modifier.padding(start = 8.dp))
+                Icon(painterResource(UiR.drawable.ic_quizz_profile), null, Modifier.size(18.dp))
+                QuizzTvActionLabel(stringResource(R.string.dashboard_profile), Modifier.padding(start = 8.dp))
             }
         },
     )

@@ -1,6 +1,7 @@
 package com.quizzgame.tv.network.mocks
 
 import com.quizzgame.debug.network.mocks.SplashMockScenario
+import com.quizzgame.debug.network.mocks.authMockRules
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.mockRules
 import dev.androidmock.core.response.ResponseSpec
@@ -10,6 +11,7 @@ import java.net.HttpURLConnection.HTTP_OK
 import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 
 internal fun tvMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mockRules(assets) {
+    authMockRules(json, "tv")
     rule("splash-feature-toggles", "/api/tv/feature-toggles") {
         match { method("GET") }
         respondWith { _, _ ->

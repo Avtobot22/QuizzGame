@@ -1,4 +1,8 @@
 [versions]
+credentials = "1.6.0"
+googleId = "1.2.1"
+zxing = "3.5.4"
+googlePlayBase = "18.11.1"
 paging = "3.5.3"
 coil = "3.6.3"
 agp = "9.3.3"
@@ -30,6 +34,11 @@ androidxHilt = "1.4.0"
 androidxAnnotationExperimental = "1.6.0"
 
 [libraries]
+zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
+androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
+androidx-credentials-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }
+google-identity = { module = "com.google.android.libraries.identity.googleid:googleid", version.ref = "googleId" }
+google-play-base = { module = "com.google.android.gms:play-services-base", version.ref = "googlePlayBase" }
 androidx-paging-common = { module = "androidx.paging:paging-common", version.ref = "paging" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
 androidx-paging-testing = { module = "androidx.paging:paging-testing", version.ref = "paging" }

@@ -9,4 +9,5 @@
         <item quantity="many">%1$d вопросов</item>
         <item quantity="other">%1$d вопроса</item>
     </plurals>
+    <string name="quiz_entry_sign_in">Войти для запуска</string>
 </resources>

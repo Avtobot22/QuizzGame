@@ -7,6 +7,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.swipeDown
 import androidx.test.espresso.Espresso.pressBack
 import com.quizzgame.debug.network.mocks.SplashMockScenario
+import com.quizzgame.feature.account.mobile.navigation.ProfileRoute
+import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
+import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
 import com.quizzgame.feature.feed.mobile.navigation.ExploreRoute
 import com.quizzgame.feature.feed.mobile.ui.tags.MobileFeedTags
 import com.quizzgame.feature.play.mobile.navigation.PlayRoute
@@ -82,6 +85,54 @@ class MobileCatalogJourneyTest {
         screen.tag(MobileFeedTags.REFRESH).performTouchInput { swipeDown() }
         compose.waitUntil(15_000) { MobileCatalogMockScenario.feedLoadCount > before }
         await(MobileFeedTags.LIST)
+    }
+
+    @Test
+    fun guestCanCancelSignInThenUseOtpAndReturnToProfile() {
+        await(MobilePlayTags.ROOT)
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_IN)
+        screen.tag(MobileProfileTags.SIGN_IN).performClick()
+        await(MobileSignInTags.EMAIL)
+        pressBack()
+        await(MobileProfileTags.SIGN_IN)
+        screen.tag(MobileProfileTags.SIGN_IN).performClick()
+        await(MobileSignInTags.EMAIL)
+        screen.tag(MobileSignInTags.EMAIL).performClick()
+        screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("guest@example.test")
+        screen.tag(MobileSignInTags.SEND).performClick()
+        await(MobileSignInTags.CODE)
+        screen.tag(MobileSignInTags.CODE).performTextInput("012345")
+        screen.tag(MobileSignInTags.VERIFY).performClick()
+        await(MobileProfileTags.SIGN_OUT)
+        screen.tag(MobileProfileTags.SIGN_OUT).performClick()
+        await(MobilePlayTags.ROOT)
+    }
+
+    @Test
+    fun wrongCodeKeepsInputAndAllowsChangingEmailDuringCooldown() {
+        await(MobilePlayTags.ROOT)
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_IN)
+        screen.tag(MobileProfileTags.SIGN_IN).performClick()
+        await(MobileSignInTags.EMAIL)
+        screen.tag(MobileSignInTags.EMAIL).performClick()
+        screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("guest@example.test")
+        screen.tag(MobileSignInTags.SEND).performClick()
+
+        await(MobileSignInTags.CODE)
+        screen.tag(MobileSignInTags.RESEND_TIMER).assertIsDisplayed()
+        screen.tag(MobileSignInTags.RESEND).assertIsNotEnabled()
+        screen.tag(MobileSignInTags.CODE).performTextInput("111111")
+        screen.tag(MobileSignInTags.VERIFY).performClick()
+        await(MobileSignInTags.ERROR)
+        screen.tag(MobileSignInTags.CODE).assertIsDisplayed()
+        screen.tag(MobileSignInTags.VERIFY).assertIsNotEnabled()
+        screen.tag(MobileSignInTags.CHANGE_DESTINATION).apply {
+            performScrollTo()
+            performClick()
+        }
+        await(MobileSignInTags.IDENTIFIER)
     }
 
     private fun awaitEntryAction() {

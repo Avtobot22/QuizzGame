@@ -10,9 +10,9 @@ import com.quizzgame.shared.feed.data.dto.section.IgnoredFeedSectionDto
 import com.quizzgame.shared.feed.data.dto.section.RailDto
 import com.quizzgame.shared.feed.data.dto.section.RailItemsDto
 import com.quizzgame.shared.feed.domain.entity.Feed
-import com.quizzgame.shared.feed.domain.entity.QuizHero
-import com.quizzgame.shared.feed.domain.entity.QuizRail
 import com.quizzgame.shared.feed.domain.entity.RailItems
+import com.quizzgame.shared.feed.domain.entity.section.QuizHero
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import javax.inject.Inject
 
 class FeedMapper @Inject constructor() {

@@ -10,8 +10,8 @@ import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.shared.catalog.data.mapper.catalogId
 import com.quizzgame.shared.catalog.data.mapper.requireCatalog
 import com.quizzgame.shared.catalog.data.mapper.toDomain
-import com.quizzgame.shared.quizentry.domain.QuizEntryRepository
 import com.quizzgame.shared.quizentry.domain.entity.QuizEntryResult
+import com.quizzgame.shared.quizentry.domain.repository.QuizEntryRepository
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
 import javax.inject.Inject

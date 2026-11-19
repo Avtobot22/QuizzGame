@@ -1,6 +1,6 @@
 package com.quizzgame.feature.dashboard.mobile.ui.tags
 
-object MobileAccountTags {
+internal object MobileAccountTags {
     const val LIBRARY = "mobile-library"
-    const val PROFILE = "mobile-profile"
+    const val SIGN_IN = "library:sign-in"
 }

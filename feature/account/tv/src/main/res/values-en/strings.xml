@@ -1,0 +1,12 @@
+<resources>
+    <string name="profile_title">Profile</string>
+    <string name="profile_guest">Sign in to open your profile on this TV.</string>
+    <string name="profile_sign_in">Sign in</string>
+    <string name="profile_signed_in">Signed in</string>
+    <string name="profile_unavailable">Profile unavailable</string>
+    <string name="profile_retry">Retry</string>
+    <string name="profile_settings">Settings</string>
+    <string name="profile_sign_out">Sign out</string>
+    <string name="profile_loading">Loading profile</string>
+    <string name="profile_guest_title">Guest profile</string>
+</resources>

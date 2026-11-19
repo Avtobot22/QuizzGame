@@ -8,8 +8,8 @@ import com.quizzgame.shared.feed.data.dto.section.RailItemsDto
 import com.quizzgame.shared.feed.data.mapper.FeedMapper
 import com.quizzgame.shared.feed.domain.entity.Feed
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.QuizRail
 import com.quizzgame.shared.feed.domain.entity.RailItems
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 
 internal object FeedTestData {
     private val json = createNetworkJson()
