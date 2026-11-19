@@ -1,5 +1,5 @@
 <resources>
-    <string name="auth_title">Sign in to QuizzGame</string>
+    <string name="auth_title">Sign in</string>
     <string name="auth_choose">Choose how to sign in</string>
     <string name="auth_email">Sign in by email</string>
     <string name="auth_sms">Sign in by SMS</string>
@@ -11,7 +11,7 @@
     <string name="auth_code">Verification code</string>
     <string name="auth_sent">Code sent to %1$s</string>
     <string name="auth_verify">Verify</string>
-    <string name="auth_resend">Send again</string>
+    <string name="auth_resend">Resend code</string>
     <string name="auth_cooldown">Try again in %1$d s</string>
     <string name="auth_back">Back</string>
     <string name="auth_cancel">Cancel</string>
@@ -29,4 +29,15 @@
     <string name="auth_busy">Signing in</string>
     <string name="auth_change_destination">Change email or phone number</string>
     <string name="auth_enter_code">Enter the code</string>
+    <string name="auth_account">Account</string>
+    <string name="auth_code_explanation">We’ll send a one-time code to sign you in.</string>
+    <string name="auth_loading_methods">Loading sign-in options</string>
+    <string name="auth_load_failed">Couldn’t load sign-in options</string>
+    <string name="auth_methods_empty_hint">Refresh the list or come back later.</string>
+    <string name="auth_timer">%1$d:%2$02d</string>
+    <string name="auth_phase">Step %1$d of 2</string>
+    <string name="auth_change_email">Change email</string>
+    <string name="auth_change_phone">Change phone number</string>
+    <string name="auth_signed_in">You’re signed in</string>
+    <string name="auth_opening">Opening the app…</string>
 </resources>

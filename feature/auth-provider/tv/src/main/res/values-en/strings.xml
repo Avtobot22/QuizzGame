@@ -1,0 +1,17 @@
+<resources>
+    <string name="auth_device_google">Sign in with Google</string>
+    <string name="auth_device_back">Back</string>
+    <string name="auth_device_rate_limited">Too many attempts. Try again later.</string>
+    <string name="auth_device_provider_error">Could not sign in with this provider</string>
+    <string name="auth_device_session_changed">Start signing in again</string>
+    <string name="auth_device_storage">Could not save your session</string>
+    <string name="auth_device_intro">Confirm your TV sign-in on your phone.</string>
+    <string name="auth_device_scan">Scan the QR code with your phone camera</string>
+    <string name="auth_device_open">Or open %1$s and enter the code</string>
+    <string name="auth_device_waiting">Waiting for confirmation on your phone</string>
+    <string name="auth_device_confirming">Finishing sign-in on the TV</string>
+    <string name="auth_device_loading">Preparing the sign-in code</string>
+    <string name="auth_device_qr">QR code for signing in on the TV</string>
+    <string name="auth_device_expired">This code has expired.</string>
+    <string name="auth_device_retry">Get a new code</string>
+</resources>

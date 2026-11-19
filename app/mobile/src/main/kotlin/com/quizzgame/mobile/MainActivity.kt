@@ -17,9 +17,8 @@ import com.quizzgame.core.designsystem.mobile.media.LocalMobileMediaLoader
 import com.quizzgame.core.media.android.CatalogMediaLoader
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
-import com.quizzgame.feature.auth.mobile.oauth.LocalMockOAuth
-import com.quizzgame.feature.auth.mobile.oauth.YandexAppLink
-import com.quizzgame.feature.auth.mobile.oauth.YandexLinkInbox
+import com.quizzgame.feature.authprovider.mobile.navigation.YandexAppLink
+import com.quizzgame.feature.authprovider.mobile.navigation.YandexLinkInbox
 import com.quizzgame.mobile.navigation.MobileCatalogNavigationHost
 import com.quizzgame.mobile.navigation.MobileNavigationContext
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +50,6 @@ class MainActivity : ComponentActivity() {
         setContent {
             CompositionLocalProvider(
                 LocalMobileMediaLoader provides mediaLoader,
-                LocalMockOAuth provides (BuildConfig.DEBUG && BuildConfig.NETWORK_MODE == "MOCK"),
             ) {
                 QuizzMobileTheme {
                     Surface(

@@ -1,5 +1,5 @@
 <resources>
-    <string name="auth_title">Вход в QuizzGame</string>
+    <string name="auth_title">Вход</string>
     <string name="auth_choose">Выберите способ входа</string>
     <string name="auth_email">Войти по почте</string>
     <string name="auth_sms">Войти по SMS</string>
@@ -11,7 +11,7 @@
     <string name="auth_code">Код подтверждения</string>
     <string name="auth_sent">Код отправлен на %1$s</string>
     <string name="auth_verify">Подтвердить</string>
-    <string name="auth_resend">Отправить ещё раз</string>
+    <string name="auth_resend">Новый код</string>
     <string name="auth_cooldown">Повторить через %1$d с</string>
     <string name="auth_back">Назад</string>
     <string name="auth_cancel">Отмена</string>
@@ -29,4 +29,15 @@
     <string name="auth_busy">Вход выполняется</string>
     <string name="auth_change_destination">Изменить почту или номер</string>
     <string name="auth_enter_code">Введите код</string>
+    <string name="auth_account">Аккаунт</string>
+    <string name="auth_code_explanation">Отправим одноразовый код для входа.</string>
+    <string name="auth_loading_methods">Загружаются способы входа</string>
+    <string name="auth_load_failed">Не загрузились способы входа</string>
+    <string name="auth_methods_empty_hint">Обновите список или вернитесь позже.</string>
+    <string name="auth_timer">%1$d:%2$02d</string>
+    <string name="auth_phase">Шаг %1$d из 2</string>
+    <string name="auth_change_email">Изменить почту</string>
+    <string name="auth_change_phone">Изменить номер</string>
+    <string name="auth_signed_in">Вход выполнен</string>
+    <string name="auth_opening">Открываем приложение…</string>
 </resources>

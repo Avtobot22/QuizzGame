@@ -11,6 +11,7 @@ import com.quizzgame.shared.auth.domain.entity.AuthFailure
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
 import com.quizzgame.shared.auth.domain.entity.AuthResult
 import com.quizzgame.shared.auth.domain.entity.AuthSurface
+import com.quizzgame.shared.auth.domain.entity.device.DeviceAuthStatus
 import kotlinx.coroutines.runBlocking
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -36,8 +37,8 @@ class AuthRepositoryTest {
             assertTrue(repo.verify("challenge", "012345", DEVICE, "idem") is AuthResult.Success)
             val methods = server.takeRequest()
             val verify = server.takeRequest()
-            assertEquals("/api/v2/auth/methods?clientSurface=tv", methods.path)
-            assertEquals("/api/v2/auth/otp/challenges/challenge/verify", verify.path)
+            assertEquals("/api/auth/methods?clientSurface=tv", methods.path)
+            assertEquals("/api/auth/otp/challenges/challenge/verify", verify.path)
             assertEquals("GET", methods.method)
             assertEquals("POST", verify.method)
             assertEquals("idem", verify.getHeader("Idempotency-Key"))
@@ -66,6 +67,57 @@ class AuthRepositoryTest {
             assertEquals(3, server.requestCount)
         }
     }
+
+    @Test
+    fun deviceAuthPollsWithPrivateHeaderAndRedeemsTheApprovedRequest() = runBlocking {
+        MockWebServer().use { server ->
+            val policies = mutableListOf<RequestPolicy?>()
+            val repo = DeviceAuthRepositoryImpl(executor(server, policies))
+            server.enqueue(json(deviceStart("https://auth.example.test/device?user_code=ABCD-2345")))
+            server.enqueue(json("""{"status":"pending"}"""))
+            server.enqueue(json("""{"status":"approved"}"""))
+            server.enqueue(json("""{"access":"test-access","refresh":"test-refresh"}"""))
+
+            val request = (repo.requestDeviceAuth(DEVICE, "auth.example.test") as AuthResult.Success).value
+            assertEquals("ABCD-2345", request.display.code)
+            assertEquals(DeviceAuthStatus.PENDING, (repo.deviceAuthStatus(request) as AuthResult.Success).value)
+            assertEquals(DeviceAuthStatus.APPROVED, (repo.deviceAuthStatus(request) as AuthResult.Success).value)
+            assertTrue(repo.redeemDeviceAuth(request, DEVICE) is AuthResult.Success)
+
+            assertEquals("/api/auth/device/requests", server.takeRequest().path)
+            repeat(2) {
+                val poll = server.takeRequest()
+                assertEquals("GET", poll.method)
+                assertEquals("/api/auth/device/requests/device-attempt", poll.path)
+                assertEquals("test-private-secret", poll.getHeader("X-Device-Authorization-Secret"))
+                assertNull(poll.getHeader("Authorization"))
+            }
+            val redeem = server.takeRequest()
+            assertEquals("/api/auth/device/requests/device-attempt/redeem", redeem.path)
+            assertEquals("""{"deviceSecret":"test-private-secret","deviceId":"$DEVICE"}""", redeem.body.readUtf8())
+            assertEquals(List(4) { RequestPolicy(AuthPolicy.NONE, ReplayPolicy.NEVER) }, policies)
+        }
+    }
+
+    @Test
+    fun deviceAuthRejectsUntrustedQrHostAndPrivateSecretInQr() = runBlocking {
+        MockWebServer().use { server ->
+            val repo = DeviceAuthRepositoryImpl(executor(server, mutableListOf()))
+            listOf(
+                "https://auth.example.test.evil.invalid/device?user_code=ABCD-2345",
+                "https://auth.example.test/device?secret=test-private%2Dsecret",
+            ).forEach { unsafe ->
+                server.enqueue(json(deviceStart(unsafe)))
+                assertTrue(repo.requestDeviceAuth(DEVICE, "auth.example.test") is AuthResult.Failed)
+            }
+        }
+    }
+
+    private fun deviceStart(qr: String) =
+        """{"requestId":"device-attempt","userCode":"ABCD-2345",""" +
+            """"verificationUri":"https://auth.example.test/device","verificationUriComplete":"$qr",""" +
+            """"deviceSecret":"test-private-secret",""" +
+            """"expiresAt":"2029-01-01T00:00:00Z","pollIntervalSeconds":2}"""
 
     private fun json(body: String) = MockResponse().setBody(body).setHeader("Content-Type", "application/json")
 

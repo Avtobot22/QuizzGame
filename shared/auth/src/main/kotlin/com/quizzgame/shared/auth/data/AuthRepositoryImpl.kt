@@ -1,32 +1,21 @@
 package com.quizzgame.shared.auth.data
 
-import com.quizzgame.core.error.classification.classifyApiUnavailable
-import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.network.api.ApiCallExecutor
-import com.quizzgame.core.network.api.ApiCallResult
-import com.quizzgame.core.network.auth.AuthPolicy
-import com.quizzgame.core.network.auth.ReplayPolicy
-import com.quizzgame.core.network.auth.RequestPolicy
-import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.shared.auth.data.api.AuthApi
 import com.quizzgame.shared.auth.data.dto.DeviceRequestDto
-import com.quizzgame.shared.auth.data.dto.GoogleVerifyRequestDto
-import com.quizzgame.shared.auth.data.dto.OtpChallengeRequestDto
-import com.quizzgame.shared.auth.data.dto.OtpVerifyRequestDto
-import com.quizzgame.shared.auth.data.dto.YandexRedeemRequestDto
-import com.quizzgame.shared.auth.data.mapper.toAuthFailure
+import com.quizzgame.shared.auth.data.dto.otp.OtpChallengeRequestDto
+import com.quizzgame.shared.auth.data.dto.otp.OtpVerifyRequestDto
+import com.quizzgame.shared.auth.data.dto.provider.GoogleVerifyRequestDto
+import com.quizzgame.shared.auth.data.dto.provider.YandexRedeemRequestDto
 import com.quizzgame.shared.auth.data.mapper.toDomain
-import com.quizzgame.shared.auth.domain.AuthRepository
-import com.quizzgame.shared.auth.domain.entity.AuthFailure
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
 import com.quizzgame.shared.auth.domain.entity.AuthResult
 import com.quizzgame.shared.auth.domain.entity.AuthSurface
-import com.quizzgame.shared.auth.domain.entity.OtpChallenge
-import com.quizzgame.shared.auth.domain.entity.YandexAttempt
+import com.quizzgame.shared.auth.domain.entity.otp.OtpChallenge
+import com.quizzgame.shared.auth.domain.entity.provider.YandexAttempt
+import com.quizzgame.shared.auth.domain.repository.AuthRepository
 import kotlinx.serialization.json.JsonObject
 import javax.inject.Inject
-
-private val authPolicy = RequestPolicy(AuthPolicy.NONE, ReplayPolicy.NEVER)
 
 internal class AuthRepositoryImpl @Inject constructor(private val executor: ApiCallExecutor) : AuthRepository {
     override suspend fun methods(surface: AuthSurface) = execute({ methods(surface.wireId, authPolicy) }) {
@@ -61,16 +50,5 @@ internal class AuthRepositoryImpl @Inject constructor(private val executor: ApiC
     ) { it.toDomain() }
 
     private suspend fun <D, T> execute(request: suspend AuthApi.() -> D, map: (D) -> T): AuthResult<T> =
-        when (val call = executor.call(AuthApi::class.java, request)) {
-            is ApiCallResult.Executed -> when (val result = call.result) {
-                is NetworkResult.Failure -> AuthResult.Failed(result.reason.toAuthFailure())
-                is NetworkResult.Success -> try {
-                    AuthResult.Success(map(result.value))
-                } catch (_: IllegalArgumentException) {
-                    AuthResult.Failed(AuthFailure.General(AppFailure.InvalidServerData))
-                }
-            }
-            is ApiCallResult.Unavailable -> AuthResult.Failed(AuthFailure.General(classifyApiUnavailable(call.reason)))
-            ApiCallResult.Closed -> AuthResult.Failed(AuthFailure.General(AppFailure.OperationInterrupted))
-        }
+        executor.executeAuthRequest(AuthApi::class.java, request, map)
 }

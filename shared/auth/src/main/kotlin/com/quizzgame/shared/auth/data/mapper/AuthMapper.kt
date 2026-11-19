@@ -1,15 +1,15 @@
 package com.quizzgame.shared.auth.data.mapper
 
 import com.quizzgame.core.session.model.TokenPair
-import com.quizzgame.shared.auth.data.dto.AuthMethodsDto
-import com.quizzgame.shared.auth.data.dto.GoogleChallengeDto
-import com.quizzgame.shared.auth.data.dto.OtpChallengeDto
 import com.quizzgame.shared.auth.data.dto.TokenPairDto
-import com.quizzgame.shared.auth.data.dto.YandexAttemptDto
+import com.quizzgame.shared.auth.data.dto.methods.AuthMethodsDto
+import com.quizzgame.shared.auth.data.dto.otp.OtpChallengeDto
+import com.quizzgame.shared.auth.data.dto.provider.GoogleChallengeDto
+import com.quizzgame.shared.auth.data.dto.provider.YandexAttemptDto
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.domain.entity.GoogleChallenge
-import com.quizzgame.shared.auth.domain.entity.OtpChallenge
-import com.quizzgame.shared.auth.domain.entity.YandexAttempt
+import com.quizzgame.shared.auth.domain.entity.otp.OtpChallenge
+import com.quizzgame.shared.auth.domain.entity.provider.GoogleChallenge
+import com.quizzgame.shared.auth.domain.entity.provider.YandexAttempt
 import java.net.URI
 import java.time.Instant
 

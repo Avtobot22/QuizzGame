@@ -3,17 +3,15 @@ package com.quizzgame.app.di
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.StartupApiCallExecutor
 import com.quizzgame.app.session.SessionManagerFactory
+import com.quizzgame.app.session.StartupSessionActions
 import com.quizzgame.app.startup.AppStartup
 import com.quizzgame.app.startup.AppStartupCoordinator
 import com.quizzgame.app.startup.GraphAccessResult
 import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiCallExecutor
 import com.quizzgame.core.network.config.createNetworkJson
-import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.core.session.lifecycle.SessionActions
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.core.session.model.TokenPair
-import com.quizzgame.shared.auth.domain.AuthSessionAccess
-import com.quizzgame.shared.auth.domain.AuthSessionAttempt
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,21 +37,8 @@ object AppStartupModule {
         }
 
     @Provides
-    fun authSessionAccess(startup: AppStartup): AuthSessionAccess = AuthSessionAccess {
-        val manager = (startup.accessGraph() as? GraphAccessResult.Ready)?.graph?.session
-            ?: return@AuthSessionAccess null
-        val epoch = manager.signInEpoch()
-        val state = manager.state.value
-        if (state != SessionState.Guest && manager.recoveryAction.value !=
-            com.quizzgame.core.session.lifecycle.SessionRecoveryAction.REAUTHENTICATE
-        ) {
-            return@AuthSessionAccess null
-        }
-        object : AuthSessionAttempt {
-            override val deviceId: String = manager.deviceIdProvider.get()
-            override suspend fun signIn(tokens: TokenPair) = manager.signInIfCurrent(tokens, epoch)
-        }
-    }
+    @Singleton
+    fun sessionActions(startup: AppStartup): SessionActions = StartupSessionActions(startup)
 
     @Provides
     @Singleton

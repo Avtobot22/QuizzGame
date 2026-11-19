@@ -7,10 +7,20 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val verificationHost = providers.gradleProperty("quizz.auth.deviceVerificationHost").orElse("").get()
+check(verificationHost.isEmpty() || verificationHost.matches(Regex("[a-z0-9-]+([.][a-z0-9-]+)+")))
+val debugNetworkMode = providers.gradleProperty("quizz.tv.debugNetworkMode").orElse(DebugNetworkMode.MOCK.name).get()
+
 android {
     namespace = "com.quizzgame.tv"
     defaultConfig {
         applicationId = "com.quizzgame.tv"
+        buildConfigField("String", "DEVICE_VERIFICATION_HOST", "\"$verificationHost\"")
+    }
+    buildTypes.named("debug") {
+        if (debugNetworkMode == DebugNetworkMode.MOCK.name) {
+            buildConfigField("String", "DEVICE_VERIFICATION_HOST", "\"auth.mock.invalid\"")
+        }
     }
 }
 
@@ -36,6 +46,7 @@ dependencies {
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.tv)
     implementation(projects.feature.auth.tv)
+    implementation(projects.shared.auth)
     implementation(projects.core.network)
     implementation(projects.core.session)
     implementation(projects.core.error.uiTv)
@@ -45,6 +56,7 @@ dependencies {
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
 
     debugImplementation(projects.app.debugSupport)
+    androidTestImplementation(projects.feature.authProvider.tv)
 
     testImplementation(libs.bundles.unit.test)
     testDebugImplementation(libs.junit)

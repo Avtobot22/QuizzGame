@@ -31,9 +31,9 @@ class SessionManager private constructor(
     )
     internal var pending: PendingSessionMutation? = PendingSessionMutation.Read
     private val mutableState = MutableStateFlow<SessionState>(SessionState.Initializing)
-    override val state = mutableState.asStateFlow()
+    val state = mutableState.asStateFlow()
     private val mutableRecoveryAction = MutableStateFlow(SessionRecoveryAction.NONE)
-    override val recoveryAction = mutableRecoveryAction.asStateFlow()
+    val recoveryAction = mutableRecoveryAction.asStateFlow()
     val deviceIdProvider = DeviceIdProvider {
         access.get().record?.deviceId ?: throw SessionUnavailableException(
             if (access.get() == CredentialAccess.Closed) {
@@ -119,10 +119,17 @@ class SessionManager private constructor(
     override suspend fun signOut(): SessionChangeResult = logout().asChange()
     override suspend fun recoverStorage(): SessionRecoveryResult = withContext(dispatcher) { recovery.recover() }
 
-    /** Поколение для привязки запроса входа к сессии, даже если access закрыт для refresh. */
-    fun signInEpoch(): Long = access.get().epoch
+    override suspend fun beginSignIn(): SessionSignInAttempt? = lock.withLock {
+        if (state.value != SessionState.Guest && recoveryAction.value != SessionRecoveryAction.REAUTHENTICATE) {
+            return@withLock null
+        }
+        val current = access.get()
+        val deviceId = current.record?.deviceId ?: return@withLock null
+        val epoch = current.epoch
+        SessionSignInAttempt(deviceId) { tokens -> signInIfCurrent(tokens, epoch) }
+    }
 
-    suspend fun signInIfCurrent(tokens: TokenPair, epoch: Long): SessionChangeResult = withContext(dispatcher) {
+    private suspend fun signInIfCurrent(tokens: TokenPair, epoch: Long): SessionChangeResult = withContext(dispatcher) {
         lock.withLock {
             if (access.get().epoch != epoch || state.value is SessionState.Authenticated) {
                 SessionChangeResult.BusyOrBlocked

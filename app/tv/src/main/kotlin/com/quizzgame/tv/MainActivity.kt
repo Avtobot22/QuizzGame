@@ -44,7 +44,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         if (savedInstanceState == null) acceptNavigationIntent(intent)
         setContent {
-            CompositionLocalProvider(LocalTvMediaLoader provides mediaLoader) {
+            CompositionLocalProvider(
+                LocalTvMediaLoader provides mediaLoader,
+            ) {
                 QuizzTvTheme {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
