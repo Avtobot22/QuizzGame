@@ -1,4 +1,4 @@
-package com.quizzgame.shared.feed.domain.entity
+package com.quizzgame.shared.feed.domain.entity.section
 
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
 

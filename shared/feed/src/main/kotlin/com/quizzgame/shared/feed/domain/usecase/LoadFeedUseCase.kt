@@ -1,7 +1,8 @@
-package com.quizzgame.shared.feed.domain
+package com.quizzgame.shared.feed.domain.usecase
 
 import androidx.paging.PagingData
-import com.quizzgame.shared.feed.domain.entity.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

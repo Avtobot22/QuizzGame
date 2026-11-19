@@ -1,4 +1,4 @@
-package com.quizzgame.shared.quizentry.domain
+package com.quizzgame.shared.quizentry.domain.repository
 
 import com.quizzgame.shared.quizentry.domain.entity.QuizEntryResult
 

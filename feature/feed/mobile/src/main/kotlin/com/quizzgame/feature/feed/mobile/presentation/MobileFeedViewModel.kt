@@ -3,9 +3,9 @@ package com.quizzgame.feature.feed.mobile.presentation
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.shared.feed.domain.LoadFeedUseCase
-import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
+import com.quizzgame.shared.feed.domain.usecase.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.usecase.LoadRailItemsUseCase
 import com.quizzgame.shared.feed.presentation.FeedRailCache
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

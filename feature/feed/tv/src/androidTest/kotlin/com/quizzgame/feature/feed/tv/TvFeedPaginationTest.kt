@@ -15,7 +15,7 @@ import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewProvider
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewState
 import com.quizzgame.feature.feed.tv.ui.preview.TvFeedPreviewStateContent
 import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test

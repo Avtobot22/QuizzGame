@@ -10,8 +10,8 @@ import com.quizzgame.shared.feed.FakeFeedRemoteDataSource
 import com.quizzgame.shared.feed.FeedTestData
 import com.quizzgame.shared.feed.data.paging.FeedPagingSession
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest

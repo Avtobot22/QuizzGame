@@ -4,8 +4,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import androidx.paging.LoadState
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.ConnectivityKind
-import com.quizzgame.shared.feed.domain.FeedPagingException
 import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedPagingException
 
 internal class MobileFeedPreviewProvider : PreviewParameterProvider<MobileFeedPreviewState> {
     private val compactFeed = Feed(

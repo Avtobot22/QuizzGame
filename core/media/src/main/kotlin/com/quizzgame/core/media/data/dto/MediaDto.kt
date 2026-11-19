@@ -1,5 +1,9 @@
 package com.quizzgame.core.media.data.dto
 
+import com.quizzgame.core.media.data.dto.icon.IconVariantDto
+import com.quizzgame.core.media.data.dto.icon.IconWeightDto
+import com.quizzgame.core.media.data.dto.presentation.MediaLoadingDto
+import com.quizzgame.core.media.data.dto.presentation.MediaPresentationDto
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

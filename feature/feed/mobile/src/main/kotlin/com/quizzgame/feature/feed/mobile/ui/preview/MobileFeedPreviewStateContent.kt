@@ -9,8 +9,8 @@ import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.quizzgame.feature.feed.mobile.presentation.MobileFeedIntent
 import com.quizzgame.feature.feed.mobile.ui.MobileFeedStateContent
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.flow.flowOf
 
 @Composable

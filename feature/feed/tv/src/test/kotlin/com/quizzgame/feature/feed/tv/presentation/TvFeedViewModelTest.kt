@@ -11,11 +11,11 @@ import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.feature.feed.tv.FakeFeedRemoteDataSource
 import com.quizzgame.feature.feed.tv.FeedTestData
 import com.quizzgame.shared.feed.data.FeedRepositoryImpl
-import com.quizzgame.shared.feed.domain.LoadFeedUseCase
-import com.quizzgame.shared.feed.domain.LoadRailItemsUseCase
 import com.quizzgame.shared.feed.domain.entity.Feed
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
+import com.quizzgame.shared.feed.domain.usecase.LoadFeedUseCase
+import com.quizzgame.shared.feed.domain.usecase.LoadRailItemsUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation

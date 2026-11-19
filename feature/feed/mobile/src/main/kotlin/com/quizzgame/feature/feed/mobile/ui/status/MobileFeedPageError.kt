@@ -14,7 +14,7 @@ import com.quizzgame.core.error.presentation.ErrorActionKind
 import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorCard
 import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorFullScreen
 import com.quizzgame.feature.feed.mobile.ui.tags.MobileFeedTags
-import com.quizzgame.shared.feed.domain.FeedPagingException
+import com.quizzgame.shared.feed.domain.entity.FeedPagingException
 
 @Composable
 internal fun MobileFeedPageError(

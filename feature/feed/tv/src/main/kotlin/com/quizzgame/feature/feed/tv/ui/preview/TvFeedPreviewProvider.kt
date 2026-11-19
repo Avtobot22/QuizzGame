@@ -11,7 +11,7 @@ import com.quizzgame.shared.catalog.domain.entity.PassingStatus
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.shared.catalog.domain.entity.QuizUserState
 import com.quizzgame.shared.feed.domain.entity.Feed
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 
 internal class TvFeedPreviewProvider : PreviewParameterProvider<TvFeedPreviewState> {
     private val feed = Feed(

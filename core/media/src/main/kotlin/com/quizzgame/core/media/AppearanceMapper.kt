@@ -2,8 +2,8 @@ package com.quizzgame.core.media
 
 import com.quizzgame.core.media.data.dto.ColorDto
 import com.quizzgame.core.media.data.dto.MediaDto
-import com.quizzgame.core.media.data.dto.MediaScaleDto
-import com.quizzgame.core.media.data.dto.MediaTransitionDto
+import com.quizzgame.core.media.data.dto.presentation.MediaScaleDto
+import com.quizzgame.core.media.data.dto.presentation.MediaTransitionDto
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /** Проверяет значения типизированных подсказок оформления перед отображением. */

@@ -1,6 +1,7 @@
-package com.quizzgame.shared.feed.domain
+package com.quizzgame.shared.feed.domain.usecase
 
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
+import com.quizzgame.shared.feed.domain.repository.FeedRepository
 import javax.inject.Inject
 
 class LoadRailItemsUseCase @Inject constructor(private val repository: FeedRepository) {

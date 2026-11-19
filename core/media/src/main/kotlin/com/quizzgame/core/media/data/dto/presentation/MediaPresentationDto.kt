@@ -1,5 +1,6 @@
-package com.quizzgame.core.media.data.dto
+package com.quizzgame.core.media.data.dto.presentation
 
+import com.quizzgame.core.media.data.dto.ColorDto
 import kotlinx.serialization.Serializable
 
 @Serializable

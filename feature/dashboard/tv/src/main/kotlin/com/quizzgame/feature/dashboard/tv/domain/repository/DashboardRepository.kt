@@ -1,4 +1,4 @@
-package com.quizzgame.feature.dashboard.tv.domain
+package com.quizzgame.feature.dashboard.tv.domain.repository
 
 import com.quizzgame.feature.dashboard.tv.domain.entity.DashboardResult
 

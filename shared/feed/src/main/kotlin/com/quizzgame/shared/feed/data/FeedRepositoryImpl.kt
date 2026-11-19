@@ -6,9 +6,9 @@ import androidx.paging.PagingData
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.shared.feed.data.paging.FeedPagingSession
-import com.quizzgame.shared.feed.domain.FeedRepository
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
+import com.quizzgame.shared.feed.domain.repository.FeedRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow

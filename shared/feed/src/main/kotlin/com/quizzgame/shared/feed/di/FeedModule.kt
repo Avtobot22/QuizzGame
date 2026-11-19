@@ -1,7 +1,7 @@
 package com.quizzgame.shared.feed.di
 
 import com.quizzgame.shared.feed.data.FeedRepositoryImpl
-import com.quizzgame.shared.feed.domain.FeedRepository
+import com.quizzgame.shared.feed.domain.repository.FeedRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

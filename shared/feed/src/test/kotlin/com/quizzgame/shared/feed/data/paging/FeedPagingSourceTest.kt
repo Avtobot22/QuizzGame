@@ -10,11 +10,11 @@ import com.quizzgame.shared.catalog.domain.entity.CursorPageInfo
 import com.quizzgame.shared.catalog.domain.entity.QuizCard
 import com.quizzgame.shared.feed.FakeFeedRemoteDataSource
 import com.quizzgame.shared.feed.FeedTestData
-import com.quizzgame.shared.feed.domain.FeedPagingException
 import com.quizzgame.shared.feed.domain.entity.Feed
+import com.quizzgame.shared.feed.domain.entity.FeedPagingException
 import com.quizzgame.shared.feed.domain.entity.FeedResult
-import com.quizzgame.shared.feed.domain.entity.FeedSection
-import com.quizzgame.shared.feed.domain.entity.QuizRail
+import com.quizzgame.shared.feed.domain.entity.section.FeedSection
+import com.quizzgame.shared.feed.domain.entity.section.QuizRail
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancelAndJoin

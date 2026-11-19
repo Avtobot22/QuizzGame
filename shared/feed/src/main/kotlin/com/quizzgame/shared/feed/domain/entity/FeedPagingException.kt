@@ -1,4 +1,4 @@
-package com.quizzgame.shared.feed.domain
+package com.quizzgame.shared.feed.domain.entity
 
 import com.quizzgame.core.error.failure.AppFailure
 

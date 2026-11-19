@@ -1,7 +1,7 @@
 package com.quizzgame.feature.dashboard.tv.di
 
 import com.quizzgame.feature.dashboard.tv.data.DashboardRepositoryImpl
-import com.quizzgame.feature.dashboard.tv.domain.DashboardRepository
+import com.quizzgame.feature.dashboard.tv.domain.repository.DashboardRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

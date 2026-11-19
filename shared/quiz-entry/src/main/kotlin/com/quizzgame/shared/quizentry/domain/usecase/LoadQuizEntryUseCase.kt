@@ -1,5 +1,6 @@
-package com.quizzgame.shared.quizentry.domain
+package com.quizzgame.shared.quizentry.domain.usecase
 
+import com.quizzgame.shared.quizentry.domain.repository.QuizEntryRepository
 import javax.inject.Inject
 
 /** Загружает подробности без запуска игры или смены викторины на другом устройстве. */
