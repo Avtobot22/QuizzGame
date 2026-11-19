@@ -12,7 +12,7 @@ import com.quizzgame.core.network.api.ApiCallResult
 import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
-import com.quizzgame.shared.splash.domain.SplashRepository
+import com.quizzgame.shared.splash.domain.repository.SplashRepository
 import javax.inject.Inject
 
 internal class SplashRepositoryImpl @Inject constructor(

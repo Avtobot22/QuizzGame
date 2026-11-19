@@ -6,16 +6,17 @@ import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.policy.DefaultErrorDecisionPolicy
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.feature.dashboard.mobile.domain.LoadDashboardUseCase
 import com.quizzgame.feature.dashboard.mobile.domain.entity.DashboardResult
+import com.quizzgame.feature.dashboard.mobile.domain.usecase.LoadDashboardUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MobileDashboardViewModel @Inject constructor(private val load: LoadDashboardUseCase) :
-    BaseViewModel<MobileDashboardState, MobileDashboardIntent, Nothing>() {
+internal class MobileDashboardViewModel @Inject constructor(
+    private val loadDashboardUseCase: LoadDashboardUseCase,
+) : BaseViewModel<MobileDashboardState, MobileDashboardIntent, Nothing>() {
     private var loading: Job? = null
     init { refresh() }
     override fun createInitialState(): MobileDashboardState = MobileDashboardState.Bootstrapped()
@@ -28,7 +29,7 @@ internal class MobileDashboardViewModel @Inject constructor(private val load: Lo
     private fun refresh() {
         if (loading?.isActive == true) return
         loading = viewModelScope.launch {
-            val next = when (val result = load()) {
+            val next = when (val result = loadDashboardUseCase()) {
                 is DashboardResult.Loaded -> MobileDashboardState.Remote(result.content)
                 is DashboardResult.Failed -> MobileDashboardState.FailureWithFallback(
                     DefaultErrorDecisionPolicy().decide(

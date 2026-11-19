@@ -7,8 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.quizzgame.feature.dashboard.mobile.presentation.MobileAccountViewModel
 
 @Composable
-internal fun MobileAccountScreen(library: Boolean, onSignIn: () -> Unit, onLogout: () -> Unit) {
+internal fun MobileAccountScreen(onSignIn: () -> Unit) {
     val viewModel: MobileAccountViewModel = hiltViewModel()
     val account by viewModel.state.collectAsStateWithLifecycle()
-    MobileAccountContent(account, library, viewModel::onIntent, onSignIn, onLogout)
+    MobileAccountContent(account, viewModel::onIntent, onSignIn)
 }

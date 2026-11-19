@@ -37,6 +37,7 @@ dependencies {
     implementation(projects.feature.auth.mobile)
     implementation(projects.shared.catalog)
     implementation(projects.feature.dashboard.mobile)
+    implementation(projects.feature.account.mobile)
     implementation(projects.feature.play.mobile)
     implementation(projects.feature.feed.mobile)
     implementation(projects.feature.quizEntry.mobile)

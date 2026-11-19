@@ -18,7 +18,7 @@ import com.quizzgame.core.navigation.request.NavigationRequest
 import com.quizzgame.core.navigation.routes.common.SignInRoute
 import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.session.lifecycle.SessionState
-import com.quizzgame.feature.dashboard.mobile.navigation.ProfileRoute
+import com.quizzgame.feature.account.mobile.navigation.ProfileRoute
 import com.quizzgame.feature.feed.mobile.navigation.ExploreRoute
 import com.quizzgame.feature.play.mobile.navigation.PlayRoute
 import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryRoute

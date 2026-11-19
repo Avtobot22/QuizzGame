@@ -1,4 +1,4 @@
-package com.quizzgame.shared.splash.domain
+package com.quizzgame.shared.splash.domain.repository
 
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.session.lifecycle.SessionState

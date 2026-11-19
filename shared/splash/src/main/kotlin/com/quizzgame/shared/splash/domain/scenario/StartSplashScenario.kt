@@ -1,4 +1,4 @@
-package com.quizzgame.shared.splash.domain
+package com.quizzgame.shared.splash.domain.scenario
 
 import com.quizzgame.core.error.classification.DefaultErrorClassifier
 import com.quizzgame.core.error.failure.AppFailure
@@ -6,10 +6,17 @@ import com.quizzgame.core.error.failure.StorageKind
 import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.repository.SplashRepository
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashPolicyUseCase
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashUserUseCase
+import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import javax.inject.Inject
 
-class StartSplashUseCase @Inject constructor(
+class StartSplashScenario @Inject constructor(
     private val repository: SplashRepository,
+    private val loadSplashPolicyUseCase: LoadSplashPolicyUseCase,
+    private val refreshSplashFlagsUseCase: RefreshSplashFlagsUseCase,
+    private val loadSplashUserUseCase: LoadSplashUserUseCase,
 ) {
     suspend operator fun invoke(): SplashResult {
         val initial = repository.currentSession()
@@ -17,7 +24,7 @@ class StartSplashUseCase @Inject constructor(
     }
 
     private suspend fun prepareStartup(initial: SessionState): SplashResult {
-        val failure = repository.loadLaunch() ?: repository.refreshFlags()
+        val failure = loadSplashPolicyUseCase() ?: refreshSplashFlagsUseCase()
         return if (failure == null) finishStartup(initial) else resolvedFailure(failure)
     }
 
@@ -39,7 +46,7 @@ class StartSplashUseCase @Inject constructor(
     }
 
     private suspend fun finishAuthenticatedStartup(generation: Long): SplashResult {
-        repository.loadUser(generation)
+        loadSplashUserUseCase(generation)
         val current = repository.currentSession()
         return terminal(current) ?: if (current == SessionState.Authenticated(generation)) {
             SplashResult.Continue

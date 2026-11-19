@@ -12,6 +12,8 @@ dependencies {
     implementation(projects.core.presentation)
     implementation(projects.shared.splash)
     implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     implementation(libs.kotlinx.serialization.core)
 }

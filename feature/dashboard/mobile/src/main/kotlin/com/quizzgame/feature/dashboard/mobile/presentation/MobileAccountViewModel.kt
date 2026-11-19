@@ -2,15 +2,15 @@ package com.quizzgame.feature.dashboard.mobile.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.feature.dashboard.mobile.domain.LoadAccountUseCase
 import com.quizzgame.feature.dashboard.mobile.domain.entity.Account
+import com.quizzgame.feature.dashboard.mobile.domain.usecase.LoadAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MobileAccountViewModel @Inject constructor(private val load: LoadAccountUseCase) :
+internal class MobileAccountViewModel @Inject constructor(private val loadAccountUseCase: LoadAccountUseCase) :
     BaseViewModel<Account, MobileAccountIntent, Nothing>() {
     private var loading: Job? = null
     init { refresh() }
@@ -19,7 +19,7 @@ internal class MobileAccountViewModel @Inject constructor(private val load: Load
     private fun refresh() {
         if (loading?.isActive == true) return
         loading = viewModelScope.launch {
-            val result = load()
+            val result = loadAccountUseCase()
             updateState { result }
         }
     }

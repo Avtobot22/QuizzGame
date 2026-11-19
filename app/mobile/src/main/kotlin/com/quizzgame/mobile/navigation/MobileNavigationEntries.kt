@@ -6,6 +6,8 @@ import androidx.navigation3.runtime.NavKey
 import com.quizzgame.app.navigation.AuthReturnTarget
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
+import com.quizzgame.feature.account.mobile.navigation.MobileProfileCallbacks
+import com.quizzgame.feature.account.mobile.navigation.MobileProfileEntries
 import com.quizzgame.feature.auth.mobile.navigation.MobileSignInCallbacks
 import com.quizzgame.feature.auth.mobile.navigation.MobileSignInEntries
 import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountCallbacks
@@ -54,7 +56,10 @@ internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<Mobi
         MobileQuizEntryCallbacks(it.onBack, it.onPlay, { id -> it.onAuthFor(AuthReturnTarget.QuizEntry(id)) })
     }.register(this, context)
     MobileAccountEntries.withContext<MobileNavigationContext, MobileAccountCallbacks> {
-        MobileAccountCallbacks({ it.onAuthFor(AuthReturnTarget.Profile) }, it.onLogout)
+        MobileAccountCallbacks { it.onAuthFor(AuthReturnTarget.Profile) }
+    }.register(this, context)
+    MobileProfileEntries.withContext<MobileNavigationContext, MobileProfileCallbacks> {
+        MobileProfileCallbacks({ it.onAuthFor(AuthReturnTarget.Profile) }, it.onLogout)
     }.register(this, context)
 }
 

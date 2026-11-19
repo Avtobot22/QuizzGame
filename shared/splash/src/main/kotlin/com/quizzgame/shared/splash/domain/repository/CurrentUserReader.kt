@@ -1,4 +1,4 @@
-package com.quizzgame.shared.splash.domain
+package com.quizzgame.shared.splash.domain.repository
 
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 

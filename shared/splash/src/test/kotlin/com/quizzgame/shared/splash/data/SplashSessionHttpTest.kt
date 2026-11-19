@@ -30,9 +30,12 @@ import com.quizzgame.shared.splash.data.dto.LaunchDto
 import com.quizzgame.shared.splash.data.dto.UserDto
 import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.data.mapper.validated
-import com.quizzgame.shared.splash.domain.StartSplashUseCase
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.scenario.StartSplashScenario
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashPolicyUseCase
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashUserUseCase
+import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import io.github.avtobot22.featureflags.FeatureFlagsSource
 import kotlinx.coroutines.test.runTest
 import okhttp3.ResponseBody
@@ -160,14 +163,12 @@ class SplashSessionHttpTest {
                 currentUser(RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE)).toDomain()
             }
         }
-        val useCase = StartSplashUseCase(
-            SplashRepositoryImpl(
-                remote,
-                flags,
-                flags,
-                reader,
-                users,
-            ),
+        private val repository = SplashRepositoryImpl(remote, flags, flags, reader, users)
+        val useCase = StartSplashScenario(
+            repository,
+            LoadSplashPolicyUseCase(repository),
+            RefreshSplashFlagsUseCase(repository),
+            LoadSplashUserUseCase(repository),
         )
 
         fun enqueueBootstrap() {

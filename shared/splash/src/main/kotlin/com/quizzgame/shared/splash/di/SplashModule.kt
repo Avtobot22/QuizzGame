@@ -2,8 +2,8 @@ package com.quizzgame.shared.splash.di
 
 import com.quizzgame.shared.splash.data.CurrentUserStore
 import com.quizzgame.shared.splash.data.SplashRepositoryImpl
-import com.quizzgame.shared.splash.domain.CurrentUserReader
-import com.quizzgame.shared.splash.domain.SplashRepository
+import com.quizzgame.shared.splash.domain.repository.CurrentUserReader
+import com.quizzgame.shared.splash.domain.repository.SplashRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

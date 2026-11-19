@@ -7,4 +7,6 @@
     <string name="profile_retry">Retry</string>
     <string name="profile_settings">Settings</string>
     <string name="profile_sign_out">Sign out</string>
+    <string name="profile_loading">Loading profile</string>
+    <string name="profile_guest_title">Guest profile</string>
 </resources>

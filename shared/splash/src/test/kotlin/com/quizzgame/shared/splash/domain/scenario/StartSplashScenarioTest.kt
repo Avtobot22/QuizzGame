@@ -1,4 +1,4 @@
-package com.quizzgame.shared.splash.domain
+package com.quizzgame.shared.splash.domain.scenario
 
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.failure.StorageKind
@@ -23,6 +23,9 @@ import com.quizzgame.shared.splash.data.dto.UserDto
 import com.quizzgame.shared.splash.data.mapper.toDomain
 import com.quizzgame.shared.splash.domain.entity.CurrentUser
 import com.quizzgame.shared.splash.domain.entity.SplashResult
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashPolicyUseCase
+import com.quizzgame.shared.splash.domain.usecase.LoadSplashUserUseCase
+import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -30,7 +33,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class StartSplashUseCaseTest {
+class StartSplashScenarioTest {
     @Test
     fun guestLaunchRefreshesFlagsInOrderAndNeverLoadsUser() = runTest {
         val fixture = Fixture()
@@ -210,6 +213,11 @@ class StartSplashUseCaseTest {
             reader,
             users,
         )
-        val useCase = StartSplashUseCase(repository)
+        val useCase = StartSplashScenario(
+            repository,
+            LoadSplashPolicyUseCase(repository),
+            RefreshSplashFlagsUseCase(repository),
+            LoadSplashUserUseCase(repository),
+        )
     }
 }

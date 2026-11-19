@@ -2,14 +2,14 @@ package com.quizzgame.feature.account.tv.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.quizzgame.core.presentation.BaseViewModel
-import com.quizzgame.shared.splash.domain.ReadAccountUseCase
+import com.quizzgame.shared.splash.domain.usecase.ReadAccountUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class TvProfileViewModel @Inject constructor(private val read: ReadAccountUseCase) :
+internal class TvProfileViewModel @Inject constructor(private val readAccountUseCase: ReadAccountUseCase) :
     BaseViewModel<TvProfileState, TvProfileIntent, Nothing>() {
     private var loading: Job? = null
 
@@ -21,8 +21,10 @@ internal class TvProfileViewModel @Inject constructor(private val read: ReadAcco
 
     private fun load() {
         if (loading?.isActive == true) return
+        val previous = state.value as? TvProfileState.Loaded
+        if (previous != null) updateState { previous.copy(refreshing = true) }
         loading = viewModelScope.launch {
-            val profile = read()
+            val profile = readAccountUseCase()
             updateState { TvProfileState.Loaded(profile) }
         }
     }
