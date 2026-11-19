@@ -4,9 +4,8 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.compositeOver
-import androidx.compose.ui.graphics.luminance
 import com.quizzgame.core.media.ColorSpec
+import com.quizzgame.core.ui.media.readableOn
 
 /** Семантическая роль и тема вычисляются при каждой смене темы. */
 @Composable
@@ -36,12 +35,5 @@ private fun semanticColor(name: String, fallback: Color): Color {
 }
 
 @Composable
-fun ColorSpec?.readableColor(fallback: Color, background: Color): Color {
-    val candidate = themeColor(fallback).compositeOver(background)
-    val light = maxOf(candidate.luminance(), background.luminance())
-    val dark = minOf(candidate.luminance(), background.luminance())
-    return if ((light + CONTRAST_OFFSET) / (dark + CONTRAST_OFFSET) >= TEXT_CONTRAST) candidate else fallback
-}
-
-private const val CONTRAST_OFFSET = 0.05f
-private const val TEXT_CONTRAST = 4.5f
+fun ColorSpec?.readableColor(fallback: Color, background: Color): Color =
+    themeColor(fallback).readableOn(background, fallback)

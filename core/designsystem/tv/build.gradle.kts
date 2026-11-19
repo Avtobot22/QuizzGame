@@ -12,7 +12,6 @@ dependencies {
     implementation(projects.core.coroutines)
     api(projects.core.media)
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.okhttp)
     testImplementation(libs.okhttp.mockwebserver)
