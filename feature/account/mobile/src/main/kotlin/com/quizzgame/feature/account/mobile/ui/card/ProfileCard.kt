@@ -41,14 +41,6 @@ internal fun ProfileCard(
         PlayerProfile.Unavailable -> stringResource(R.string.mobile_profile_unavailable)
         is PlayerProfile.SignedIn -> nickname ?: stringResource(R.string.mobile_profile_member)
     }
-    val description = when (profile) {
-        PlayerProfile.Guest       -> stringResource(R.string.mobile_profile_guest_description)
-        PlayerProfile.Unavailable -> stringResource(R.string.mobile_profile_retry_description)
-        is PlayerProfile.SignedIn -> when (user) {
-            null -> stringResource(R.string.mobile_profile_retry_description)
-            else -> user.email ?: user.phoneNumber ?: stringResource(R.string.mobile_profile_member_description)
-        }
-    }
     val colors = MaterialTheme.colorScheme
     QuizzProfilePanel(colors.surfaceContainer, colors.primaryContainer, MaterialTheme.shapes.extraLarge) {
         QuizzProfileAvatar(
@@ -65,7 +57,7 @@ internal fun ProfileCard(
             textAlign = TextAlign.Center,
         )
         Text(
-            description,
+            profileDescription(profile),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -88,6 +80,16 @@ internal fun ProfileCard(
                 Text(stringResource(label))
             }
         }
+    }
+}
+
+@Composable
+private fun profileDescription(profile: PlayerProfile): String = when (profile) {
+    PlayerProfile.Guest       -> stringResource(R.string.mobile_profile_guest_description)
+    PlayerProfile.Unavailable -> stringResource(R.string.mobile_profile_retry_description)
+    is PlayerProfile.SignedIn -> when (val user = profile.user) {
+        null -> stringResource(R.string.mobile_profile_retry_description)
+        else -> user.email ?: user.phoneNumber ?: stringResource(R.string.mobile_profile_member_description)
     }
 }
 

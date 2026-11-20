@@ -49,26 +49,7 @@ internal fun MobileNicknameEditor(state: NicknameEditorState, onIntent: (Profile
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { if (canSave) save() }),
                 )
-                val issue = when (state.issue) {
-                    NicknameEditorState.Issue.INVALID_NAME -> R.string.profile_nickname_invalid
-                    NicknameEditorState.Issue.ACCOUNT_CHANGED -> R.string.profile_nickname_account_changed
-                    NicknameEditorState.Issue.SAVE_FAILURE -> R.string.profile_nickname_save_failed
-                    null -> null
-                }
-                Text(
-                    if (issue == null) {
-                        stringResource(R.string.profile_nickname_hint, PlayerNickname.MAX_LENGTH)
-                    } else {
-                        stringResource(issue)
-                    },
-                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-                    color = if (issue == null) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.error
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                )
+                NicknameEditorHint(state.issue)
                 QuizzButton(
                     { onIntent(ProfileIntent.SuggestNickname) },
                     style = QuizzButtonStyle.TEXT,
@@ -87,5 +68,25 @@ internal fun MobileNicknameEditor(state: NicknameEditorState, onIntent: (Profile
                 Text(stringResource(R.string.profile_nickname_cancel))
             }
         },
+    )
+}
+
+@Composable
+private fun NicknameEditorHint(issue: NicknameEditorState.Issue?) {
+    val message = when (issue) {
+        NicknameEditorState.Issue.INVALID_NAME    -> stringResource(R.string.profile_nickname_invalid)
+        NicknameEditorState.Issue.ACCOUNT_CHANGED -> stringResource(R.string.profile_nickname_account_changed)
+        NicknameEditorState.Issue.SAVE_FAILURE    -> stringResource(R.string.profile_nickname_save_failed)
+        null                                     -> stringResource(
+            R.string.profile_nickname_hint,
+            PlayerNickname.MAX_LENGTH,
+        )
+    }
+    val colors = MaterialTheme.colorScheme
+    Text(
+        message,
+        Modifier.semantics { liveRegion = LiveRegionMode.Polite },
+        color = if (issue == null) colors.onSurfaceVariant else colors.error,
+        style = MaterialTheme.typography.bodySmall,
     )
 }
