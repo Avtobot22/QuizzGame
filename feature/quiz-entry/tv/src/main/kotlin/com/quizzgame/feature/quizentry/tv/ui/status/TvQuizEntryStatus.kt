@@ -19,22 +19,26 @@ internal fun TvQuizEntryLoading() {
 }
 
 @Composable
-internal fun TvQuizEntryError(spec: ErrorPresentationSpec, onRetry: () -> Unit, onSignIn: () -> Unit = {}) {
+internal fun TvQuizEntryError(
+    spec: ErrorPresentationSpec,
+    onRetry: () -> Unit,
+    onSignIn: () -> Unit,
+    onBack: () -> Unit,
+) {
+    val onAction: (ErrorActionKind) -> Unit = { action ->
+        when (action) {
+            ErrorActionKind.RETRY -> onRetry()
+            ErrorActionKind.SIGN_IN -> onSignIn()
+            ErrorActionKind.GO_BACK -> onBack()
+            else -> Unit
+        }
+    }
     if (spec.surface == ErrorSurface.BLOCKING) {
-        QuizzTvErrorFullScreen(spec, onAction = { action ->
-            when (action) {
-                ErrorActionKind.RETRY -> onRetry()
-                ErrorActionKind.SIGN_IN -> onSignIn()
-                else -> Unit
-            }
-        })
+        QuizzTvErrorFullScreen(
+            spec.copy(actions = (spec.actions + ErrorActionKind.GO_BACK).distinct()),
+            onAction = onAction,
+        )
     } else {
-        QuizzTvErrorInline(spec, onAction = { action ->
-            when (action) {
-                ErrorActionKind.RETRY -> onRetry()
-                ErrorActionKind.SIGN_IN -> onSignIn()
-                else -> Unit
-            }
-        })
+        QuizzTvErrorInline(spec, onAction = onAction)
     }
 }

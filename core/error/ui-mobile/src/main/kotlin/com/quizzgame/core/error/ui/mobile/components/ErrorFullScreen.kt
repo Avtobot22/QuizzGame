@@ -52,7 +52,7 @@ fun QuizzMobileErrorFullScreen(
                 modifier = Modifier.fillMaxWidth(),
                 tone = QuizzNoticeTone.ERROR,
                 icon = model.icon,
-                actions = { ErrorActions(model, enabled, onAction) },
+                actions = { ErrorActions(model, enabled, onAction, expandPrimary = model.actions.size == 1) },
             ) { ErrorCopy(model, heading = true) }
         }
     }

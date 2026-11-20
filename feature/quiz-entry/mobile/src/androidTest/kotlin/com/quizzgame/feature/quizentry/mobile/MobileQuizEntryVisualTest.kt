@@ -21,6 +21,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
+import com.quizzgame.core.error.ui.common.R as ErrorR
 
 @RunWith(Parameterized::class)
 class MobileQuizEntryVisualTest(private val index: Int, private val dark: Boolean, private val fontScale: Float) {
@@ -30,11 +31,12 @@ class MobileQuizEntryVisualTest(private val index: Int, private val dark: Boolea
     @Test
     fun skeletonAndDetailsKeepNavigationAndConnectionActionUsable() {
         val state = MobileQuizEntryPreviewProvider().values.elementAt(index)
+        var wentBack = false
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(3f, fontScale)) {
                 QuizzMobileTheme(darkTheme = dark) {
                     Box(Modifier.fillMaxSize().testTag(MobileQuizEntryVisualScreen.ROOT)) {
-                        MobileQuizEntryStateContent(state, {}, {}, {})
+                        MobileQuizEntryStateContent(state, {}, { wentBack = true }, {})
                     }
                 }
             }
@@ -59,6 +61,11 @@ class MobileQuizEntryVisualTest(private val index: Int, private val dark: Boolea
             }
         }
         screen.capture("mobile-entry-$index-$dark-$fontScale.png")
+        if (state is MobileQuizEntryState.Error) {
+            val back = compose.activity.getString(ErrorR.string.quizz_error_action_go_back)
+            screen.text(back).performClick()
+            compose.runOnIdle { assertEquals(true, wentBack) }
+        }
     }
 
     private fun assertUserState(screen: MobileQuizEntryVisualScreen, user: QuizUserState) {
@@ -89,7 +96,7 @@ class MobileQuizEntryVisualTest(private val index: Int, private val dark: Boolea
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "state {0}, dark {1}, font {2}")
-        fun states(): List<Array<Any>> = listOf(0, 2, 3, 5, 6, 7).flatMap { index ->
+        fun states(): List<Array<Any>> = listOf(0, 1, 2, 3, 5, 6, 7).flatMap { index ->
             listOf(arrayOf<Any>(index, false, 1f), arrayOf<Any>(index, true, 1f))
         } + listOf(3, 5, 6).map { arrayOf<Any>(it, false, 1.6f) }
     }

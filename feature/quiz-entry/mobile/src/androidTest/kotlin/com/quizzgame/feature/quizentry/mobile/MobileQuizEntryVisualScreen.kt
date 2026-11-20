@@ -17,6 +17,7 @@ internal class MobileQuizEntryVisualScreen(private val provider: SemanticsNodeIn
     ComposeScreen<MobileQuizEntryVisualScreen>(provider) {
     fun bounds(tag: String): Rect = provider.onNodeWithTag(tag).fetchSemanticsNode().boundsInRoot
     fun tag(value: String) = KNode(provider) { hasTestTag(value) }
+    fun text(value: String) = KNode(provider) { hasText(value) }
     fun progress() = provider.onNodeWithTag(MobileQuizEntryTags.PROGRESS)
         .fetchSemanticsNode().config[SemanticsProperties.ProgressBarRangeInfo].current
     fun capture(name: String) {

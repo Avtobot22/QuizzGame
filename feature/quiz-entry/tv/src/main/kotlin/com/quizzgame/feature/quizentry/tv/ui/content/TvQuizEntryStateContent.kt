@@ -24,7 +24,8 @@ internal fun TvQuizEntryStateContent(
             is TvQuizEntryState.Error -> TvQuizEntryError(
                 state.spec,
                 { onIntent(TvQuizEntryIntent.Retry) },
-                onSignIn,
+                onSignIn = onSignIn,
+                onBack = onBack,
             )
             is TvQuizEntryState.Content -> TvQuizEntryContent(
                 state.value,
