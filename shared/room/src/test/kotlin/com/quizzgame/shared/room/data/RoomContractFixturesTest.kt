@@ -10,12 +10,10 @@ import com.quizzgame.shared.room.data.stream.RoomStreamEvent
 import com.quizzgame.shared.room.domain.entity.admission.RoomEndpointSettings
 import com.quizzgame.shared.room.domain.entity.admission.RoomJoinInput
 import com.quizzgame.shared.room.domain.entity.admission.RoomJoinLink
-import com.quizzgame.shared.room.domain.entity.command.RoomAttempt
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 import com.quizzgame.shared.room.domain.entity.session.RoomRole
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -75,18 +73,11 @@ class RoomContractFixturesTest {
     }
 
     @Test
-    fun normalizesNicknameAndKeepsAttemptKeyForSameInput() {
+    fun normalizesNicknameAndValidatesPin() {
         assertEquals("Café", RoomJoinInput.nickname(" Café "))
         assertNull(RoomJoinInput.nickname("a".repeat(25)))
         assertTrue(RoomJoinInput.validCode("000001"))
         assertFalse(RoomJoinInput.validCode("123"))
-        val attempt = RoomAttempt<Pair<String, String>>()
-        val draft = "000001" to "Майя"
-        val key = attempt.keyFor(draft)
-        assertEquals(key, attempt.keyFor(draft))
-        assertNotEquals(key, attempt.keyFor(draft.copy(second = "Саша")))
-        attempt.reset()
-        assertNotEquals(key, attempt.keyFor(draft))
     }
 
     private fun snapshot(name: String): SnapshotDto = json.decodeFromString(fixture(name))

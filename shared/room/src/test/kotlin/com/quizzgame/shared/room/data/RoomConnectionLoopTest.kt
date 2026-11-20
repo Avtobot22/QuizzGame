@@ -11,6 +11,7 @@ import com.quizzgame.shared.room.data.stream.RoomConnectionObserver
 import com.quizzgame.shared.room.data.stream.RoomStreamEvent
 import com.quizzgame.shared.room.domain.entity.admission.RoomEndpointSettings
 import com.quizzgame.shared.room.domain.entity.admission.RoomJoinLink
+import com.quizzgame.shared.room.domain.entity.result.RoomFailure
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 import com.quizzgame.shared.room.domain.entity.result.RoomResult
 import com.quizzgame.shared.room.domain.entity.session.RoomRole
@@ -121,4 +122,3 @@ class RoomConnectionLoopTest {
         }
     }
 }
-import com.quizzgame.shared.room.domain.entity.result.RoomFailure
