@@ -16,27 +16,35 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.mobile.QuizzButton
+import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
 import com.quizzgame.core.designsystem.mobile.QuizzMobileSkeleton
 import com.quizzgame.core.ui.QuizzProfileAvatar
 import com.quizzgame.core.ui.QuizzProfilePanel
 import com.quizzgame.core.ui.quizzSkeleton
 import com.quizzgame.feature.account.mobile.R
 import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
-import com.quizzgame.shared.splash.domain.entity.AccountProfile
+import com.quizzgame.shared.account.domain.entity.PlayerNickname
+import com.quizzgame.shared.account.domain.entity.PlayerProfile
 
 @Composable
-internal fun ProfileCard(profile: AccountProfile, refreshing: Boolean, onRetry: () -> Unit, onSignIn: () -> Unit) {
-    val user = (profile as? AccountProfile.SignedIn)?.user
+internal fun ProfileCard(
+    profile: PlayerProfile,
+    refreshing: Boolean,
+    onRetry: () -> Unit,
+    onSignIn: () -> Unit,
+    onEditNickname: () -> Unit,
+) {
+    val user = (profile as? PlayerProfile.SignedIn)?.user
+    val nickname = user?.displayName?.let(PlayerNickname::normalize)
     val title = when (profile) {
-        AccountProfile.Guest       -> stringResource(R.string.mobile_profile_guest)
-        AccountProfile.Unavailable -> stringResource(R.string.mobile_profile_unavailable)
-        is AccountProfile.SignedIn -> user?.displayName?.takeIf(String::isNotBlank)
-            ?: stringResource(R.string.mobile_profile_member)
+        PlayerProfile.Guest       -> stringResource(R.string.mobile_profile_guest)
+        PlayerProfile.Unavailable -> stringResource(R.string.mobile_profile_unavailable)
+        is PlayerProfile.SignedIn -> nickname ?: stringResource(R.string.mobile_profile_member)
     }
     val description = when (profile) {
-        AccountProfile.Guest       -> stringResource(R.string.mobile_profile_guest_description)
-        AccountProfile.Unavailable -> stringResource(R.string.mobile_profile_retry_description)
-        is AccountProfile.SignedIn -> when (user) {
+        PlayerProfile.Guest       -> stringResource(R.string.mobile_profile_guest_description)
+        PlayerProfile.Unavailable -> stringResource(R.string.mobile_profile_retry_description)
+        is PlayerProfile.SignedIn -> when (user) {
             null -> stringResource(R.string.mobile_profile_retry_description)
             else -> user.email ?: user.phoneNumber ?: stringResource(R.string.mobile_profile_member_description)
         }
@@ -44,7 +52,7 @@ internal fun ProfileCard(profile: AccountProfile, refreshing: Boolean, onRetry: 
     val colors = MaterialTheme.colorScheme
     QuizzProfilePanel(colors.surfaceContainer, colors.primaryContainer, MaterialTheme.shapes.extraLarge) {
         QuizzProfileAvatar(
-            user?.displayName,
+            nickname,
             colors.primaryContainer,
             colors.onPrimaryContainer,
             MaterialTheme.typography.headlineMedium,
@@ -63,12 +71,21 @@ internal fun ProfileCard(profile: AccountProfile, refreshing: Boolean, onRetry: 
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         when {
-            profile == AccountProfile.Guest -> QuizzButton(
+            profile == PlayerProfile.Guest -> QuizzButton(
                 onSignIn,
                 Modifier.fillMaxWidth().testTag(MobileProfileTags.SIGN_IN),
             ) { Text(stringResource(R.string.mobile_profile_sign_in)) }
             user == null -> QuizzButton(onRetry, Modifier.fillMaxWidth(), enabled = !refreshing) {
                 Text(stringResource(R.string.mobile_profile_retry))
+            }
+            else -> QuizzButton(
+                onEditNickname,
+                Modifier.fillMaxWidth().testTag(MobileProfileTags.EDIT_NICKNAME),
+                style = if (nickname == null) QuizzButtonStyle.FILLED else QuizzButtonStyle.TONAL,
+                enabled = !refreshing,
+            ) {
+                val label = if (nickname == null) R.string.profile_nickname_add else R.string.profile_nickname_edit
+                Text(stringResource(label))
             }
         }
     }

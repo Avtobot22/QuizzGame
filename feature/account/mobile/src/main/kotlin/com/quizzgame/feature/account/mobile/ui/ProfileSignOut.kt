@@ -12,12 +12,12 @@ import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
 import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.feature.account.mobile.R
 import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
-import com.quizzgame.shared.splash.domain.entity.AccountProfile
+import com.quizzgame.shared.account.domain.entity.PlayerProfile
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun ProfileSignOut(profile: AccountProfile, onSignOut: () -> Unit) {
-    if (profile !is AccountProfile.SignedIn) return
+internal fun ProfileSignOut(profile: PlayerProfile, onSignOut: () -> Unit) {
+    if (profile !is PlayerProfile.SignedIn) return
     val color = MaterialTheme.colorScheme.error
     QuizzButton(
         onSignOut,

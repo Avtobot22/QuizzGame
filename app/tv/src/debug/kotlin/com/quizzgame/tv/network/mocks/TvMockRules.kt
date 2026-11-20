@@ -2,6 +2,7 @@ package com.quizzgame.tv.network.mocks
 
 import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.debug.network.mocks.authMockRules
+import com.quizzgame.debug.network.mocks.profileMockRules
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.mockRules
 import dev.androidmock.core.response.ResponseSpec
@@ -18,12 +19,7 @@ internal fun tvMockRules(assets: BodyAssetResolver, json: Json): List<Rule> = mo
             SplashMockScenario.response(SplashMockScenario.Stage.FLAGS, assets.read("mock/bodies/feature-toggles.json"))
         }
     }
-    rule("splash-user", "/api/tv/user") {
-        match { method("GET") }
-        respondWith { _, _ ->
-            SplashMockScenario.response(SplashMockScenario.Stage.USER, assets.read("mock/bodies/user.json"))
-        }
-    }
+    profileMockRules(assets, json, "tv")
 
     rule("catalog-dashboard", "/api/tv/dashboard") {
         match { method("GET") }

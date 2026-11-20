@@ -17,30 +17,58 @@ import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.QuizzProfileAvatar
 import com.quizzgame.core.ui.QuizzProfilePanel
 import com.quizzgame.feature.account.tv.R
-import com.quizzgame.feature.account.tv.presentation.TvProfileState
+import com.quizzgame.feature.account.tv.ui.editor.TvNicknameEditor
 import com.quizzgame.feature.account.tv.ui.tags.TvProfileTags
-import com.quizzgame.shared.splash.domain.entity.AccountProfile
+import com.quizzgame.shared.account.domain.entity.PlayerNickname
+import com.quizzgame.shared.account.domain.entity.PlayerProfile
+import com.quizzgame.shared.account.presentation.ProfileIntent
+import com.quizzgame.shared.account.presentation.ProfileState
 
 @Composable
 internal fun TvProfileLoaded(
-    state: TvProfileState.Loaded,
+    state: ProfileState.Ready,
     onSignIn: () -> Unit,
     onLogout: () -> Unit,
     onSettings: () -> Unit,
-    retry: () -> Unit,
+    onIntent: (ProfileIntent) -> Unit,
 ) {
     when (val profile = state.profile) {
-        AccountProfile.Guest -> GuestProfile(onSignIn)
-        is AccountProfile.SignedIn -> {
-            val displayName = profile.user?.displayName?.takeIf(String::isNotBlank)
-            ProfileIdentity(
-                title = displayName ?: stringResource(R.string.profile_signed_in),
-                displayName = displayName,
-            )
-            if (profile.user == null) TvProfileRecovery(state.refreshing, retry)
+        PlayerProfile.Guest -> GuestProfile(onSignIn)
+        is PlayerProfile.SignedIn -> {
+            val user = profile.user
+            if (user == null) {
+                ProfileIdentity(title = stringResource(R.string.profile_signed_in))
+                TvProfileRecovery(state.refreshing, { onIntent(ProfileIntent.Retry) })
+            } else {
+                val displayName = user.displayName?.let(PlayerNickname::normalize)
+                val editFocus = remember { FocusRequester() }
+                ProfileIdentity(
+                    title = displayName ?: stringResource(R.string.profile_signed_in),
+                    subtitle = stringResource(R.string.profile_nickname_description),
+                    displayName = displayName,
+                ) {
+                    QuizzTvButton(
+                        { onIntent(ProfileIntent.EditNickname) },
+                        Modifier.focusRequester(editFocus).testTag(TvProfileTags.EDIT_NICKNAME),
+                        enabled = !state.refreshing,
+                    ) {
+                        val label = if (displayName == null) {
+                            R.string.profile_nickname_add
+                        } else {
+                            R.string.profile_nickname_edit
+                        }
+                        Text(stringResource(label))
+                    }
+                }
+                state.editor?.let { TvNicknameEditor(it, editFocus, onIntent) }
+            }
             TvProfileAccountActions(onSettings, onLogout)
         }
-        AccountProfile.Unavailable -> TvProfileRecovery(state.refreshing, retry, requestFocus = true)
+        PlayerProfile.Unavailable -> TvProfileRecovery(
+            state.refreshing,
+            { onIntent(ProfileIntent.Retry) },
+            requestFocus = true,
+        )
     }
 }
 
@@ -55,7 +83,12 @@ private fun GuestProfile(onSignIn: () -> Unit) {
 }
 
 @Composable
-private fun ProfileIdentity(title: String, subtitle: String? = null, displayName: String? = null) {
+private fun ProfileIdentity(
+    title: String,
+    subtitle: String? = null,
+    displayName: String? = null,
+    action: @Composable () -> Unit = {},
+) {
     val colors = MaterialTheme.colorScheme
     QuizzProfilePanel(
         colors.surfaceVariant.copy(alpha = 0.35f),
@@ -78,5 +111,6 @@ private fun ProfileIdentity(title: String, subtitle: String? = null, displayName
                 textAlign = TextAlign.Center,
             )
         }
+        action()
     }
 }

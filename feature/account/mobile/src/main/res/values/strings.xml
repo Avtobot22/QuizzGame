@@ -10,4 +10,16 @@
     <string name="mobile_profile_sign_out">Выйти из аккаунта</string>
     <string name="mobile_profile_retry">Повторить</string>
     <string name="mobile_profile_loading">Профиль загружается</string>
+    <string name="profile_nickname_label">Ник в игре</string>
+    <string name="profile_nickname_description">Так вас увидят другие игроки в лобби.</string>
+    <string name="profile_nickname_edit">Изменить ник</string>
+    <string name="profile_nickname_add">Задать ник</string>
+    <string name="profile_nickname_hint">До %1$d символов</string>
+    <string name="profile_nickname_invalid">Введите ник длиной от 1 до 24 символов.</string>
+    <string name="profile_nickname_account_changed">Аккаунт сменился. Откройте профиль заново.</string>
+    <string name="profile_nickname_save_failed">Не удалось сохранить ник. Попробуйте ещё раз.</string>
+    <string name="profile_nickname_saving">Сохраняем…</string>
+    <string name="profile_nickname_save">Сохранить</string>
+    <string name="profile_nickname_cancel">Отмена</string>
+    <string name="profile_nickname_suggest">Предложить другой</string>
 </resources>

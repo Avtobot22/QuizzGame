@@ -54,6 +54,7 @@ include(":shared:feed")
 include(":shared:quiz-entry")
 include(":shared:splash")
 include(":shared:auth")
+include(":shared:account")
 
 include(":feature:splash:tv")
 include(":feature:splash:mobile")
