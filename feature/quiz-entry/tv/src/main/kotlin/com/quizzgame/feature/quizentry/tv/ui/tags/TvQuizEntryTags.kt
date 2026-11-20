@@ -1,6 +1,7 @@
 package com.quizzgame.feature.quizentry.tv.ui.tags
 
 object TvQuizEntryTags {
+    const val CREATE_ROOM = "tv_quiz_entry_create_room"
     const val CONTENT = "quizentry:content"
     const val LOADING = "quizentry:loading"
     const val EMPTY = "quizentry:empty"

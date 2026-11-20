@@ -33,6 +33,8 @@ import com.quizzgame.core.designsystem.tv.media.QuizzTvMedia
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.quizentry.tv.R
+import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryIntent
+import com.quizzgame.feature.quizentry.tv.presentation.TvQuizRoomState
 import com.quizzgame.feature.quizentry.tv.ui.tags.TvQuizEntryTags
 import com.quizzgame.shared.catalog.domain.entity.QuizEntry
 import com.quizzgame.core.error.ui.common.R as ErrorR
@@ -43,6 +45,8 @@ internal fun TvQuizEntryContent(
     entry: QuizEntry,
     onBack: () -> Unit,
     modifier: Modifier,
+    room: TvQuizRoomState,
+    onIntent: (TvQuizEntryIntent) -> Unit,
     onSignIn: (() -> Unit)?,
 ) {
     val focus = remember { FocusRequester() }
@@ -85,7 +89,8 @@ internal fun TvQuizEntryContent(
                     .padding(top = QuizzTvLayout.detailHeaderGap.dp, bottom = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                TvQuizEntryDetails(entry, onSignIn)
+                TvQuizEntryDetails(entry)
+                TvQuizRoomAction(entry.available, room, onIntent, onSignIn)
             }
         }
     }

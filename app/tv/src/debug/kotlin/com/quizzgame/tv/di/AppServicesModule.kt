@@ -40,7 +40,8 @@ object AppServicesModule {
             "mock/bodies/refresh.json",
             BuildConfig.DEBUG_FAIL_NETWORK_ONCE,
             revocationPolicy,
-            ::tvMockRules,
+            externalLoopbackPort = BuildConfig.ROOM_MOCK_PORT,
+            platformRules = ::tvMockRules,
         )
     }
 }

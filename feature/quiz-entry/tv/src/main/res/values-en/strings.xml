@@ -2,10 +2,12 @@
     <string name="quiz_entry_duration">%1$d min</string>
     <string name="quiz_entry_bookmarked">Bookmarked</string>
     <string name="quiz_entry_label">About this quiz</string>
-    <string name="quiz_entry_launch_soon">Launching games is coming soon</string>
     <plurals name="quiz_entry_question_count">
         <item quantity="one">%1$d question</item>
         <item quantity="other">%1$d questions</item>
     </plurals>
     <string name="quiz_entry_sign_in">Sign in to host</string>
+    <string name="quiz_entry_create_room">Create room</string>
+    <string name="quiz_entry_creating_room">Creating room…</string>
+    <string name="quiz_entry_room_auth_required">The host needs an account for this quiz.</string>
 </resources>

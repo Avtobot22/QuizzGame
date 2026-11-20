@@ -2,6 +2,7 @@
 credentials = "1.6.0"
 googleId = "1.2.1"
 zxing = "3.5.4"
+camera = "1.7.0"
 googlePlayBase = "18.11.1"
 paging = "3.5.3"
 coil = "3.6.3"
@@ -34,6 +35,9 @@ androidxHilt = "1.4.0"
 androidxAnnotationExperimental = "1.6.0"
 
 [libraries]
+androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }
+androidx-camera-lifecycle = { module = "androidx.camera:camera-lifecycle", version.ref = "camera" }
+androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "camera" }
 zxing-core = { module = "com.google.zxing:core", version.ref = "zxing" }
 androidx-credentials = { module = "androidx.credentials:credentials", version.ref = "credentials" }
 androidx-credentials-play = { module = "androidx.credentials:credentials-play-services-auth", version.ref = "credentials" }

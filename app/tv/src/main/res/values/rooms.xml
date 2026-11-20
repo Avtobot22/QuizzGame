@@ -1,0 +1,5 @@
+<resources>
+    <string name="room_logout_title">Выйти из аккаунта?</string>
+    <string name="room_logout_description">Вы потеряете доступ ведущего к текущей комнате.</string>
+    <string name="room_logout_confirm">Выйти</string>
+</resources>

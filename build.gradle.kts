@@ -37,6 +37,8 @@ tasks.register("ciLint") {
     dependsOn(
         ":shared:auth:lint",
         ":shared:room:lint",
+        ":feature:room:mobile:lint",
+        ":feature:room:tv:lint",
         ":feature:auth:mobile:lint",
         ":feature:auth:tv:lint",
         ":feature:auth-provider:mobile:lint",
@@ -226,6 +228,8 @@ tasks.register("ciAssembleAndroidTest") {
         ":core:media:android:assembleDebugAndroidTest",
         ":feature:feed:tv:assembleDebugAndroidTest",
         ":feature:play:mobile:assembleDebugAndroidTest",
+        ":feature:room:mobile:assembleDebugAndroidTest",
+        ":feature:room:tv:assembleDebugAndroidTest",
         ":feature:feed:mobile:assembleDebugAndroidTest",
         ":feature:quiz-entry:mobile:assembleDebugAndroidTest",
         ":feature:quiz-entry:tv:assembleDebugAndroidTest",

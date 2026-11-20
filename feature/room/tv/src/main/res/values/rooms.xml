@@ -1,0 +1,29 @@
+<resources>
+    <string name="room_invite_help">Сканируйте QR в разделе «Играть»</string>
+    <string name="room_invite_or">или</string>
+    <string name="room_pin_help">Введите этот код в разделе «Играть» на телефоне.</string>
+    <string name="room_qr">QR-код для входа в комнату</string>
+    <string name="room_pin">Код комнаты</string>
+    <string name="room_invite_unavailable">Код комнаты недоступен.</string>
+    <string name="room_close_action">Закрыть комнату</string>
+    <string name="room_close_title">Закрыть комнату?</string>
+    <string name="room_close_description">Все участники покинут лобби.</string>
+    <string name="room_manage_player">Управление участником</string>
+    <string name="room_kick_action">Исключить</string>
+    <string name="room_kick_title">Исключить участника?</string>
+    <string name="room_kick_description">%1$s покинет комнату.</string>
+    <string name="room_start_wait_ready">Ждём, пока все отметят готовность</string>
+    <string name="room_all_ready">Все участники готовы</string>
+    <string name="room_enough_players">Участники на месте</string>
+    <string name="room_roster_empty">Ждём участников</string>
+    <string name="room_roster_empty_description">Имена появятся здесь, когда игроки подключатся.</string>
+    <string name="room_started_description">Участники уже в игре.</string>
+    <string name="room_create_again">Откройте викторину, чтобы создать новую комнату.</string>
+    <string name="room_host_account_changed">Создайте комнату заново с текущим аккаунтом.</string>
+    <plurals name="room_more_players">
+        <item quantity="one">Нужен ещё %d игрок</item>
+        <item quantity="few">Нужны ещё %d игрока</item>
+        <item quantity="many">Нужно ещё %d игроков</item>
+        <item quantity="other">Нужно ещё %d игроков</item>
+    </plurals>
+</resources>

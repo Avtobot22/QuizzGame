@@ -1,0 +1,5 @@
+<resources>
+    <string name="room_logout_title">Sign out?</string>
+    <string name="room_logout_description">You will lose host access to the current room.</string>
+    <string name="room_logout_confirm">Sign out</string>
+</resources>

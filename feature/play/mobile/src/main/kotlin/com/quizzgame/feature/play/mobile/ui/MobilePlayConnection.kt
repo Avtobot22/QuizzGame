@@ -13,16 +13,16 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.mobile.QuizzButton
@@ -30,12 +30,20 @@ import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
 import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.feature.play.mobile.R
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayIntent
+import com.quizzgame.feature.play.mobile.presentation.MobilePlayState
+import com.quizzgame.feature.play.mobile.presentation.MobilePlayValidation
 import com.quizzgame.feature.play.mobile.ui.tags.MobilePlayTags
 import com.quizzgame.core.ui.R as UiR
+import com.quizzgame.shared.room.R as RoomR
 
 @Composable
-internal fun MobilePlayConnection(onIntent: (MobilePlayIntent) -> Unit, modifier: Modifier = Modifier) {
-    var code by remember { mutableStateOf("") }
+internal fun MobilePlayConnection(
+    state: MobilePlayState,
+    onIntent: (MobilePlayIntent) -> Unit,
+    onScan: () -> Unit,
+    onSignIn: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val colors = MaterialTheme.colorScheme
     Card(
         modifier,
@@ -43,33 +51,99 @@ internal fun MobilePlayConnection(onIntent: (MobilePlayIntent) -> Unit, modifier
         colors = CardDefaults.cardColors(containerColor = colors.surfaceContainerLow),
         border = BorderStroke(1.dp, colors.outlineVariant),
     ) {
-        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            OutlinedTextField(
-                code,
-                { code = it },
-                Modifier.fillMaxWidth().testTag(MobilePlayTags.CODE),
-                label = { Text(stringResource(R.string.play_code)) },
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii),
-                textStyle = MaterialTheme.typography.titleLarge,
-                shape = MaterialTheme.shapes.medium,
-            )
-            QuizzButton(
-                { onIntent(MobilePlayIntent.CONNECT) },
-                Modifier.fillMaxWidth().testTag(MobilePlayTags.CONNECT),
-            ) { Text(stringResource(R.string.play_connect)) }
-            MobilePlayQrOption { onIntent(MobilePlayIntent.SCAN) }
-            Text(
-                stringResource(R.string.play_pending),
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.onSurfaceVariant,
-            )
+        Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            if (state.activeRoom != null) {
+                QuizzButton(
+                    { onIntent(MobilePlayIntent.Resume) },
+                    Modifier.fillMaxWidth().testTag(MobilePlayTags.RESUME),
+                ) {
+                    Text(stringResource(RoomR.string.room_resume))
+                }
+            } else {
+                MobilePlayFields(state, onIntent)
+                MobilePlayFeedback(state, onIntent, onSignIn)
+                val canConnect = !state.joining && state.retryAfter == 0L && !state.checkingIdentity
+                QuizzButton(
+                    { onIntent(MobilePlayIntent.Connect) },
+                    Modifier.fillMaxWidth().testTag(MobilePlayTags.CONNECT),
+                    enabled = canConnect,
+                ) {
+                    Text(stringResource(if (state.joining) R.string.play_joining else R.string.play_connect))
+                }
+                MobilePlayQrOption(onScan, enabled = !state.joining)
+            }
         }
     }
 }
 
 @Composable
-private fun MobilePlayQrOption(onScan: () -> Unit) {
+private fun MobilePlayFields(state: MobilePlayState, onIntent: (MobilePlayIntent) -> Unit) {
+    OutlinedTextField(
+        state.code,
+        { onIntent(MobilePlayIntent.EditCode(it)) },
+        Modifier.fillMaxWidth().testTag(MobilePlayTags.CODE),
+        label = { Text(stringResource(R.string.play_code)) },
+        singleLine = true,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        textStyle = MaterialTheme.typography.titleLarge,
+        shape = MaterialTheme.shapes.medium,
+        enabled = !state.joining,
+        isError = state.validation == MobilePlayValidation.CODE,
+    )
+    val profileName = state.profileName
+    when {
+        profileName != null -> MobilePlayProfileName(profileName)
+        state.showNickname -> OutlinedTextField(
+            state.nickname,
+            { onIntent(MobilePlayIntent.EditNickname(it)) },
+            Modifier.fillMaxWidth().testTag(MobilePlayTags.NICKNAME),
+            label = { Text(stringResource(R.string.play_nickname)) },
+            singleLine = true,
+            shape = MaterialTheme.shapes.medium,
+            enabled = !state.joining,
+            isError = state.validation == MobilePlayValidation.NICKNAME,
+        )
+        else -> Text(
+            stringResource(R.string.play_loading_profile),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+        )
+    }
+}
+
+@Composable
+private fun MobilePlayProfileName(name: String) {
+    val colors = MaterialTheme.colorScheme
+    Surface(
+        Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.medium,
+        color = colors.secondaryContainer,
+        contentColor = colors.onSecondaryContainer,
+    ) {
+        Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            QuizzIconLabel(UiR.drawable.ic_quizz_profile, tint = LocalContentColor.current) {
+                Text(
+                    stringResource(R.string.play_signed_in_as, name),
+                    modifier = Modifier.testTag(MobilePlayTags.PROFILE_NAME),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+internal fun MobilePlayValidationText(message: String) {
+    Text(
+        message,
+        Modifier.testTag(MobilePlayTags.VALIDATION).semantics { liveRegion = LiveRegionMode.Polite },
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.error,
+    )
+}
+
+@Composable
+private fun MobilePlayQrOption(onScan: () -> Unit, enabled: Boolean) {
     val colors = MaterialTheme.colorScheme
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -87,6 +161,7 @@ private fun MobilePlayQrOption(onScan: () -> Unit) {
         onScan,
         Modifier.fillMaxWidth().testTag(MobilePlayTags.SCAN),
         style = QuizzButtonStyle.OUTLINED,
+        enabled = enabled,
     ) {
         QuizzIconLabel(UiR.drawable.ic_quizz_scan, tint = LocalContentColor.current) {
             Text(stringResource(R.string.play_scan))

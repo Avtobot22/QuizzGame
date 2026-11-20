@@ -6,8 +6,14 @@ import androidx.navigation3.runtime.NavKey
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.feature.play.mobile.ui.MobilePlayScreen
 
-object MobilePlayEntries : FeatureEntries<Unit> {
-    override fun register(scope: EntryProviderScope<NavKey>, context: State<Unit>) {
-        scope.entry<PlayRoute> { MobilePlayScreen() }
+data class MobilePlayCallbacks(
+    val openLobby: (String) -> Boolean,
+    val signIn: (String, String) -> Boolean,
+)
+
+object MobilePlayEntries : FeatureEntries<MobilePlayCallbacks> {
+    override fun register(scope: EntryProviderScope<NavKey>, context: State<MobilePlayCallbacks>) {
+        scope.entry<PlayRoute> { MobilePlayScreen(context.value) }
+        scope.entry<MobileJoinRoute> { route -> MobilePlayScreen(context.value, draft = route) }
     }
 }

@@ -7,12 +7,17 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.pressKey
+import androidx.test.espresso.matcher.RootMatchers.isDialog
 import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import org.hamcrest.Matcher
 
 internal object TvRemote {
     fun press(keyCode: Int) {
         onView(isRoot()).perform(pressKey(keyCode))
+    }
+
+    fun pressInDialog(keyCode: Int) {
+        onView(isRoot()).inRoot(isDialog()).perform(pressKey(keyCode))
     }
 
     fun pressBeforeNextFrame(vararg keyCodes: Int) {

@@ -11,9 +11,18 @@ val verificationHost = providers.gradleProperty("quizz.auth.deviceVerificationHo
 check(verificationHost.isEmpty() || verificationHost.matches(Regex("[a-z0-9-]+([.][a-z0-9-]+)+")))
 val debugNetworkMode = providers.gradleProperty("quizz.tv.debugNetworkMode").orElse(DebugNetworkMode.MOCK.name).get()
 
+val roomJoinHost = providers.gradleProperty("quizz.rooms.joinHost").orElse("disabled.invalid").get()
+check(roomJoinHost.matches(Regex("[a-z0-9-]+([.][a-z0-9-]+)+")))
+
 android {
     namespace = "com.quizzgame.tv"
+    buildTypes.named("debug") {
+        val port = providers.gradleProperty("quizz.rooms.debugPort").orElse("0").get().toInt()
+        check(port in 0..65535)
+        buildConfigField("int", "ROOM_MOCK_PORT", port.toString())
+    }
     defaultConfig {
+        buildConfigField("String", "ROOM_JOIN_HOST", "\"$roomJoinHost\"")
         applicationId = "com.quizzgame.tv"
         buildConfigField("String", "DEVICE_VERIFICATION_HOST", "\"$verificationHost\"")
     }
@@ -42,6 +51,7 @@ dependencies {
     implementation(projects.feature.feed.tv)
     implementation(projects.feature.quizEntry.tv)
     implementation(projects.app.foundation)
+    implementation(projects.feature.room.tv)
     implementation(projects.core.navigation)
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.tv)

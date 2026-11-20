@@ -40,7 +40,8 @@ object AppServicesModule {
             "mock/bodies/mobile-refresh.json",
             BuildConfig.DEBUG_FAIL_NETWORK_ONCE,
             revocationPolicy,
-            ::mobileMockRules,
+            externalLoopbackPort = BuildConfig.ROOM_MOCK_PORT,
+            platformRules = ::mobileMockRules,
         )
     }
 }

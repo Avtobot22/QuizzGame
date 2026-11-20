@@ -1,0 +1,23 @@
+<resources>
+    <string name="room_self">%1$s · you</string>
+    <string name="room_leave">Leave room</string>
+    <string name="room_leave_title">Leave the room?</string>
+    <string name="room_leave_description">Enter the PIN or scan the QR code to return.</string>
+    <string name="room_set_ready">I’m ready</string>
+    <string name="room_unset_ready">I’m not ready</string>
+    <string name="room_wait_host">Waiting for the host to start on the TV</string>
+    <string name="room_started_description">Watch the game on the TV.</string>
+    <string name="room_to_play">Back to Play</string>
+    <string name="room_update_failed">The action could not be confirmed.</string>
+    <string name="room_open_failed">Couldn’t open the room</string>
+    <string name="room_open_from_play">Open the room again from Play.</string>
+    <string name="room_try_open_again">Try opening the room again.</string>
+    <plurals name="room_game_questions">
+        <item quantity="one">%d question</item>
+        <item quantity="other">%d questions</item>
+    </plurals>
+    <plurals name="room_game_minutes">
+        <item quantity="one">about %d minute</item>
+        <item quantity="other">about %d minutes</item>
+    </plurals>
+</resources>

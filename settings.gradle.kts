@@ -56,6 +56,8 @@ include(":shared:splash")
 include(":shared:auth")
 include(":shared:account")
 include(":shared:room")
+include(":feature:room:tv")
+include(":feature:room:mobile")
 
 include(":feature:splash:tv")
 include(":feature:splash:mobile")

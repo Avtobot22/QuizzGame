@@ -4,6 +4,8 @@ import androidx.compose.runtime.State
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.quizzgame.app.navigation.AuthReturnTarget
+import com.quizzgame.core.navigation.chrome.NavigationChromePolicy
+import com.quizzgame.core.navigation.chrome.navigationChrome
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
 import com.quizzgame.feature.account.mobile.navigation.MobileProfileCallbacks
@@ -14,9 +16,12 @@ import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountCallbacks
 import com.quizzgame.feature.dashboard.mobile.navigation.MobileAccountEntries
 import com.quizzgame.feature.feed.mobile.navigation.MobileFeedCallbacks
 import com.quizzgame.feature.feed.mobile.navigation.MobileFeedEntries
+import com.quizzgame.feature.play.mobile.navigation.MobilePlayCallbacks
 import com.quizzgame.feature.play.mobile.navigation.MobilePlayEntries
 import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryCallbacks
 import com.quizzgame.feature.quizentry.mobile.navigation.MobileQuizEntryEntries
+import com.quizzgame.feature.room.mobile.navigation.MobileLobbyRoute
+import com.quizzgame.feature.room.mobile.ui.MobileLobbyScreen
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashCallbacks
 import com.quizzgame.feature.splash.mobile.navigation.MobileSplashEntries
 import dagger.Module
@@ -36,6 +41,7 @@ internal data class MobileNavigationContext(
     val onOpenEntry: (String) -> Boolean = { false },
     val onPlay: () -> Boolean = { false },
     val onBack: () -> Unit = {},
+    val onLobby: (String) -> Boolean = { false },
 )
 
 internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<MobileNavigationContext>) {
@@ -48,7 +54,12 @@ internal fun EntryProviderScope<NavKey>.mobileStartupEntries(context: State<Mobi
 }
 
 internal fun EntryProviderScope<NavKey>.mobileContentEntries(context: State<MobileNavigationContext>) {
-    MobilePlayEntries.withContext<MobileNavigationContext, Unit> { Unit }.register(this, context)
+    MobilePlayEntries.withContext<MobileNavigationContext, MobilePlayCallbacks> {
+        MobilePlayCallbacks(it.onLobby) { code, name -> it.onAuthFor(AuthReturnTarget.JoinRoomDraft(code, name)) }
+    }.register(this, context)
+    entry<MobileLobbyRoute>(metadata = navigationChrome(NavigationChromePolicy.HIDDEN)) { route ->
+        MobileLobbyScreen(route.roomId, context.value.onBack)
+    }
     MobileFeedEntries.withContext<MobileNavigationContext, MobileFeedCallbacks> {
         MobileFeedCallbacks(it.onOpenEntry, { it.onSignIn() })
     }.register(this, context)
