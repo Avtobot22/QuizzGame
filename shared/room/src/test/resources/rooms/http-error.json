@@ -1,0 +1,5 @@
+{
+  "reasonCode": 32006,
+  "debugMessage": "ROOM_FULL",
+  "userFriendlyMessage": "В комнате больше нет мест"
+}

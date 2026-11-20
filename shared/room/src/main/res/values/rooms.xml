@@ -1,0 +1,31 @@
+<resources>
+    <string name="room_lobby">Лобби</string>
+    <string name="room_connecting">Подключаемся к комнате</string>
+    <string name="room_reconnecting">Восстанавливаем связь с комнатой</string>
+    <string name="room_roster">Участники</string>
+    <string name="room_count">%1$d из %2$d</string>
+    <string name="room_ready">Готов</string>
+    <string name="room_not_ready">Не готов</string>
+    <string name="room_disconnected">Нет связи</string>
+    <string name="room_rejoining">Подключается</string>
+    <string name="room_keep_waiting">Ожидаем участников</string>
+    <string name="room_closed">Комната закрыта</string>
+    <string name="room_removed">Ведущий удалил вас из комнаты</string>
+    <string name="room_expired">Время комнаты истекло</string>
+    <string name="room_account_changed">Сессия аккаунта изменилась</string>
+    <string name="room_unavailable">Комната недоступна</string>
+    <string name="room_back">Назад</string>
+    <string name="room_starting">Игра запускается</string>
+    <string name="room_started">Игра началась</string>
+    <string name="room_retry">Повторить</string>
+    <string name="room_cancel">Отмена</string>
+    <string name="room_resume">Вернуться в комнату</string>
+    <string name="room_action_denied">Это действие недоступно</string>
+    <string name="room_conflict">Комната обновилась. Повторите действие, если оно ещё нужно.</string>
+    <string name="room_closed_description">Чтобы сыграть, подключитесь к новой комнате.</string>
+    <string name="room_removed_description">Вы можете присоединиться к другой комнате.</string>
+    <string name="room_expired_description">Попросите ведущего создать новую комнату.</string>
+    <string name="room_account_changed_description">Подключитесь заново с текущим аккаунтом.</string>
+    <string name="room_unavailable_description">Вернитесь назад и попробуйте открыть комнату снова.</string>
+    <string name="room_reconnecting_description">Лобби откроется, когда связь восстановится.</string>
+</resources>

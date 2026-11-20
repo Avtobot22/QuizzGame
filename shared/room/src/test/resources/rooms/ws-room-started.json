@@ -1,0 +1,8 @@
+{
+  "type": "room.started",
+  "version": 4,
+  "sentAt": "2026-11-19T15:41:00Z",
+  "payload": {
+    "gameSessionId": "82ca03be-48cc-4ad5-a62e-cb184860aa11"
+  }
+}
