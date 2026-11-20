@@ -21,9 +21,8 @@ internal class AccessTokenInterceptor(
             .tag(RequestPolicy::class.java, policy)
             .tag(RequestAuthContext::class.java, null)
         if (policy.auth != AuthPolicy.NONE) {
-            val snapshot = credentialsProvider.snapshot()
+            val snapshot = credentialsProvider.snapshot().requireAuth(policy)
             val access = snapshot.accessToken
-            if (access == null && policy.auth == AuthPolicy.REQUIRED) throw AuthenticationRequiredException()
             val admitted = calls?.context(chain.call())
             if (admitted != null && admitted.observedCredentials.sessionGeneration != snapshot.sessionGeneration) {
                 throw AuthenticationRequiredException()
@@ -49,6 +48,15 @@ internal class AccessTokenInterceptor(
         }
         return response
     }
+}
+
+private fun CredentialsSnapshot.requireAuth(policy: RequestPolicy): CredentialsSnapshot {
+    val requiredGeneration = policy.requiredSessionGeneration
+    val ownerChanged = requiredGeneration != null && requiredGeneration != sessionGeneration
+    if (policy.auth == AuthPolicy.REQUIRED && (accessToken == null || ownerChanged)) {
+        throw AuthenticationRequiredException()
+    }
+    return this
 }
 
 internal class AnonymousRequestInterceptor : Interceptor {

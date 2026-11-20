@@ -16,7 +16,12 @@ enum class ReplayPolicy {
 data class RequestPolicy(
     val auth: AuthPolicy = AuthPolicy.NONE,
     val replay: ReplayPolicy = ReplayPolicy.NEVER,
-)
+    val requiredSessionGeneration: Long? = null,
+) {
+    init {
+        require(requiredSessionGeneration == null || auth == AuthPolicy.REQUIRED)
+    }
+}
 
 internal fun RequestPolicy.forRequest(request: Request): RequestPolicy =
     if (auth != AuthPolicy.NONE && request.method == "GET" && request.body == null) {

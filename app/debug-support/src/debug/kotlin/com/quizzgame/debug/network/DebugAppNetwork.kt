@@ -5,6 +5,7 @@ import com.quizzgame.app.network.AppNetworkGraph
 import com.quizzgame.app.network.AppNetworkGraphFactory
 import com.quizzgame.app.network.AppNetworkSettings
 import com.quizzgame.core.network.api.ApiRuntime
+import com.quizzgame.core.network.api.NetworkWebSockets
 import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
 import com.quizzgame.debug.network.mocks.DebugMockAssets
 import dev.androidmock.core.dsl.BodyAssetResolver
@@ -20,6 +21,7 @@ fun debugAppNetworkFactory(
     refreshFixture: String,
     failNetworkOnce: Boolean,
     revocationPolicy: RefreshRevocationPolicy,
+    externalLoopbackPort: Int = 0,
     platformRules: (BodyAssetResolver, Json) -> List<Rule>,
 ): AppNetworkGraphFactory {
     val failOnce = AtomicBoolean(failNetworkOnce)
@@ -27,8 +29,9 @@ fun debugAppNetworkFactory(
         if (failOnce.getAndSet(false)) throw IOException("Simulated local transport startup failure")
         val mode = DebugNetworkMode.valueOf(settings.networkMode)
         if (mode == DebugNetworkMode.REAL) settings.realNetworkConfiguration()
+        require(externalLoopbackPort == 0 || mode == DebugNetworkMode.MOCK)
         val assets = DebugMockAssets.from(context.assets)
-        val rules = if (mode == DebugNetworkMode.MOCK) {
+        val rules = if (mode == DebugNetworkMode.MOCK && externalLoopbackPort == 0) {
             appMockRules(assets, settings, refreshFixture, json, platformRules)
         } else {
             emptyList()
@@ -39,6 +42,7 @@ fun debugAppNetworkFactory(
                 settings.headers,
                 realBaseUrl = settings.apiBaseUrl.takeIf { mode == DebugNetworkMode.REAL },
                 timeouts = settings.timeouts,
+                externalLoopbackPort = externalLoopbackPort,
             ),
             json,
             session,
@@ -46,7 +50,8 @@ fun debugAppNetworkFactory(
             rules,
             revocationPolicy,
         )
-        AppNetworkGraph(ApiRuntime(graph.api.retrofit, graph.api.results), graph)
+        val sockets = NetworkWebSockets(graph.api.httpClient, graph.api.retrofit.baseUrl())
+        AppNetworkGraph(ApiRuntime(graph.api.retrofit, graph.api.results, sockets), graph)
     }
 }
 

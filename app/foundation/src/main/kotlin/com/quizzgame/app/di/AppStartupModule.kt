@@ -9,6 +9,7 @@ import com.quizzgame.app.startup.AppStartupCoordinator
 import com.quizzgame.app.startup.GraphAccessResult
 import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiCallExecutor
+import com.quizzgame.core.network.api.ApiWebSockets
 import com.quizzgame.core.network.config.createNetworkJson
 import com.quizzgame.core.session.lifecycle.SessionActions
 import com.quizzgame.core.session.lifecycle.SessionStateReader
@@ -39,6 +40,12 @@ object AppStartupModule {
     @Provides
     @Singleton
     fun sessionActions(startup: AppStartup): SessionActions = StartupSessionActions(startup)
+
+    @Provides
+    @Singleton
+    fun apiWebSockets(startup: AppStartup): ApiWebSockets = ApiWebSockets { path, listener ->
+        (startup.accessGraph() as? GraphAccessResult.Ready)?.graph?.network?.api?.sockets?.open(path, listener)
+    }
 
     @Provides
     @Singleton
