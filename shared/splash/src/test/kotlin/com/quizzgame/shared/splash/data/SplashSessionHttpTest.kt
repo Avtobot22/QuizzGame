@@ -43,7 +43,6 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.http.GET
@@ -53,7 +52,7 @@ import java.net.InetAddress
 
 class SplashSessionHttpTest {
     @Test
-    fun userUnauthorizedRefreshesAndReplaysOnceBeforePublishingCurrentUser() = runTest {
+    fun userUnauthorizedRefreshesAndReplaysOnceBeforeCatalogAdmission() = runTest {
         Fixture.open().use { fixture ->
             fixture.enqueueBootstrap()
             fixture.server.enqueue(MockResponse().setResponseCode(401))
@@ -63,7 +62,6 @@ class SplashSessionHttpTest {
             assertEquals(5, fixture.server.requestCount)
             assertEquals("fixture-access-2", fixture.store.record.tokens?.access)
             assertEquals("fixture-refresh-2", fixture.store.record.tokens?.refresh)
-            assertTrue(fixture.users.current() != null)
             val requests = List(5) { fixture.server.takeRequest() }
             assertEquals(
                 listOf(
@@ -90,7 +88,6 @@ class SplashSessionHttpTest {
             fixture.server.enqueue(MockResponse().setResponseCode(401))
             assertEquals(SplashResult.Continue, fixture.useCase())
             assertEquals(5, fixture.server.requestCount)
-            assertNull(fixture.users.current())
         }
     }
 
@@ -107,7 +104,6 @@ class SplashSessionHttpTest {
             assertEquals(SessionState.Expired, fixture.session.state.value)
             assertEquals(4, fixture.server.requestCount)
             assertNull(fixture.store.record.tokens)
-            assertNull(fixture.users.current())
         }
     }
 
@@ -122,7 +118,6 @@ class SplashSessionHttpTest {
             assertEquals(CredentialUnavailableKind.REFRESH_UNCERTAIN, state.kind)
             assertEquals("fixture-refresh-1", fixture.store.record.tokens?.refresh)
             assertEquals(4, fixture.server.requestCount)
-            assertNull(fixture.users.current())
             assertEquals(SplashResult.SignIn, fixture.useCase())
             assertEquals(4, fixture.server.requestCount)
         }
@@ -153,17 +148,15 @@ class SplashSessionHttpTest {
             AppFeatureDefinitions.tvGuest,
         )
         private val reader = SessionStateReader { session.state.value }
-        val users = CurrentUserStore(reader)
         private val remote = object : SplashRemoteDataSource {
             override suspend fun launch(): ApiCallResult<Unit> = executor.call(TestSplashApi::class.java) {
                 launch(RequestPolicy(AuthPolicy.OPTIONAL, ReplayPolicy.AFTER_REFRESH_ONCE)).validated()
-                Unit
             }
             override suspend fun currentUser(): ApiCallResult<CurrentUser> = executor.call(TestSplashApi::class.java) {
                 currentUser(RequestPolicy(AuthPolicy.REQUIRED, ReplayPolicy.AFTER_REFRESH_ONCE)).toDomain()
             }
         }
-        private val repository = SplashRepositoryImpl(remote, flags, flags, reader, users)
+        private val repository = SplashRepositoryImpl(remote, flags, flags, reader)
         val useCase = StartSplashScenario(
             repository,
             LoadSplashPolicyUseCase(repository),

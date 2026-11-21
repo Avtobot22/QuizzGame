@@ -15,6 +15,7 @@ import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.feature.account.mobile.navigation.ProfileRoute
 import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
 import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
+import com.quizzgame.feature.dashboard.mobile.navigation.LibraryRoute
 import com.quizzgame.feature.feed.mobile.navigation.ExploreRoute
 import com.quizzgame.feature.feed.mobile.ui.tags.MobileFeedTags
 import com.quizzgame.feature.play.mobile.navigation.PlayRoute
@@ -28,6 +29,7 @@ import org.junit.rules.ExternalResource
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
 import java.io.File
+import com.quizzgame.feature.dashboard.mobile.R as DashboardR
 
 class MobileCatalogJourneyTest {
     private val compose = createAndroidComposeRule<MainActivity>()
@@ -93,6 +95,17 @@ class MobileCatalogJourneyTest {
         screen.tag(MobileFeedTags.REFRESH).performTouchInput { swipeDown() }
         compose.waitUntil(15_000) { MobileCatalogMockScenario.feedLoadCount > before }
         await(MobileFeedTags.LIST)
+    }
+
+    @Test
+    fun libraryShowsItsOwnStatusAndProfileOpensSeparately() {
+        await(MobilePlayTags.ROOT)
+        screen.tag(MobileChromeTags.item(LibraryRoute)).performClick()
+        screen.text(compose.activity.getString(DashboardR.string.library_unavailable)).assertIsDisplayed()
+        screen.tag(MobileProfileTags.SCREEN).assertDoesNotExist()
+
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_IN)
     }
 
     @Test
