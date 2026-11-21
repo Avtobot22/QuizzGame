@@ -13,7 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -29,6 +28,7 @@ import com.quizzgame.core.navigation.policy.DestinationAccess
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.session.lifecycle.SessionState
+import com.quizzgame.tv.navigation.fixtureString
 import com.quizzgame.tv.ui.tags.UserContextTags
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
@@ -118,7 +118,7 @@ class UserContextNavigationTest {
     private fun Content(key: Key, model: UserContextModel = viewModel { UserContextModel() }) {
         SideEffect { models[key] = model }
         BasicText(
-            stringResource(FixtureR.string.fixture_counter, model.counter),
+            fixtureString(FixtureR.string.fixture_counter, model.counter),
             Modifier.testTag(UserContextTags.screen(key)),
         )
     }

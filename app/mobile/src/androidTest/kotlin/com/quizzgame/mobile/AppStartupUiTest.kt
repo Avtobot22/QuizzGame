@@ -57,8 +57,11 @@ class AppStartupUiTest {
     }
 
     @Test
-    fun confirmedExpiryDropsThePreviousRootAndShowsSignIn() {
-        val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
+    fun confirmedExpiryDropsThePreviousRootBeforeGuestSplash() {
+        val startup = FailingAppStartup().apply {
+            state.value = AppStartupState.Ready
+            sessionState.value = SessionState.Authenticated(1)
+        }
         val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzMobileTheme {
@@ -74,9 +77,13 @@ class AppStartupUiTest {
         screen.tag(MobileFixtureTags.action(1)).performClick()
         compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.PLAY).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
-        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SIGN_IN).isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_LOADING).isDisplayed() }
         screen.tag(MobileChromeTags.BAR).assertDoesNotExist()
         screen.tag(MobileChromeTags.RAIL).assertDoesNotExist()
+        screen.tag(MobileNavigationTags.PLAY).assertDoesNotExist()
+
+        compose.runOnIdle { startup.sessionState.value = SessionState.Guest }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(MobileNavigationTags.SPLASH).isDisplayed() }
         screen.tag(MobileNavigationTags.PLAY).assertDoesNotExist()
     }
 

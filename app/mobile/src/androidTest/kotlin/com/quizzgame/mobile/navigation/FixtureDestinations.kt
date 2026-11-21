@@ -1,5 +1,6 @@
 package com.quizzgame.mobile.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,16 +14,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.test.platform.app.InstrumentationRegistry
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzRoomCodeField
 import com.quizzgame.core.designsystem.mobile.QuizzScreenScaffold
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.debug.navigation.FixtureSignInViewModel
-import com.quizzgame.mobile.R
 import com.quizzgame.mobile.ui.tags.MobileFixtureTags
 import com.quizzgame.mobile.test.R as FixtureR
 
@@ -34,7 +34,7 @@ internal fun MobileFixtureSignInDestination(
     val result by viewModel.result.collectAsStateWithLifecycle()
     NavigationResultEffect(result, viewModel::resultHandled) { onContinue() }
     FixturePlaceholder(
-        R.string.signin_placeholder,
+        FixtureR.string.fixture_signin_title,
         listOf(FixtureR.string.fixture_restart to viewModel::requestRestart),
     )
 }
@@ -44,11 +44,11 @@ internal fun MobileFixturePlayDestination(
     onLogout: () -> Unit,
 ) {
     var roomCode by rememberSaveable { mutableStateOf("") }
-    FixturePlaceholder(R.string.play_placeholder, listOf(FixtureR.string.fixture_signout to onLogout)) {
+    FixturePlaceholder(FixtureR.string.fixture_play_title, listOf(FixtureR.string.fixture_signout to onLogout)) {
         QuizzRoomCodeField(
             value = roomCode,
             onValueChange = { roomCode = it },
-            label = stringResource(FixtureR.string.fixture_room_code),
+            label = fixtureString(FixtureR.string.fixture_room_code),
             modifier = Modifier.testTag(MobileFixtureTags.ROOM_CODE),
         )
     }
@@ -66,15 +66,18 @@ internal fun FixturePlaceholder(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
         ) {
-            Text(stringResource(FixtureR.string.fixture_label))
-            Text(stringResource(title))
+            Text(fixtureString(FixtureR.string.fixture_label))
+            Text(fixtureString(title))
             content()
             actions.forEachIndexed { index, (label, action) ->
                 QuizzButton(
                     onClick = action,
                     modifier = Modifier.testTag(MobileFixtureTags.action(index)),
-                ) { Text(stringResource(label)) }
+                ) { Text(fixtureString(label)) }
             }
         }
     }
 }
+
+internal fun fixtureString(@StringRes id: Int, vararg args: Any): String =
+    InstrumentationRegistry.getInstrumentation().context.getString(id, *args)

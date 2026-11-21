@@ -19,7 +19,7 @@ internal fun startupTestEntries(): FeatureEntries<MobileNavigationContext> = Fea
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(MobileNavigationTags.SPLASH)) {
             FixturePlaceholder(
-                R.string.splash_placeholder,
+                FixtureR.string.fixture_splash_title,
                 listOf(
                     FixtureR.string.fixture_signin to { current.onSignIn() },
                     FixtureR.string.fixture_continue to { current.onContentReady() },

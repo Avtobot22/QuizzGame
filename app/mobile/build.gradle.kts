@@ -38,8 +38,6 @@ quizzDebug {
 }
 
 dependencies {
-    implementation(libs.androidx.compose.ui.tooling.preview)
-    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(projects.app.foundation)
     implementation(projects.feature.room.mobile)
     implementation(projects.core.navigation)

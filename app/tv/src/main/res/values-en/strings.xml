@@ -1,7 +1,4 @@
 <resources>
     <string name="app_startup_loading">Preparing the app…</string>
     <string name="app_network_configuration_required">The app is not configured to connect to a server yet.</string>
-    <string name="splash_placeholder">Splash — startup screen under development</string>
-    <string name="signin_placeholder">Account sign-in is coming soon. You can browse the catalog and find a quiz in the meantime.</string>
-    <string name="signin_title">Sign in to Quizz</string>
 </resources>

@@ -19,7 +19,7 @@ internal fun startupTestEntries(): FeatureEntries<TvNavigationContext> = Feature
         val current = context.value
         Box(Modifier.fillMaxSize().testTag(TvNavigationTags.SPLASH)) {
             FixturePlaceholder(
-                R.string.splash_placeholder,
+                FixtureR.string.fixture_splash_title,
                 listOf(
                     FixtureR.string.fixture_signin to { current.onSignIn() },
                     FixtureR.string.fixture_continue to { current.onContentReady() },

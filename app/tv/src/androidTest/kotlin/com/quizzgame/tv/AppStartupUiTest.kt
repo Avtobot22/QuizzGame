@@ -59,8 +59,11 @@ class AppStartupUiTest {
     }
 
     @Test
-    fun confirmedExpiryDropsThePreviousRootAndShowsSignIn() {
-        val startup = FailingAppStartup().apply { state.value = AppStartupState.Ready }
+    fun confirmedExpiryDropsThePreviousRootBeforeGuestSplash() {
+        val startup = FailingAppStartup().apply {
+            state.value = AppStartupState.Ready
+            sessionState.value = SessionState.Authenticated(1)
+        }
         val viewModel = AppRootViewModel(startup, SavedStateHandle())
         compose.setContent {
             QuizzTvTheme {
@@ -76,8 +79,12 @@ class AppStartupUiTest {
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.DASHBOARD).isDisplayed() }
         compose.runOnIdle { startup.sessionState.value = SessionState.Expired }
-        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SIGN_IN).isDisplayed() }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(AppRootTags.STARTUP_LOADING).isDisplayed() }
         screen.tag(TvNavigationTags.NAVIGATION_BAR).assertDoesNotExist()
+        screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
+
+        compose.runOnIdle { startup.sessionState.value = SessionState.Guest }
+        compose.waitUntil(5_000) { compose.onNodeWithTag(TvNavigationTags.SPLASH).isDisplayed() }
         screen.tag(TvNavigationTags.DASHBOARD).assertDoesNotExist()
     }
 
