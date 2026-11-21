@@ -1,9 +1,12 @@
 package com.quizzgame.feature.play.mobile.ui.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
+import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayJoinIdentity
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayState
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayValidation
+import com.quizzgame.shared.room.domain.entity.result.RoomFailure
+import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 import com.quizzgame.shared.room.domain.entity.session.RoomId
 import java.util.UUID
 
@@ -21,5 +24,12 @@ internal class MobilePlayPreviewProvider : PreviewParameterProvider<MobilePlaySt
         draft.copy(validation = MobilePlayValidation.CAMERA_DENIED),
         draft.copy(validation = MobilePlayValidation.NICKNAME),
         draft.copy(activeRoom = RoomId(UUID(0, 1))),
+        draft.copy(
+            failure = RoomFailure(AppFailure.OperationInterrupted, RoomFailureReason.PARTICIPANT_AUTH_REQUIRED),
+        ),
+        signedIn.copy(
+            editProfileName = true,
+            failure = RoomFailure(AppFailure.OperationInterrupted, RoomFailureReason.NAME_TAKEN),
+        ),
     )
 }

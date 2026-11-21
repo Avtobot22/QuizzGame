@@ -20,24 +20,24 @@ import com.quizzgame.feature.play.mobile.R
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun MobilePlayIntro(modifier: Modifier = Modifier) {
+internal fun MobilePlayIntro(hasRoom: Boolean, modifier: Modifier = Modifier) {
     val colors = MaterialTheme.colorScheme
     Column(
         modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        QuizzSceneIllustration(colors.primary, colors.tertiary, Modifier.size(112.dp)) {
+        QuizzSceneIllustration(colors.primary, colors.tertiary, Modifier.size(88.dp)) {
             Icon(painterResource(UiR.drawable.ic_quizz_room), null, Modifier.size(44.dp), tint = colors.primary)
         }
         Text(
-            stringResource(R.string.play_heading),
+            stringResource(if (hasRoom) R.string.play_resume_heading else R.string.play_heading),
             modifier = Modifier.semantics { heading() },
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
         )
         Text(
-            stringResource(R.string.play_description),
+            stringResource(if (hasRoom) R.string.play_resume_description else R.string.play_description),
             style = MaterialTheme.typography.bodyMedium,
             color = colors.onSurfaceVariant,
             textAlign = TextAlign.Center,

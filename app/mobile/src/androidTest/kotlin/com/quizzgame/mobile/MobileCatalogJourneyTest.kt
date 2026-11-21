@@ -4,7 +4,9 @@ import android.graphics.Bitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isDisplayed
+import androidx.compose.ui.test.isEnabled
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
@@ -70,10 +72,11 @@ class MobileCatalogJourneyTest {
 
     @Test
     fun emptyPinShowsValidationAndKeepsJoinForm() {
-        await(MobilePlayTags.CONNECT)
+        compose.waitUntil(15_000) {
+            compose.onAllNodes(hasTestTag(MobilePlayTags.CONNECT) and isEnabled()).fetchSemanticsNodes().isNotEmpty()
+        }
         screen.tag(MobilePlayTags.CONNECT).performClick()
-        await(MobilePlayTags.VALIDATION)
-        screen.tag(MobilePlayTags.VALIDATION).assertIsDisplayed()
+        screen.tag(MobilePlayTags.VALIDATION, useUnmergedTree = true).assertIsDisplayed()
     }
 
     @Test
