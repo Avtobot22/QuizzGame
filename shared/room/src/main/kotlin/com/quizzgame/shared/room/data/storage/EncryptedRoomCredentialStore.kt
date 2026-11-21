@@ -1,6 +1,7 @@
 package com.quizzgame.shared.room.data.storage
 
 import android.content.Context
+import android.security.keystore.KeyPermanentlyInvalidatedException
 import android.util.AtomicFile
 import com.google.crypto.tink.integration.android.AndroidKeystore
 import com.quizzgame.core.coroutines.DispatcherProvider
@@ -18,8 +19,11 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.IOException
 import java.security.GeneralSecurityException
+import java.security.InvalidKeyException
+import java.security.ProviderException
 import java.util.Locale
 import java.util.UUID
+import javax.crypto.BadPaddingException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -34,13 +38,13 @@ internal class EncryptedRoomCredentialStore @Inject constructor(
 
     override suspend fun load(): StoredRoom? = withContext(dispatchers.io) {
         val encrypted = record.readIfPresent() ?: return@withContext null
-        try {
-            val data = AndroidKeystore.getAead(KEY_ALIAS).decrypt(encrypted, associatedData)
-            json.decodeFromString<StoredRoomDto>(data.decodeToString()).toStoredRoom()
-        } catch (_: GeneralSecurityException) {
-            throw IOException("Room credentials cannot be decrypted")
-        } catch (_: IllegalArgumentException) {
-            throw IOException("Room credentials have invalid data")
+        keystoreOperation("Room credentials cannot be decrypted") {
+            recoverRoomCredential(
+                json,
+                decrypt = { decryptRoomCredential(encrypted) },
+                resetKey = { AndroidKeystore.deleteKey(KEY_ALIAS) },
+                discard = ::clearRecord,
+            )
         }
     }
 
@@ -55,16 +59,16 @@ internal class EncryptedRoomCredentialStore @Inject constructor(
             room.self?.toString(),
             room.accountGeneration,
         )
-        val bytes = try {
+        val bytes = keystoreOperation("Room credentials cannot be encrypted") {
             if (!AndroidKeystore.hasKey(KEY_ALIAS)) AndroidKeystore.generateNewAes256GcmKey(KEY_ALIAS)
             AndroidKeystore.getAead(KEY_ALIAS).encrypt(json.encodeToString(dto).encodeToByteArray(), associatedData)
-        } catch (_: GeneralSecurityException) {
-            throw IOException("Room credentials cannot be encrypted")
         }
         record.replace(bytes)
     }
 
-    override suspend fun clear() = withContext(dispatchers.io) {
+    override suspend fun clear() = withContext(dispatchers.io) { clearRecord() }
+
+    private fun clearRecord() {
         record.delete()
         if (record.baseFile.exists()) throw IOException("Room credentials could not be cleared")
     }
@@ -75,17 +79,59 @@ internal class EncryptedRoomCredentialStore @Inject constructor(
         }
     }
 
-    private fun StoredRoomDto.toStoredRoom(): StoredRoom {
-        val decoded = credential.toDomain()
-        val participant = self?.let { ParticipantId(requireNotNull(it.roomUuid())) }
-        require((decoded.role == RoomRole.PARTICIPANT) == (participant != null))
-        return StoredRoom(requireNotNull(RoomId.parse(roomId)), decoded, participant, accountGeneration)
+    private fun decryptRoomCredential(encrypted: ByteArray): ByteArray? {
+        val aead = try {
+            AndroidKeystore.getAead(KEY_ALIAS)
+        } catch (failure: InvalidKeyException) {
+            // Tink throws InvalidKeyException here when KeyStore.getKey returns null.
+            if (failure.javaClass != InvalidKeyException::class.java) throw failure
+            return null
+        }
+        return aead.decrypt(encrypted, associatedData)
     }
 
     private companion object {
         const val KEY_ALIAS = "quizzgame.room"
         val associatedData = "quizzgame.room.credential.v1".encodeToByteArray()
     }
+}
+
+internal fun recoverRoomCredential(
+    json: Json,
+    decrypt: () -> ByteArray?,
+    resetKey: () -> Unit,
+    discard: () -> Unit,
+): StoredRoom? {
+    val data = try {
+        decrypt()
+    } catch (_: BadPaddingException) {
+        null
+    } catch (_: KeyPermanentlyInvalidatedException) {
+        resetKey()
+        null
+    }
+    val room = try {
+        data?.let { json.decodeFromString<StoredRoomDto>(it.decodeToString()).toStoredRoom() }
+    } catch (_: IllegalArgumentException) {
+        null
+    }
+    if (room == null) discard()
+    return room
+}
+
+private fun StoredRoomDto.toStoredRoom(): StoredRoom {
+    val decoded = credential.toDomain()
+    val participant = self?.let { ParticipantId(requireNotNull(it.roomUuid())) }
+    require((decoded.role == RoomRole.PARTICIPANT) == (participant != null))
+    return StoredRoom(requireNotNull(RoomId.parse(roomId)), decoded, participant, accountGeneration)
+}
+
+private inline fun <T> keystoreOperation(message: String, operation: () -> T): T = try {
+    operation()
+} catch (_: GeneralSecurityException) {
+    throw IOException(message)
+} catch (_: ProviderException) {
+    throw IOException(message)
 }
 
 private fun AtomicFile.readIfPresent(): ByteArray? = try {
