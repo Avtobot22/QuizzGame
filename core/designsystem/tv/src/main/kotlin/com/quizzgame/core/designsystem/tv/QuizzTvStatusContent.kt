@@ -1,11 +1,14 @@
 package com.quizzgame.core.designsystem.tv
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
@@ -72,22 +75,41 @@ fun QuizzTvNoticeBanner(
     content: @Composable ColumnScope.() -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
+    val accent = when (tone) {
+        QuizzNoticeTone.NEUTRAL -> colors.onSurfaceVariant
+        QuizzNoticeTone.INFORMATION -> colors.primary
+        QuizzNoticeTone.ERROR -> colors.error
+    }
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().border(
+            1.dp,
+            accent.copy(alpha = 0.25f),
+            MaterialTheme.shapes.large,
+        ),
         shape = MaterialTheme.shapes.large,
         colors = SurfaceDefaults.colors(
-            containerColor = lerp(colors.surface, colors.surfaceVariant, 0.28f),
+            containerColor = lerp(colors.surface, accent, 0.055f),
             contentColor = colors.onSurface,
         ),
-
     ) {
         Row(
-            Modifier.padding(20.dp).semantics { liveRegion = LiveRegionMode.Polite },
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalAlignment = Alignment.Top,
+            Modifier.heightIn(min = 60.dp).padding(horizontal = 14.dp, vertical = 10.dp)
+                .semantics { liveRegion = LiveRegionMode.Polite },
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            if (icon != null) QuizzTvStatusSymbol(icon, Modifier.size(28.dp), tone)
-            Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            if (icon != null) {
+                Box(
+                    Modifier.size(36.dp).background(accent.copy(alpha = 0.13f), MaterialTheme.shapes.small),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(painterResource(icon.resource), null, Modifier.size(21.dp), tint = accent)
+                }
+            }
+            Column(
+                Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
                 content()
                 actions()
             }
