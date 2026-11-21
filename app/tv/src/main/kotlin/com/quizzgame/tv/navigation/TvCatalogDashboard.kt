@@ -17,6 +17,8 @@ import com.quizzgame.feature.dashboard.tv.ui.TvDashboardScreen
 import com.quizzgame.feature.feed.tv.ui.TvFeedScreen
 import com.quizzgame.feature.quizentry.tv.navigation.QuizEntryRoute
 import com.quizzgame.feature.quizentry.tv.ui.TvQuizEntryScreen
+import com.quizzgame.feature.room.tv.navigation.TvLobbyRoute
+import com.quizzgame.feature.room.tv.ui.TvLobbyScreen
 import com.quizzgame.tv.R
 
 @Composable
@@ -62,7 +64,11 @@ internal fun TvCatalogDashboard(navigation: TvNavigationContext) {
                         current.value.back,
                         onSignIn = { latest.value.onAuthFor(AuthReturnTarget.QuizEntry(route.entryId)) },
                         authenticated = latest.value.authenticated,
+                        onLobby = { current.value.open(TvLobbyRoute(it)) },
                     )
+                }
+                scope.entry<TvLobbyRoute>(metadata = navigationChrome(NavigationChromePolicy.HIDDEN)) { route ->
+                    TvLobbyScreen(route.roomId, current.value.back)
                 }
             },
         )

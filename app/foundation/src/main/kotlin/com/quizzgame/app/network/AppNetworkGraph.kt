@@ -1,6 +1,7 @@
 package com.quizzgame.app.network
 
 import com.quizzgame.core.network.api.ApiRuntime
+import com.quizzgame.core.network.api.NetworkWebSockets
 import com.quizzgame.core.network.client.NetworkClientFactory
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.refresh.RefreshRevocationPolicy
@@ -16,7 +17,10 @@ class AppNetworkGraph(val api: ApiRuntime, private val resources: Closeable) : C
     internal val isClosed: Boolean get() = closed.get()
 
     override fun close() {
-        if (closed.compareAndSet(false, true)) resources.close()
+        if (closed.compareAndSet(false, true)) {
+            api.sockets?.close()
+            resources.close()
+        }
     }
 }
 
@@ -52,7 +56,8 @@ internal fun openRealAppNetwork(
         val client = NetworkClientFactory(configuration, json, session, coordinator).createApiClient()
         api = client.httpClient
         val owner = requireNotNull(coordinator)
-        val graph = AppNetworkGraph(ApiRuntime(client.retrofit, client.results)) {
+        val sockets = NetworkWebSockets(client.httpClient, client.retrofit.baseUrl())
+        val graph = AppNetworkGraph(ApiRuntime(client.retrofit, client.results, sockets)) {
             owner.close()
             closeHttpClient(client.httpClient)
             closeHttpClient(refresh.httpClient)

@@ -1,0 +1,45 @@
+{
+  "room": {
+    "roomId": "7c324c71-9cd5-4235-887b-a7800c39a401",
+    "entry": {
+      "entryId": "78e2b5b5-05e6-43f5-9580-2e88ec713001",
+      "title": "Обо всём на свете"
+    },
+    "state": "lobby",
+    "version": 2,
+    "capacity": {
+      "minPlayers": 1,
+      "maxPlayers": 16
+    },
+    "policy": {
+      "guestPlayersAllowed": true,
+      "allPlayersReadyRequired": false
+    },
+    "players": [
+      {
+        "participantId": "629f36d8-7e51-4df3-a624-ff2463d112ef",
+        "displayName": "Никита",
+        "ready": false,
+        "connection": "connected"
+      }
+    ],
+    "permissions": {
+      "canStart": false,
+      "canClose": false,
+      "canKick": false,
+      "canReady": true
+    },
+    "expiresAt": "2026-11-19T18:00:00Z"
+  },
+  "participant": {
+    "participantId": "629f36d8-7e51-4df3-a624-ff2463d112ef",
+    "displayName": "Никита",
+    "ready": false,
+    "connection": "connected"
+  },
+  "credential": {
+    "role": "participant",
+    "roomToken": "example-participant-secret-do-not-log",
+    "expiresAt": "2026-11-19T18:00:00Z"
+  }
+}

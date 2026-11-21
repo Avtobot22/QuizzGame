@@ -1,10 +1,14 @@
 package com.quizzgame.tv
 
+import android.graphics.Bitmap
 import android.view.KeyEvent
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import com.quizzgame.debug.network.mocks.ProfileMockScenario
 import com.quizzgame.feature.account.tv.ui.tags.TvProfileTags
 import com.quizzgame.feature.auth.tv.ui.tags.TvSignInTags
 import com.quizzgame.feature.authprovider.tv.ui.tags.TvDeviceAuthTags
@@ -14,6 +18,7 @@ import com.quizzgame.feature.feed.tv.ui.tags.TvFeedTags
 import com.quizzgame.feature.quizentry.tv.ui.tags.TvQuizEntryTags
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 
 class DashboardNavigationTest {
     @get:Rule
@@ -135,6 +140,38 @@ class DashboardNavigationTest {
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         awaitVisible(TvProfileTags.SIGN_OUT)
         signOutWithRemote()
+    }
+
+    @Test
+    fun savesSuggestedNicknameFromTheRemoteAndRestoresFocus() {
+        ProfileMockScenario.reset()
+        openSignInWithRemote()
+        repeat(2) { TvRemote.press(KeyEvent.KEYCODE_DPAD_DOWN) }
+        compose.awaitFocused(TvSignInTags.GOOGLE)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        awaitVisible(TvProfileTags.EDIT_NICKNAME)
+        captureProfile(TvProfileTags.SCREEN, "tv-profile.png")
+        compose.awaitFocused(TvProfileTags.SETTINGS)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_UP)
+        compose.awaitFocused(TvProfileTags.EDIT_NICKNAME)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvProfileTags.SAVE_NICKNAME)
+        captureProfile(TvProfileTags.NICKNAME_EDITOR, "tv-nickname.png")
+        TvRemote.pressInDialog(KeyEvent.KEYCODE_DPAD_CENTER)
+        compose.awaitFocused(TvProfileTags.EDIT_NICKNAME)
+        val nodes = AppShellScreen(compose)
+        nodes.tag(TvProfileTags.NICKNAME_EDITOR).assertDoesNotExist()
+        nodes.tag(TvProfileTags.SIGN_OUT).performClick()
+        awaitVisible(TvDashboardTags.NAVIGATION)
+        ProfileMockScenario.reset()
+    }
+
+    private fun captureProfile(tag: String, filename: String) {
+        val directory = checkNotNull(compose.activity.getExternalFilesDir("visual-previews"))
+        File(directory, filename).outputStream().use { output ->
+            val bitmap = compose.onNodeWithTag(tag).captureToImage().asAndroidBitmap()
+            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
+        }
     }
 
     private fun openSignInWithRemote() {

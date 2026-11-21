@@ -4,6 +4,8 @@ sealed interface AuthReturnTarget {
     data object Profile : AuthReturnTarget
     data object Home : AuthReturnTarget
 
+    data class JoinRoomDraft(val code: String, val nickname: String) : AuthReturnTarget
+
     data class QuizEntry(val entryId: String) : AuthReturnTarget {
         init { require(ENTRY_ID.matches(entryId)) }
     }

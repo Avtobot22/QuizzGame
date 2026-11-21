@@ -37,13 +37,21 @@ internal fun MobileQuizEntryStateContent(
                     Modifier.padding(padding),
                 )
             }
-            is MobileQuizEntryState.Error -> QuizzMobileErrorFullScreen(current.spec, { action ->
-                when (action) {
-                    ErrorActionKind.RETRY -> onIntent(MobileQuizEntryIntent.Retry)
-                    ErrorActionKind.SIGN_IN -> onSignIn()
-                    else -> Unit
-                }
-            }, Modifier.padding(padding))
+            is MobileQuizEntryState.Error -> {
+                val spec = current.spec
+                QuizzMobileErrorFullScreen(
+                    spec.copy(actions = (spec.actions + ErrorActionKind.GO_BACK).distinct()),
+                    onAction = { action ->
+                        when (action) {
+                            ErrorActionKind.RETRY -> onIntent(MobileQuizEntryIntent.Retry)
+                            ErrorActionKind.SIGN_IN -> onSignIn()
+                            ErrorActionKind.GO_BACK -> onBack()
+                            else -> Unit
+                        }
+                    },
+                    modifier = Modifier.padding(padding),
+                )
+            }
         }
     }
 }

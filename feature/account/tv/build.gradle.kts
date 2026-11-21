@@ -10,7 +10,7 @@ dependencies {
     api(projects.core.navigation)
     implementation(projects.core.designsystem.tv)
     implementation(projects.core.presentation)
-    implementation(projects.shared.splash)
+    implementation(projects.shared.account)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)

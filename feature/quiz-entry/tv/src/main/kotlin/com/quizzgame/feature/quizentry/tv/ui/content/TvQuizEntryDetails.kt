@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
@@ -15,9 +14,6 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
-import com.quizzgame.core.designsystem.tv.QuizzTvActionLabel
-import com.quizzgame.core.designsystem.tv.QuizzTvButton
-import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
 import com.quizzgame.core.designsystem.tv.media.QuizzTvBadge
 import com.quizzgame.core.designsystem.tv.media.QuizzTvBadgeStyle
 import com.quizzgame.core.designsystem.tv.media.readableColor
@@ -28,7 +24,7 @@ import com.quizzgame.shared.catalog.domain.entity.QuizEntry
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun TvQuizEntryDetails(entry: QuizEntry, onSignIn: (() -> Unit)?) {
+internal fun TvQuizEntryDetails(entry: QuizEntry) {
     val colors = MaterialTheme.colorScheme
     Box(Modifier.heightIn(min = QuizzTvLayout.badgeHeight.dp)) {
         entry.badge?.let {
@@ -62,25 +58,6 @@ internal fun TvQuizEntryDetails(entry: QuizEntry, onSignIn: (() -> Unit)?) {
         }
         if (entry.user.bookmarked) {
             EntryMetadata(UiR.drawable.ic_quizz_bookmark, stringResource(R.string.quiz_entry_bookmarked))
-        }
-    }
-    if (onSignIn != null) {
-        QuizzTvButton(onSignIn, Modifier.padding(top = 8.dp)) {
-            QuizzTvActionLabel(stringResource(R.string.quiz_entry_sign_in))
-        }
-    } else {
-        entry.actionTitle?.let { title ->
-            QuizzTvButton(
-                {},
-                Modifier.padding(top = 8.dp),
-                enabled = false,
-                style = QuizzTvButtonStyle.PRIMARY,
-            ) { QuizzTvActionLabel(title) }
-            Text(
-                stringResource(R.string.quiz_entry_launch_soon),
-                color = colors.onSurfaceVariant,
-                style = MaterialTheme.typography.bodySmall,
-            )
         }
     }
 }

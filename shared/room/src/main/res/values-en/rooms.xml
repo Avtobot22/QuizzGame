@@ -1,0 +1,31 @@
+<resources>
+    <string name="room_lobby">Lobby</string>
+    <string name="room_connecting">Connecting to the room</string>
+    <string name="room_reconnecting">Reconnecting to the room</string>
+    <string name="room_roster">Players</string>
+    <string name="room_count">%1$d of %2$d</string>
+    <string name="room_ready">Ready</string>
+    <string name="room_not_ready">Not ready</string>
+    <string name="room_disconnected">Disconnected</string>
+    <string name="room_rejoining">Reconnecting</string>
+    <string name="room_keep_waiting">Waiting for players</string>
+    <string name="room_closed">Room closed</string>
+    <string name="room_removed">The host removed you from the room</string>
+    <string name="room_expired">This room has expired</string>
+    <string name="room_account_changed">The account session changed</string>
+    <string name="room_unavailable">Room unavailable</string>
+    <string name="room_back">Back</string>
+    <string name="room_starting">The game is starting</string>
+    <string name="room_started">The game has started</string>
+    <string name="room_retry">Try again</string>
+    <string name="room_cancel">Cancel</string>
+    <string name="room_resume">Return to room</string>
+    <string name="room_action_denied">Action unavailable</string>
+    <string name="room_conflict">The room changed. Try the action again if it is still needed.</string>
+    <string name="room_closed_description">Join a new room to play.</string>
+    <string name="room_removed_description">You can join a different room.</string>
+    <string name="room_expired_description">Ask the host to create a new room.</string>
+    <string name="room_account_changed_description">Rejoin using your current account.</string>
+    <string name="room_unavailable_description">Go back and try opening the room again.</string>
+    <string name="room_reconnecting_description">The lobby will open when the connection is restored.</string>
+</resources>

@@ -8,6 +8,7 @@ import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryIntent
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryState
 import com.quizzgame.feature.quizentry.tv.ui.status.TvQuizEntryError
 import com.quizzgame.feature.quizentry.tv.ui.status.TvQuizEntryLoading
+import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 
 @Composable
 internal fun TvQuizEntryStateContent(
@@ -24,13 +25,21 @@ internal fun TvQuizEntryStateContent(
             is TvQuizEntryState.Error -> TvQuizEntryError(
                 state.spec,
                 { onIntent(TvQuizEntryIntent.Retry) },
-                onSignIn,
+                onSignIn = onSignIn,
+                onBack = onBack,
             )
             is TvQuizEntryState.Content -> TvQuizEntryContent(
                 state.value,
                 onBack,
                 Modifier.fillMaxSize(),
-                onSignIn = onSignIn.takeIf { state.value.requiresAuthentication && !authenticated },
+                room = state.room,
+                onIntent = onIntent,
+                onSignIn = onSignIn.takeIf {
+                    !authenticated && (
+                        state.value.requiresAuthentication ||
+                            state.room.failure?.reason == RoomFailureReason.HOST_AUTH_REQUIRED
+                        )
+                },
             )
         }
     }

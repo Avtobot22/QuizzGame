@@ -34,3 +34,5 @@ captures/
 *.apk
 *.aab
 *.apks
+
+/tools/rooms-mock/

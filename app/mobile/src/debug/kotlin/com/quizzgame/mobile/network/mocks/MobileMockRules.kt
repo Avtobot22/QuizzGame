@@ -2,6 +2,7 @@ package com.quizzgame.mobile.network.mocks
 
 import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.debug.network.mocks.authMockRules
+import com.quizzgame.debug.network.mocks.profileMockRules
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.mockRules
 import dev.androidmock.core.response.ResponseSpec
@@ -19,12 +20,7 @@ internal fun mobileMockRules(assets: BodyAssetResolver, json: Json): List<Rule> 
             SplashMockScenario.response(SplashMockScenario.Stage.FLAGS, assets.read("mock/bodies/feature-toggles.json"))
         }
     }
-    rule("splash-user", "/api/mobile/user") {
-        match { method("GET") }
-        respondWith { _, _ ->
-            SplashMockScenario.response(SplashMockScenario.Stage.USER, assets.read("mock/bodies/user.json"))
-        }
-    }
+    profileMockRules(assets, json, "mobile")
     rule("splash-launch", "/api/mobile/launch") {
         match { method("GET") }
         respondWith { _, _ ->

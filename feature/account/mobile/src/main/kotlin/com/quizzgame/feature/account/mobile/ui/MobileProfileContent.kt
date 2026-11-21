@@ -20,16 +20,17 @@ import com.quizzgame.core.designsystem.mobile.QuizzMobileLayout
 import com.quizzgame.core.designsystem.mobile.QuizzScreenScaffold
 import com.quizzgame.core.designsystem.mobile.QuizzTopBar
 import com.quizzgame.feature.account.mobile.R
-import com.quizzgame.feature.account.mobile.presentation.MobileProfileIntent
-import com.quizzgame.feature.account.mobile.presentation.MobileProfileState
 import com.quizzgame.feature.account.mobile.ui.card.ProfileCard
 import com.quizzgame.feature.account.mobile.ui.card.ProfileLoading
+import com.quizzgame.feature.account.mobile.ui.editor.MobileNicknameEditor
 import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
+import com.quizzgame.shared.account.presentation.ProfileIntent
+import com.quizzgame.shared.account.presentation.ProfileState
 
 @Composable
 internal fun MobileProfileContent(
-    state: MobileProfileState,
-    onIntent: (MobileProfileIntent) -> Unit,
+    state: ProfileState,
+    onIntent: (ProfileIntent) -> Unit,
     onSignIn: () -> Unit,
     onSignOut: () -> Unit,
 ) {
@@ -45,9 +46,15 @@ internal fun MobileProfileContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 when (state) {
-                    MobileProfileState.Loading -> ProfileLoading()
-                    is MobileProfileState.Ready -> {
-                        ProfileCard(state.profile, state.refreshing, { onIntent(MobileProfileIntent.RETRY) }, onSignIn)
+                    ProfileState.Loading -> ProfileLoading()
+                    is ProfileState.Ready -> {
+                        ProfileCard(
+                            state.profile,
+                            state.refreshing,
+                            onRetry = { onIntent(ProfileIntent.Retry) },
+                            onSignIn = onSignIn,
+                            onEditNickname = { onIntent(ProfileIntent.EditNickname) },
+                        )
                         if (state.refreshing) LinearProgressIndicator(Modifier.fillMaxWidth())
                         ProfileSignOut(state.profile, onSignOut)
                     }
@@ -55,4 +62,5 @@ internal fun MobileProfileContent(
             }
         }
     }
+    (state as? ProfileState.Ready)?.editor?.let { MobileNicknameEditor(it, onIntent) }
 }

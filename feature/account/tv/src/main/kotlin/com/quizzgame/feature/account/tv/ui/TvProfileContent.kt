@@ -12,18 +12,19 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvCenteredContent
 import com.quizzgame.feature.account.tv.R
-import com.quizzgame.feature.account.tv.presentation.TvProfileState
 import com.quizzgame.feature.account.tv.ui.card.TvProfileLoaded
 import com.quizzgame.feature.account.tv.ui.card.TvProfileLoading
 import com.quizzgame.feature.account.tv.ui.tags.TvProfileTags
+import com.quizzgame.shared.account.presentation.ProfileIntent
+import com.quizzgame.shared.account.presentation.ProfileState
 
 @Composable
 internal fun TvProfileContent(
-    state: TvProfileState,
+    state: ProfileState,
     onSignIn: () -> Unit,
     onLogout: () -> Unit,
     onSettings: () -> Unit,
-    retry: () -> Unit,
+    onIntent: (ProfileIntent) -> Unit,
 ) {
     QuizzTvCenteredContent(
         Modifier.testTag(TvProfileTags.SCREEN),
@@ -37,8 +38,8 @@ internal fun TvProfileContent(
             textAlign = TextAlign.Center,
         )
         when (state) {
-            TvProfileState.Loading -> TvProfileLoading()
-            is TvProfileState.Loaded -> TvProfileLoaded(state, onSignIn, onLogout, onSettings, retry)
+            ProfileState.Loading -> TvProfileLoading()
+            is ProfileState.Ready -> TvProfileLoaded(state, onSignIn, onLogout, onSettings, onIntent)
         }
     }
 }

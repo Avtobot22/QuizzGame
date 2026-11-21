@@ -9,4 +9,16 @@
     <string name="profile_sign_out">Sign out</string>
     <string name="profile_loading">Loading profile</string>
     <string name="profile_guest_title">Guest profile</string>
+    <string name="profile_nickname_label">Player nickname</string>
+    <string name="profile_nickname_description">Other players see this name in the lobby.</string>
+    <string name="profile_nickname_edit">Edit nickname</string>
+    <string name="profile_nickname_add">Set nickname</string>
+    <string name="profile_nickname_hint">Up to %1$d characters</string>
+    <string name="profile_nickname_invalid">Enter a nickname between 1 and 24 characters.</string>
+    <string name="profile_nickname_account_changed">The account changed. Open your profile again.</string>
+    <string name="profile_nickname_save_failed">Couldn’t save the nickname. Try again.</string>
+    <string name="profile_nickname_saving">Saving…</string>
+    <string name="profile_nickname_save">Save</string>
+    <string name="profile_nickname_cancel">Cancel</string>
+    <string name="profile_nickname_suggest">Try another name</string>
 </resources>

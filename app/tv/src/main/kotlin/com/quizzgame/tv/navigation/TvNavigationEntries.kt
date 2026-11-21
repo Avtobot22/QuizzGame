@@ -12,7 +12,6 @@ import com.quizzgame.app.navigation.PendingAuthReturn
 import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.withContext
 import com.quizzgame.feature.account.tv.navigation.TvProfileRoute
-import com.quizzgame.feature.account.tv.ui.TvProfileScreen
 import com.quizzgame.feature.auth.tv.navigation.TvSignInCallbacks
 import com.quizzgame.feature.auth.tv.navigation.TvSignInEntries
 import com.quizzgame.feature.splash.tv.navigation.TvSplashCallbacks
@@ -53,7 +52,7 @@ internal fun EntryProviderScope<NavKey>.tvStartupEntries(context: State<TvNaviga
 
 internal fun EntryProviderScope<NavKey>.tvContentEntries(context: State<TvNavigationContext>) {
     entry<TvProfileRoute> {
-        TvProfileScreen(
+        TvRoomProfileScreen(
             { context.value.onAuthFor(AuthReturnTarget.Profile) },
             context.value.onLogout,
             context.value.onSettings,

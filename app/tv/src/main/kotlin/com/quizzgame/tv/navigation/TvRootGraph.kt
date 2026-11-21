@@ -11,6 +11,8 @@ import com.quizzgame.app.navigation.AppNavigationConfiguration
 import com.quizzgame.app.navigation.AppNavigationEnvironment
 import com.quizzgame.app.navigation.AppNavigationGraph
 import com.quizzgame.app.navigation.AuthReturnTarget
+import com.quizzgame.app.navigation.PendingAuthReturn
+import com.quizzgame.core.navigation.AppNavigator
 import com.quizzgame.core.navigation.policy.DestinationAccess
 import com.quizzgame.core.navigation.policy.NavigationPolicy
 import com.quizzgame.core.navigation.registration.FeatureEntries
@@ -54,16 +56,7 @@ internal fun TvRootGraph(
         graphs = graphs,
         externalRequest = externalRequest,
         onRequestHandled = onRequestHandled,
-        onAuthReturn = { navigator, pending ->
-            when (pending.target) {
-                AuthReturnTarget.Profile -> {
-                    navigator.navigate(TvProfileRoute)
-                    environment.auth.acknowledge(pending.id)
-                }
-                AuthReturnTarget.Home -> environment.auth.acknowledge(pending.id)
-                is AuthReturnTarget.QuizEntry -> Unit
-            }
-        },
+        onAuthReturn = { navigator, pending -> navigator.deliverTvAuthReturn(pending, environment) },
         context = { coordinator ->
             TvNavigationContext(
                 onContentReady = { isCurrentGraph() && coordinator.splashCompleted() },
@@ -90,4 +83,10 @@ internal fun TvRootGraph(
             )
         },
     )
+}
+
+private fun AppNavigator.deliverTvAuthReturn(pending: PendingAuthReturn, environment: AppNavigationEnvironment) {
+    if (pending.target is AuthReturnTarget.QuizEntry) return
+    if (pending.target == AuthReturnTarget.Profile) navigate(TvProfileRoute)
+    environment.auth.acknowledge(pending.id)
 }

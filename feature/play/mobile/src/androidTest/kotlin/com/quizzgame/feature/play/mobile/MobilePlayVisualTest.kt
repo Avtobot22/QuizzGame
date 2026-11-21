@@ -15,10 +15,12 @@ import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.unit.Density
 import com.quizzgame.core.designsystem.mobile.QuizzMobileTheme
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayIntent
+import com.quizzgame.feature.play.mobile.presentation.MobilePlayJoinIdentity
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayState
+import com.quizzgame.feature.play.mobile.presentation.MobilePlayValidation
 import com.quizzgame.feature.play.mobile.ui.MobilePlayContent
 import com.quizzgame.feature.play.mobile.ui.tags.MobilePlayTags
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,19 +32,17 @@ class MobilePlayVisualTest(private val dark: Boolean, private val fontScale: Flo
     val compose = createAndroidComposeRule<ComponentActivity>()
 
     @Test
-    fun connectionFormAndInsetDialogRemainUsableWithLargeText() {
+    fun joinFormRetainsPinAndShowsCameraFallbackAtLargeText() {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(3f, fontScale)) {
                 QuizzMobileTheme(darkTheme = dark) {
-                    var state by remember { mutableStateOf(MobilePlayState.READY) }
+                    var state by remember { mutableStateOf(MobilePlayState(code = "031482", nickname = "Саша")) }
                     Box(Modifier.fillMaxSize().testTag(MobilePlayVisualScreen.ROOT)) {
-                        MobilePlayContent(state, { intent ->
-                            state = if (intent == MobilePlayIntent.DISMISS) {
-                                MobilePlayState.READY
-                            } else {
-                                MobilePlayState.UNAVAILABLE
-                            }
-                        })
+                        MobilePlayContent(
+                            state,
+                            {},
+                            onScan = { state = state.copy(validation = MobilePlayValidation.CAMERA_DENIED) },
+                        )
                     }
                 }
             }
@@ -51,16 +51,33 @@ class MobilePlayVisualTest(private val dark: Boolean, private val fontScale: Flo
         screen.capture(MobilePlayVisualScreen.ROOT, "mobile-play-$dark-$fontScale.png")
         screen.tag(MobilePlayTags.SCAN).performScrollTo()
         screen.tag(MobilePlayTags.SCAN).performClick()
-        screen.tag(MobilePlayTags.UNAVAILABLE).assertIsDisplayed()
-        val pageWidth = screen.bounds(MobilePlayVisualScreen.ROOT).width
-        val dialogWidth = screen.bounds(MobilePlayTags.UNAVAILABLE).width
-        screen.capture(MobilePlayTags.UNAVAILABLE, "mobile-dialog-$dark-$fontScale.png")
-        val deviceDensity = compose.activity.resources.displayMetrics.density
-        assertTrue(
-            "Dialog width $dialogWidth must leave 28dp on either side of $pageWidth",
-            dialogWidth <= pageWidth - 56f * deviceDensity + 1f,
-        )
+        screen.tag(MobilePlayTags.VALIDATION).performScrollTo()
+        screen.tag(MobilePlayTags.VALIDATION).assertIsDisplayed()
+        screen.tag(MobilePlayTags.CODE).performScrollTo()
+        screen.tag(MobilePlayTags.CODE).assertTextContains("031482")
     }
+
+    @Test
+    fun signedInPlayerCanContinueWithoutANicknameField() {
+        val sent = mutableListOf<MobilePlayIntent>()
+        compose.setContent {
+            CompositionLocalProvider(LocalDensity provides Density(3f, fontScale)) {
+                QuizzMobileTheme(darkTheme = dark) {
+                    MobilePlayContent(
+                        MobilePlayState(code = "031482", identity = MobilePlayJoinIdentity.Account(1, "Майя")),
+                        sent::add,
+                    )
+                }
+            }
+        }
+        val screen = MobilePlayVisualScreen(compose)
+        screen.tag(MobilePlayTags.NICKNAME).assertDoesNotExist()
+        screen.tag(MobilePlayTags.CONNECT).performScrollTo()
+        screen.tag(MobilePlayTags.CONNECT).performClick()
+        compose.runOnIdle { assertEquals(listOf(MobilePlayIntent.Connect), sent) }
+        screen.capture(MobilePlayTags.ROOT, "mobile-play-account-$dark-$fontScale.png")
+    }
+
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "dark {0}, font scale {1}")

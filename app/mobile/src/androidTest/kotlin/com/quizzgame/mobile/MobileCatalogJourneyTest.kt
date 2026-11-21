@@ -1,11 +1,16 @@
 package com.quizzgame.mobile
 
+import android.graphics.Bitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.isDisplayed
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.swipeDown
 import androidx.test.espresso.Espresso.pressBack
+import com.quizzgame.debug.network.mocks.ProfileMockScenario
 import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.feature.account.mobile.navigation.ProfileRoute
 import com.quizzgame.feature.account.mobile.ui.tags.MobileProfileTags
@@ -22,6 +27,7 @@ import org.junit.Test
 import org.junit.rules.ExternalResource
 import org.junit.rules.RuleChain
 import org.junit.rules.TestRule
+import java.io.File
 
 class MobileCatalogJourneyTest {
     private val compose = createAndroidComposeRule<MainActivity>()
@@ -29,10 +35,12 @@ class MobileCatalogJourneyTest {
         override fun before() {
             SplashMockScenario.reset()
             MobileCatalogMockScenario.reset()
+            ProfileMockScenario.reset()
         }
         override fun after() {
             SplashMockScenario.reset()
             MobileCatalogMockScenario.reset()
+            ProfileMockScenario.reset()
         }
     }
 
@@ -59,11 +67,11 @@ class MobileCatalogJourneyTest {
     }
 
     @Test
-    fun connectionAttemptDoesNotPretendToJoinRoom() {
+    fun emptyPinShowsValidationAndKeepsJoinForm() {
         await(MobilePlayTags.CONNECT)
         screen.tag(MobilePlayTags.CONNECT).performClick()
-        await(MobilePlayTags.UNAVAILABLE)
-        screen.tag(MobilePlayTags.UNAVAILABLE).assertIsDisplayed()
+        await(MobilePlayTags.VALIDATION)
+        screen.tag(MobilePlayTags.VALIDATION).assertIsDisplayed()
     }
 
     @Test
@@ -133,6 +141,50 @@ class MobileCatalogJourneyTest {
             performClick()
         }
         await(MobileSignInTags.IDENTIFIER)
+    }
+
+    @Test
+    fun savesSuggestedNicknameAndReadsItWhenReturningToPlay() {
+        await(MobilePlayTags.ROOT)
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_IN)
+        screen.tag(MobileProfileTags.SIGN_IN).performClick()
+        await(MobileSignInTags.EMAIL)
+        screen.tag(MobileSignInTags.EMAIL).performClick()
+        screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("guest@example.test")
+        screen.tag(MobileSignInTags.SEND).performClick()
+        await(MobileSignInTags.CODE)
+        screen.tag(MobileSignInTags.CODE).performTextInput("012345")
+        screen.tag(MobileSignInTags.VERIFY).performClick()
+
+        await(MobileProfileTags.EDIT_NICKNAME)
+        captureProfile(MobileProfileTags.SCREEN, "mobile-profile.png")
+        screen.tag(MobileProfileTags.EDIT_NICKNAME).performClick()
+        await(MobileProfileTags.NICKNAME_FIELD)
+        val generated = compose.onNodeWithTag(MobileProfileTags.NICKNAME_FIELD).fetchSemanticsNode()
+            .config[SemanticsProperties.EditableText].text
+        check(generated.startsWith("Quiz"))
+        captureProfile(MobileProfileTags.NICKNAME_EDITOR, "mobile-nickname.png")
+        screen.tag(MobileProfileTags.SAVE_NICKNAME).performClick()
+        screen.tag(MobileProfileTags.NICKNAME_EDITOR).assertDoesNotExist()
+
+        screen.tag(MobileChromeTags.item(PlayRoute)).performClick()
+        await(MobilePlayTags.PROFILE_NAME)
+        screen.tag(MobilePlayTags.PROFILE_NAME).assertTextContains(generated, substring = true)
+        screen.tag(MobilePlayTags.NICKNAME).assertDoesNotExist()
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_OUT)
+        screen.tag(MobileProfileTags.SIGN_OUT).performScrollTo()
+        screen.tag(MobileProfileTags.SIGN_OUT).performClick()
+        await(MobilePlayTags.ROOT)
+    }
+
+    private fun captureProfile(tag: String, filename: String) {
+        val directory = checkNotNull(compose.activity.getExternalFilesDir("visual-previews"))
+        File(directory, filename).outputStream().use { output ->
+            val bitmap = compose.onNodeWithTag(tag).captureToImage().asAndroidBitmap()
+            check(bitmap.compress(Bitmap.CompressFormat.PNG, 100, output))
+        }
     }
 
     private fun awaitEntryAction() {

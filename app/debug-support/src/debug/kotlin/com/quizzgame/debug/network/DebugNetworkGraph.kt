@@ -81,7 +81,8 @@ class DebugNetworkGraph private constructor(
             refreshEndpoint: RefreshEndpoint? = null,
             revocationPolicy: RefreshRevocationPolicy = RefreshRevocationPolicy.never(),
         ): DebugNetworkGraph {
-            val server = if (configuration.mode == DebugNetworkMode.MOCK) {
+            val localMock = configuration.mode == DebugNetworkMode.MOCK && configuration.externalLoopbackPort == 0
+            val server = if (localMock) {
                 val engine = RuleEngine()
                 engine.replaceRules(mockRules)
                 LoopbackMockServer(engine).also { it.start() }
@@ -92,8 +93,7 @@ class DebugNetworkGraph private constructor(
             var coordinator: SessionRefreshCoordinator? = null
             var acquired = false
             try {
-                val baseUrl = server?.baseUrl?.let { ApiBaseUrl.debugLoopback(it.toString()) }
-                    ?: ApiBaseUrl.https(requireNotNull(configuration.realBaseUrl))
+                val baseUrl = debugBaseUrl(configuration, server)
                 val networkConfiguration = NetworkConfiguration(
                     baseUrl,
                     configuration.headers,
@@ -124,6 +124,16 @@ class DebugNetworkGraph private constructor(
                     server?.close()
                 }
             }
+        }
+
+        private fun debugBaseUrl(
+            configuration: DebugNetworkConfiguration,
+            server: LoopbackMockServer?,
+        ): ApiBaseUrl = when {
+            server != null -> ApiBaseUrl.debugLoopback(server.baseUrl.toString())
+            configuration.externalLoopbackPort > 0 ->
+                ApiBaseUrl.debugLoopback("http://127.0.0.1:${configuration.externalLoopbackPort}/")
+            else -> ApiBaseUrl.https(requireNotNull(configuration.realBaseUrl))
         }
 
         private fun decorate(base: NetworkClient, closed: AtomicBoolean, mock: Boolean): DebugNetworkClient {

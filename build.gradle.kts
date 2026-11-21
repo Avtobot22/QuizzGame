@@ -36,6 +36,9 @@ tasks.register("ciLint") {
     description = "Runs Android lint for all application and library modules."
     dependsOn(
         ":shared:auth:lint",
+        ":shared:room:lint",
+        ":feature:room:mobile:lint",
+        ":feature:room:tv:lint",
         ":feature:auth:mobile:lint",
         ":feature:auth:tv:lint",
         ":feature:auth-provider:mobile:lint",
@@ -57,6 +60,7 @@ tasks.register("ciLint") {
         ":core:presentation:lint",
         ":core:feature-flags:lint",
         ":shared:splash:lint",
+        ":shared:account:lint",
         ":feature:splash:tv:lint",
         ":feature:splash:mobile:lint",
         ":core:session:lint",
@@ -77,6 +81,7 @@ tasks.register("ciUnitTestDebug") {
     description = "Runs debug JVM unit tests."
     dependsOn(
         ":shared:auth:testDebugUnitTest",
+        ":shared:room:testDebugUnitTest",
         ":feature:auth-provider:mobile:testDebugUnitTest",
         ":feature:dashboard:tv:testDebugUnitTest",
         ":feature:dashboard:mobile:testDebugUnitTest",
@@ -97,6 +102,7 @@ tasks.register("ciUnitTestDebug") {
         ":core:presentation:testDebugUnitTest",
         ":core:feature-flags:testDebugUnitTest",
         ":shared:splash:testDebugUnitTest",
+        ":shared:account:testDebugUnitTest",
         ":feature:splash:tv:testDebugUnitTest",
         ":feature:splash:mobile:testDebugUnitTest",
         ":core:session:testDebugUnitTest",
@@ -117,6 +123,7 @@ tasks.register("ciUnitTestRelease") {
     description = "Runs release JVM unit tests."
     dependsOn(
         ":shared:auth:testReleaseUnitTest",
+        ":shared:room:testReleaseUnitTest",
         ":feature:auth-provider:mobile:testReleaseUnitTest",
         ":feature:dashboard:tv:testReleaseUnitTest",
         ":feature:dashboard:mobile:testReleaseUnitTest",
@@ -136,6 +143,7 @@ tasks.register("ciUnitTestRelease") {
         ":core:presentation:testReleaseUnitTest",
         ":core:feature-flags:testReleaseUnitTest",
         ":shared:splash:testReleaseUnitTest",
+        ":shared:account:testReleaseUnitTest",
         ":feature:splash:tv:testReleaseUnitTest",
         ":feature:splash:mobile:testReleaseUnitTest",
         ":core:session:testReleaseUnitTest",
@@ -167,6 +175,7 @@ tasks.register("ciAssembleDebug") {
         ":core:presentation:assembleDebug",
         ":core:feature-flags:assembleDebug",
         ":shared:splash:assembleDebug",
+        ":shared:account:assembleDebug",
         ":feature:splash:tv:assembleDebug",
         ":feature:splash:mobile:assembleDebug",
         ":core:session:assembleDebug",
@@ -199,6 +208,7 @@ tasks.register("ciAssembleRelease") {
         ":core:presentation:assembleRelease",
         ":core:feature-flags:assembleRelease",
         ":shared:splash:assembleRelease",
+        ":shared:account:assembleRelease",
         ":feature:splash:tv:assembleRelease",
         ":feature:splash:mobile:assembleRelease",
         ":core:session:assembleRelease",
@@ -218,6 +228,8 @@ tasks.register("ciAssembleAndroidTest") {
         ":core:media:android:assembleDebugAndroidTest",
         ":feature:feed:tv:assembleDebugAndroidTest",
         ":feature:play:mobile:assembleDebugAndroidTest",
+        ":feature:room:mobile:assembleDebugAndroidTest",
+        ":feature:room:tv:assembleDebugAndroidTest",
         ":feature:feed:mobile:assembleDebugAndroidTest",
         ":feature:quiz-entry:mobile:assembleDebugAndroidTest",
         ":feature:quiz-entry:tv:assembleDebugAndroidTest",

@@ -2,12 +2,14 @@
     <string name="quiz_entry_duration">%1$d мин.</string>
     <string name="quiz_entry_bookmarked">В избранном</string>
     <string name="quiz_entry_label">О квизе</string>
-    <string name="quiz_entry_launch_soon">Запуск игры скоро появится</string>
     <plurals name="quiz_entry_question_count">
         <item quantity="one">%1$d вопрос</item>
         <item quantity="few">%1$d вопроса</item>
         <item quantity="many">%1$d вопросов</item>
         <item quantity="other">%1$d вопроса</item>
     </plurals>
-    <string name="quiz_entry_sign_in">Войти для запуска</string>
+    <string name="quiz_entry_sign_in">Войти для создания комнаты</string>
+    <string name="quiz_entry_create_room">Создать комнату</string>
+    <string name="quiz_entry_creating_room">Создаём комнату…</string>
+    <string name="quiz_entry_room_auth_required">Для этой викторины ведущему нужен аккаунт.</string>
 </resources>

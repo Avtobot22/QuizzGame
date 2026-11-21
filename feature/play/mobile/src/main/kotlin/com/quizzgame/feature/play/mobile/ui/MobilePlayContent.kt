@@ -28,6 +28,8 @@ internal fun MobilePlayContent(
     state: MobilePlayState,
     onIntent: (MobilePlayIntent) -> Unit,
     modifier: Modifier = Modifier,
+    onScan: () -> Unit = {},
+    onSignIn: () -> Unit = {},
 ) {
     QuizzScreenScaffold(modifier.testTag(MobilePlayTags.ROOT), topBar = {
         QuizzTopBar(stringResource(R.string.play_title))
@@ -44,14 +46,25 @@ internal fun MobilePlayContent(
                 if (wide) {
                     Row(Modifier.widthIn(max = 1040.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
                         MobilePlayIntro(Modifier.weight(1f))
-                        MobilePlayConnection(onIntent, Modifier.weight(1f).padding(top = 40.dp))
+                        MobilePlayConnection(
+                            state,
+                            onIntent,
+                            onScan,
+                            onSignIn,
+                            Modifier.weight(1f).padding(top = 24.dp),
+                        )
                     }
                 } else {
                     MobilePlayIntro(Modifier.widthIn(max = 440.dp).fillMaxWidth())
-                    MobilePlayConnection(onIntent, Modifier.widthIn(max = 440.dp).fillMaxWidth())
+                    MobilePlayConnection(
+                        state,
+                        onIntent,
+                        onScan,
+                        onSignIn,
+                        Modifier.widthIn(max = 440.dp).fillMaxWidth(),
+                    )
                 }
             }
         }
     }
-    if (state == MobilePlayState.UNAVAILABLE) MobilePlayUnavailable { onIntent(MobilePlayIntent.DISMISS) }
 }

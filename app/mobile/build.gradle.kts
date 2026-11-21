@@ -7,9 +7,19 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
 }
 
+val roomJoinHost = providers.gradleProperty("quizz.rooms.joinHost").orElse("disabled.invalid").get()
+check(roomJoinHost.matches(Regex("[a-z0-9-]+([.][a-z0-9-]+)+")))
+
 android {
     namespace = "com.quizzgame.mobile"
+    buildTypes.named("debug") {
+        val port = providers.gradleProperty("quizz.rooms.debugPort").orElse("0").get().toInt()
+        check(port in 0..65535)
+        buildConfigField("int", "ROOM_MOCK_PORT", port.toString())
+    }
     defaultConfig {
+        buildConfigField("String", "ROOM_JOIN_HOST", "\"$roomJoinHost\"")
+        manifestPlaceholders["roomJoinHost"] = roomJoinHost
         applicationId = "com.quizzgame.mobile"
         manifestPlaceholders["yandexLinkHost"] =
             providers.gradleProperty("quizz.auth.yandexLinkHost").orElse("disabled.invalid").get()
@@ -31,6 +41,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(projects.app.foundation)
+    implementation(projects.feature.room.mobile)
     implementation(projects.core.navigation)
     implementation(projects.core.featureFlags)
     implementation(projects.feature.splash.mobile)

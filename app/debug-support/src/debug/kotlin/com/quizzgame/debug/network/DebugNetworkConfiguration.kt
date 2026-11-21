@@ -13,9 +13,12 @@ data class DebugNetworkConfiguration(
     val headers: PlatformHeaders,
     val realBaseUrl: String? = null,
     val timeouts: NetworkTimeouts = NetworkTimeouts(),
+    val externalLoopbackPort: Int = 0,
 ) {
 
     init {
+        require(externalLoopbackPort in 0..MAX_PORT)
+        require(externalLoopbackPort == 0 || mode == DebugNetworkMode.MOCK)
         require(mode != DebugNetworkMode.REAL || !realBaseUrl.isNullOrBlank()) {
             "REAL mode requires an externally configured HTTPS API URL"
         }
@@ -24,3 +27,5 @@ data class DebugNetworkConfiguration(
         }
     }
 }
+
+private const val MAX_PORT = 65_535

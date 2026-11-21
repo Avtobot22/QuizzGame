@@ -1,0 +1,27 @@
+<resources>
+    <string name="room_self">%1$s · вы</string>
+    <string name="room_leave">Покинуть комнату</string>
+    <string name="room_leave_title">Покинуть комнату?</string>
+    <string name="room_leave_description">Чтобы вернуться, введите PIN или отсканируйте QR снова.</string>
+    <string name="room_set_ready">Я готов</string>
+    <string name="room_unset_ready">Пока не готов</string>
+    <string name="room_wait_host">Ждём старта на телевизоре</string>
+    <string name="room_started_description">Следите за игрой на телевизоре.</string>
+    <string name="room_to_play">В раздел «Играть»</string>
+    <string name="room_update_failed">Не удалось подтвердить действие.</string>
+    <string name="room_open_failed">Не удалось открыть комнату</string>
+    <string name="room_open_from_play">Откройте комнату снова из раздела «Играть».</string>
+    <string name="room_try_open_again">Попробуйте открыть комнату ещё раз.</string>
+    <plurals name="room_game_questions">
+        <item quantity="one">%d вопрос</item>
+        <item quantity="few">%d вопроса</item>
+        <item quantity="many">%d вопросов</item>
+        <item quantity="other">%d вопросов</item>
+    </plurals>
+    <plurals name="room_game_minutes">
+        <item quantity="one">≈ %d мин</item>
+        <item quantity="few">≈ %d мин</item>
+        <item quantity="many">≈ %d мин</item>
+        <item quantity="other">≈ %d мин</item>
+    </plurals>
+</resources>

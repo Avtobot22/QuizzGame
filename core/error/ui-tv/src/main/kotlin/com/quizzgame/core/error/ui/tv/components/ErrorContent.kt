@@ -26,7 +26,8 @@ import com.quizzgame.core.ui.R as UiR
 
 @Composable
 internal fun ErrorCopy(model: ErrorUiModel, heading: Boolean = false) {
-    val message = model.message ?: if (heading) {
+    val backOnly = model.actions.singleOrNull()?.kind == ErrorActionKind.GO_BACK
+    val message = model.message ?: if (heading && !backOnly) {
         stringResource(
             when (model.icon) {
                 QuizzStatusIcon.NETWORK -> UiR.string.quizz_status_network_help

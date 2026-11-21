@@ -3,6 +3,7 @@ package com.quizzgame.core.error.ui.mobile.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -33,7 +34,8 @@ internal fun ErrorCopy(model: ErrorUiModel, heading: Boolean = false) {
             style = if (heading) MaterialTheme.typography.headlineMedium else MaterialTheme.typography.titleMedium,
             textAlign = if (heading) TextAlign.Center else TextAlign.Start,
         )
-        val message = model.message ?: if (heading) errorSupportingMessage(model) else null
+        val backOnly = model.actions.singleOrNull()?.kind == ErrorActionKind.GO_BACK
+        val message = model.message ?: if (heading && !backOnly) errorSupportingMessage(model) else null
         message?.let {
             Text(
                 it,
@@ -50,6 +52,7 @@ internal fun ErrorActions(
     model: ErrorUiModel,
     enabled: Boolean,
     onAction: (ErrorActionKind) -> Unit,
+    expandPrimary: Boolean = false,
 ) {
     if (model.actions.isEmpty()) return
     FlowRow(
@@ -57,14 +60,16 @@ internal fun ErrorActions(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         model.actions.forEach { action ->
+            val secondary = when (action.kind) {
+                ErrorActionKind.DISMISS -> true
+                ErrorActionKind.GO_BACK -> !expandPrimary
+                else -> false
+            }
             QuizzButton(
                 onClick = { onAction(action.kind) },
+                modifier = if (expandPrimary) Modifier.fillMaxWidth() else Modifier,
                 enabled = enabled,
-                style = if (action.kind == ErrorActionKind.DISMISS || action.kind == ErrorActionKind.GO_BACK) {
-                    QuizzButtonStyle.OUTLINED
-                } else {
-                    QuizzButtonStyle.FILLED
-                },
+                style = if (secondary) QuizzButtonStyle.OUTLINED else QuizzButtonStyle.FILLED,
             ) { Text(action.label) }
         }
     }
