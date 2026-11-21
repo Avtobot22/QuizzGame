@@ -47,7 +47,6 @@ dependencies {
     implementation(projects.feature.splash.mobile)
     implementation(projects.feature.auth.mobile)
     implementation(projects.feature.authProvider.mobile)
-    implementation(projects.shared.account)
     implementation(projects.shared.catalog)
     implementation(projects.feature.dashboard.mobile)
     implementation(projects.feature.account.mobile)
