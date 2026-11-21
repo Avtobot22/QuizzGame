@@ -30,7 +30,7 @@ class MobileSessionRecoveryTest {
             openMobileDebugNetwork(
                 DebugNetworkConfiguration(DebugNetworkMode.MOCK, headers),
                 manager,
-                RefreshEndpoint("debug/mobile/auth/refresh"),
+                RefreshEndpoint("api/mobile/auth/refresh"),
                 DebugMockAssets { path -> checkNotNull(javaClass.classLoader!!.getResourceAsStream(path)) },
             ).use { graph ->
                 val request = Request.Builder()

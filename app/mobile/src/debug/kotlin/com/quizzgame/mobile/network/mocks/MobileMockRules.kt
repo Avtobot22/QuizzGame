@@ -34,12 +34,6 @@ internal fun mobileMockRules(assets: BodyAssetResolver, json: Json): List<Rule> 
             bodyJson(json.parseToJsonElement(assets.read("mock/bodies/mobile-probe.json").decodeToString()))
         }
     }
-    rule("mobile-refresh-legacy-probe", "/debug/mobile/auth/refresh") {
-        match { method("POST") }
-        respond {
-            bodyJson(json.parseToJsonElement(assets.read("mock/bodies/mobile-refresh.json").decodeToString()))
-        }
-    }
     rule("mobile-refresh", "/api/mobile/auth/refresh") {
         match { method("POST") }
         respond {

@@ -22,7 +22,8 @@ import java.net.HttpURLConnection.HTTP_UNAUTHORIZED
 import java.util.concurrent.atomic.AtomicInteger
 
 private const val INSTALLATION_ID = "e4a508be-bb66-46d3-91f6-7b4cabfc977b"
-private const val DEBUG_REFRESH_PATH = "debug/mobile/auth/refresh"
+private const val MOBILE_REFRESH_PATH = "api/mobile/auth/refresh"
+private const val CUSTOM_REFRESH_PATH = "test/refresh"
 
 class MobileRefreshClientTest {
     private val graphs = mutableListOf<DebugNetworkGraph>()
@@ -35,14 +36,14 @@ class MobileRefreshClientTest {
     fun closeGraphs() { graphs.forEach(DebugNetworkGraph::close) }
 
     @Test
-    fun packagedMobileRefreshFixtureUsesTheGraphServerAndExplicitDebugPath() {
+    fun packagedMobileRefreshFixtureUsesTheGraphServerAndMobileEndpoint() {
         val graph = openMobileDebugNetwork(
             configuration,
             bodyAssets = assets(),
             credentialsProvider = CredentialsProvider { error("Refresh must not read access") },
         ).also(graphs::add)
         assertEquals(graph.api.retrofit.baseUrl(), graph.refresh.retrofit.baseUrl())
-        val pair = graph.mobileRefreshClient(RefreshEndpoint(DEBUG_REFRESH_PATH))
+        val pair = graph.mobileRefreshClient(RefreshEndpoint(MOBILE_REFRESH_PATH))
             .newCall("fixture-mobile-refresh-1", INSTALLATION_ID).execute()
         assertEquals("fixture-mobile-access-2", pair.access)
         assertEquals("fixture-mobile-refresh-2", pair.refresh)
@@ -56,7 +57,7 @@ class MobileRefreshClientTest {
             createNetworkJson(),
             credentialsProvider = CredentialsProvider { error("Refresh must not read access") },
             mockRules = mockRules {
-                rule("mobile-refresh", "/$DEBUG_REFRESH_PATH") {
+                rule("mobile-refresh", "/$CUSTOM_REFRESH_PATH") {
                     match {
                         method("POST")
                         bodyExactUtf8(
@@ -73,7 +74,7 @@ class MobileRefreshClientTest {
             },
         ).also(graphs::add)
         val failure = assertThrows(RefreshException::class.java) {
-            graph.mobileRefreshClient(RefreshEndpoint(DEBUG_REFRESH_PATH))
+            graph.mobileRefreshClient(RefreshEndpoint(CUSTOM_REFRESH_PATH))
                 .newCall("fixture-mobile-refresh-1", INSTALLATION_ID).execute()
         }
         assertEquals(RefreshFailure.Http(HTTP_UNAUTHORIZED), failure.failure)
@@ -90,7 +91,7 @@ class MobileRefreshClientTest {
         }
         assertNotEquals(graphs[0].refresh.retrofit.baseUrl(), graphs[1].refresh.retrofit.baseUrl())
         graphs[0].close()
-        val pair = graphs[1].mobileRefreshClient(RefreshEndpoint(DEBUG_REFRESH_PATH))
+        val pair = graphs[1].mobileRefreshClient(RefreshEndpoint(MOBILE_REFRESH_PATH))
             .newCall("fixture-mobile-refresh-1", INSTALLATION_ID).execute()
         assertEquals("fixture-mobile-access-2", pair.access)
     }
