@@ -12,7 +12,6 @@ import com.quizzgame.shared.auth.domain.usecase.ResendOtpUseCase
 import com.quizzgame.shared.auth.domain.usecase.VerifyOtpUseCase
 import javax.inject.Inject
 
-/** Связывает запрос кода и его подтверждение с одной попыткой начала сессии. */
 class OtpSignInScenario @Inject internal constructor(
     private val loadAuthMethodsUseCase: LoadAuthMethodsUseCase,
     private val beginSignInUseCase: BeginSignInUseCase,
@@ -20,6 +19,7 @@ class OtpSignInScenario @Inject internal constructor(
     private val resendOtpUseCase: ResendOtpUseCase,
     private val verifyOtpUseCase: VerifyOtpUseCase,
 ) {
+
     suspend fun methods(surface: AuthSurface): AuthResult<List<AuthMethod>> = loadAuthMethodsUseCase(surface).map {
         it.filterNot { method -> surface == AuthSurface.TV && method == AuthMethod.YANDEX }
     }

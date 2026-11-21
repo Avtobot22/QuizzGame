@@ -31,27 +31,28 @@ import com.quizzgame.core.designsystem.tv.QuizzTvProgressStrip
 import com.quizzgame.core.designsystem.tv.QuizzTvScreenScaffold
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.feature.auth.tv.R
+import com.quizzgame.feature.auth.tv.presentation.TvSignInIntent
+import com.quizzgame.feature.auth.tv.presentation.TvSignInState
+import com.quizzgame.feature.auth.tv.presentation.TvSignInStep
 import com.quizzgame.feature.auth.tv.ui.code.TvCodeScreen
 import com.quizzgame.feature.auth.tv.ui.intro.TvAuthIntro
 import com.quizzgame.feature.auth.tv.ui.intro.TvAuthSuccess
 import com.quizzgame.feature.auth.tv.ui.tags.TvSignInTags
-import com.quizzgame.shared.auth.presentation.OtpIntent
-import com.quizzgame.shared.auth.presentation.OtpState
-import com.quizzgame.shared.auth.presentation.OtpStep
 import kotlinx.coroutines.delay
 
 @Composable
 internal fun TvSignInContent(
-    state: OtpState,
-    onIntent: (OtpIntent) -> Unit,
+    state: TvSignInState,
+    onIntent: (TvSignInIntent) -> Unit,
+    onGoogle: () -> Unit,
     onCancel: () -> Unit,
     recovery: Boolean,
     previewElapsedMillis: Long? = null,
 ) {
     val back = {
         when {
-            state.step == OtpStep.Finished -> Unit
-            state.step is OtpStep.Identifier || state.step is OtpStep.Code -> onIntent(OtpIntent.Back)
+            state.step == TvSignInStep.Finished -> Unit
+            state.step is TvSignInStep.Identifier || state.step is TvSignInStep.Code -> onIntent(TvSignInIntent.Back)
             else -> onCancel()
         }
     }
@@ -60,26 +61,30 @@ internal fun TvSignInContent(
     val step = state.step
     QuizzTvScreenScaffold(modifier = Modifier.testTag(TvSignInTags.SCREEN)) {
         when {
-            step == OtpStep.Finished -> QuizzTvCenteredContent { TvAuthSuccess() }
-            step is OtpStep.Code ->
+            step == TvSignInStep.Finished -> QuizzTvCenteredContent { TvAuthSuccess() }
+            step is TvSignInStep.Code ->
                 TvCodeScreen(step, state, elapsed, back, onIntent)
-            else -> TvAuthStage(state, elapsed, recovery, onIntent, back)
+            else -> TvAuthStage(state, elapsed, recovery, onIntent, onGoogle, back)
         }
     }
 }
 
 @Composable
 private fun TvAuthStage(
-    state: OtpState,
+    state: TvSignInState,
     elapsed: Long,
     recovery: Boolean,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (TvSignInIntent) -> Unit,
+    onGoogle: () -> Unit,
     back: () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
     QuizzTvCenteredContent {
-        val needsStatus = state.methodsUnavailable
-        if (!needsStatus) TvAuthIntro(state, recovery)
+        if (state.methodsUnavailable) {
+            TvAuthStepContent(state, elapsed, back, onIntent, onGoogle)
+            return@QuizzTvCenteredContent
+        }
+        TvAuthIntro(state, recovery)
         Column(
             Modifier.widthIn(max = 500.dp).fillMaxWidth()
                 .background(colors.surfaceVariant.copy(alpha = 0.35f), MaterialTheme.shapes.extraLarge)
@@ -88,15 +93,15 @@ private fun TvAuthStage(
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             TvAuthStageProgress(state)
-            TvAuthStepContent(state, elapsed, back, onIntent)
-            if (!needsStatus && state.step !is OtpStep.Identifier) TvAuthCancelAction(state, back)
+            TvAuthStepContent(state, elapsed, back, onIntent, onGoogle)
+            if (state.step !is TvSignInStep.Identifier) TvAuthCancelAction(state, back)
         }
     }
 }
 
 @Composable
-private fun TvAuthStageProgress(state: OtpState) {
-    if (state.step is OtpStep.Identifier) {
+private fun TvAuthStageProgress(state: TvSignInState) {
+    if (state.step is TvSignInStep.Identifier) {
         Box(Modifier.fillMaxWidth().height(4.dp)) {
             if (state.busy) QuizzTvProgressStrip(stringResource(R.string.auth_busy))
         }
@@ -104,20 +109,20 @@ private fun TvAuthStageProgress(state: OtpState) {
 }
 
 @Composable
-private fun TvAuthCancelAction(state: OtpState, back: () -> Unit) {
+private fun TvAuthCancelAction(state: TvSignInState, back: () -> Unit) {
     val focus = remember { FocusRequester() }
     QuizzTvButton(back, Modifier.focusRequester(focus), style = QuizzTvButtonStyle.QUIET) {
         Text(stringResource(R.string.auth_cancel))
     }
-    val loadingMethods = state.step == OtpStep.Loading && state.failure == null
+    val loadingMethods = state.step == TvSignInStep.Loading && state.failure == null
     TvEntryFocus(focus, loadingMethods)
 }
 
 @Composable
-private fun rememberAuthElapsed(state: OtpState): Long {
-    val step = state.step as? OtpStep.Code
-    val cooldown = maxOf(state.requestBlockedUntil, step?.resendAtMillis ?: 0)
-    val until = maxOf(cooldown, step?.expiresAtMillis ?: 0)
+private fun rememberAuthElapsed(state: TvSignInState): Long {
+    val step = state.step as? TvSignInStep.Code
+    val cooldown = maxOf(state.requestBlockedUntil, step?.form?.resendAtMillis ?: 0)
+    val until = maxOf(cooldown, step?.form?.expiresAtMillis ?: 0)
     val elapsed by produceState(SystemClock.elapsedRealtime(), cooldown, until) {
         value = SystemClock.elapsedRealtime()
         while (value < until) {

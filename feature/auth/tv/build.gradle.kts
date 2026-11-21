@@ -9,6 +9,7 @@ dependencies {
     api(projects.core.navigation)
     implementation(projects.feature.authProvider.tv)
     implementation(projects.shared.auth)
+    implementation(projects.core.presentation)
     implementation(projects.core.designsystem.tv)
     implementation(projects.core.error.uiTv)
     implementation(libs.androidx.activity.compose)

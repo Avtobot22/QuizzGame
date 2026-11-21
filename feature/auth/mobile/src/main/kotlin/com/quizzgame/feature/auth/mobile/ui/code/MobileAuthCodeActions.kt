@@ -17,16 +17,16 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.unit.dp
 import com.quizzgame.feature.auth.mobile.R
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInIntent
 import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.presentation.OtpIntent
 
 @Composable
 internal fun MobileAuthCodeActions(
     method: AuthMethod,
     waitMillis: Long,
     canRequest: Boolean,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (MobileSignInIntent) -> Unit,
 ) {
     val padding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
     FlowRow(
@@ -36,7 +36,7 @@ internal fun MobileAuthCodeActions(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(
-                onClick = { onIntent(OtpIntent.Resend) },
+                onClick = { onIntent(MobileSignInIntent.RequestCode) },
                 modifier = Modifier.testTag(MobileSignInTags.RESEND),
                 enabled = canRequest && waitMillis == 0L,
                 contentPadding = padding,
@@ -44,7 +44,7 @@ internal fun MobileAuthCodeActions(
             if (waitMillis > 0) ResendTimer(waitMillis)
         }
         TextButton(
-            onClick = { onIntent(OtpIntent.Back) },
+            onClick = { onIntent(MobileSignInIntent.Back) },
             modifier = Modifier.testTag(MobileSignInTags.CHANGE_DESTINATION),
             contentPadding = padding,
         ) {

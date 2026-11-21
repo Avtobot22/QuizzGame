@@ -34,6 +34,7 @@ import com.quizzgame.core.error.ui.common.presentation.errorUiModel
 import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.core.ui.status.QuizzNoticeTone
 import com.quizzgame.core.ui.status.QuizzStatusIcon
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.feature.auth.mobile.R
 import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
 import com.quizzgame.shared.auth.domain.entity.AuthFailure
@@ -94,14 +95,15 @@ private fun StatusActions(onRetry: () -> Unit, onBack: () -> Unit) {
 internal fun MobileAuthError(failure: AuthFailure?) {
     if (failure == null) return
     val colors = MaterialTheme.colorScheme
+    val icon = if (failure is AuthFailure.General) generalErrorModel(failure).icon else QuizzStatusIcon.AUTH
     QuizzIconLabel(
-        QuizzStatusIcon.GENERIC.resource,
+        icon.resource,
         Modifier.fillMaxWidth()
             .background(colors.errorContainer.copy(alpha = 0.45f), MaterialTheme.shapes.medium)
             .padding(horizontal = 12.dp, vertical = 8.dp)
             .testTag(MobileSignInTags.ERROR)
             .semantics { liveRegion = LiveRegionMode.Polite },
-        iconSize = 17.dp,
+        iconSize = QuizzIdentityDimensions.actionIcon.dp,
         tint = colors.onErrorContainer,
         alignment = Alignment.Start,
     ) {

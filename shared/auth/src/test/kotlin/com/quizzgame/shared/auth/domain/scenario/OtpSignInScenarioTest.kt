@@ -1,6 +1,5 @@
 package com.quizzgame.shared.auth.domain.scenario
 
-import androidx.lifecycle.ViewModelStore
 import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.session.lifecycle.SessionManager
 import com.quizzgame.core.session.model.TokenPair
@@ -21,19 +20,14 @@ import com.quizzgame.shared.auth.domain.usecase.LoadAuthMethodsUseCase
 import com.quizzgame.shared.auth.domain.usecase.RequestOtpUseCase
 import com.quizzgame.shared.auth.domain.usecase.ResendOtpUseCase
 import com.quizzgame.shared.auth.domain.usecase.VerifyOtpUseCase
-import com.quizzgame.shared.auth.presentation.OtpIntent
+import com.quizzgame.shared.auth.presentation.OtpCodeSession
+import com.quizzgame.shared.auth.presentation.OtpRequestPolicy
 import com.quizzgame.shared.auth.presentation.OtpSignInEnvironment
-import com.quizzgame.shared.auth.presentation.OtpSignInViewModel
-import com.quizzgame.shared.auth.presentation.OtpStep
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceTimeBy
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
@@ -102,42 +96,24 @@ class OtpSignInScenarioTest {
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun retryAfterStillBlocksSendingAfterReturningToMethods() = runTest {
+    fun retryAfterKeepsItsDeadlineWhenTheCodeSessionIsReset() = runTest {
         val fixture = fixture()
-        val viewModels = ViewModelStore()
-        Dispatchers.setMain(StandardTestDispatcher(testScheduler))
-        try {
-            val environment = OtpSignInEnvironment(AuthSurface.MOBILE, { testScheduler.currentTime }, { Instant.EPOCH })
-            val model = object : OtpSignInViewModel(fixture.scenario, environment) {}
-            viewModels.put("otp", model)
-            runCurrent()
+        val environment = OtpSignInEnvironment({ testScheduler.currentTime }, { Instant.EPOCH })
+        val otp = OtpCodeSession(fixture.scenario, environment)
+        val initial = otp.request(AuthMethod.EMAIL, "guest@example.test") as AuthResult.Success
+        val code = initial.value.withCode("0 12-3456")
+        assertEquals("012345", code.code)
+        fixture.repository.result = AuthResult.Failed(AuthFailure.RateLimited(5))
+        val failed = otp.verify(code.code) as AuthResult.Failed
+        val blockedUntil = environment.blockedUntil(0, failed.failure)
+        assertEquals(5_000L, code.resendWaitMillis(blockedUntil, environment.elapsed()))
 
-            model.onIntent(OtpIntent.Choose(AuthMethod.EMAIL))
-            model.onIntent(OtpIntent.Edit("guest@example.test"))
-            model.onIntent(OtpIntent.Send)
-            runCurrent()
-            model.onIntent(OtpIntent.Edit("012345"))
-            fixture.repository.result = AuthResult.Failed(AuthFailure.RateLimited(5))
-            model.onIntent(OtpIntent.Verify)
-            runCurrent()
-            assertEquals(AuthFailure.RateLimited(5), model.state.value.failure)
+        otp.reset()
+        assertEquals(AuthResult.Failed(AuthFailure.Expired), otp.verify(code.code))
+        assertEquals(false, OtpRequestPolicy.canRequest(false, null, blockedUntil, environment.elapsed()))
 
-            repeat(2) { model.onIntent(OtpIntent.Back) }
-            model.onIntent(OtpIntent.Choose(AuthMethod.SMS))
-            model.onIntent(OtpIntent.Edit("+79123456789"))
-            model.onIntent(OtpIntent.Send)
-            runCurrent()
-            assertEquals(OtpStep.Identifier(AuthMethod.SMS, "+79123456789"), model.state.value.step)
-            assertEquals("guest@example.test", fixture.repository.identifier)
-
-            advanceTimeBy(5_000)
-            model.onIntent(OtpIntent.Send)
-            runCurrent()
-            assertEquals("+79123456789", fixture.repository.identifier)
-        } finally {
-            viewModels.clear()
-            Dispatchers.resetMain()
-        }
+        advanceTimeBy(5_000)
+        assertEquals(true, OtpRequestPolicy.canRequest(false, null, blockedUntil, environment.elapsed()))
     }
 
     private suspend fun TestScope.fixture(): Fixture {
