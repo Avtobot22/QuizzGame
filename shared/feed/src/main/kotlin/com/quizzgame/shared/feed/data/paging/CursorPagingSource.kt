@@ -8,11 +8,11 @@ import com.quizzgame.shared.feed.domain.entity.FeedResult
 import kotlinx.coroutines.CancellationException
 import java.io.IOException
 
-/** Хранит только связи курсоров и ID; вытесненные Paging-страницы можно прочитать назад. */
 abstract class CursorPagingSource<T : Any>(
     private val id: (T) -> String,
     private val onExpired: () -> Boolean,
 ) : PagingSource<CursorKey, T>() {
+
     private val ids = mutableSetOf<String>()
     private val pages = LinkedHashMap<CursorKey, PageRecord>()
 
@@ -26,7 +26,7 @@ abstract class CursorPagingSource<T : Any>(
         return try {
             when (val result = request(cursor)) {
                 is FeedResult.Failed -> LoadResult.Error(FeedPagingException(result.failure))
-                FeedResult.Expired -> expired()
+                FeedResult.Expired   -> expired()
                 is FeedResult.Loaded -> accept(key, result.content)
             }
         } catch (cancelled: CancellationException) {
