@@ -17,12 +17,17 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 
 private object AndroidConfig {
     const val COMPILE_SDK = 37
+    const val COMPILE_SDK_MINOR = 1
     const val MIN_SDK = 26
     const val JDK = 21
 }
 
 private fun CommonExtension.configureAndroid(compose: Boolean = true) {
-    compileSdk = AndroidConfig.COMPILE_SDK
+    compileSdk {
+        version = release(AndroidConfig.COMPILE_SDK) {
+            minorApiLevel = AndroidConfig.COMPILE_SDK_MINOR
+        }
+    }
     defaultConfig.minSdk = AndroidConfig.MIN_SDK
     buildFeatures.compose = compose
     if (compose) defaultConfig.testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

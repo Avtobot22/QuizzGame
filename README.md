@@ -6,7 +6,7 @@
 
 ## Запуск
 
-Нужны Android Studio, JDK 21 для приложения, JDK 17 для mock SDK, Android SDK Platform 37.0 и Build Tools 36.0.0. Для запуска подойдут телефон или Android TV с Android 8.0 (API 26) и выше, либо соответствующий эмулятор.
+Нужны Android Studio, JDK 21 для приложения, JDK 17 для mock SDK, Android SDK Platform 37.1 и Build Tools 36.0.0. Для запуска подойдут телефон или Android TV с Android 8.0 (API 26) и выше, либо соответствующий эмулятор.
 
 1. После клонирования загрузи исходные зависимости mock SDK и Feature Flags SDK:
 
