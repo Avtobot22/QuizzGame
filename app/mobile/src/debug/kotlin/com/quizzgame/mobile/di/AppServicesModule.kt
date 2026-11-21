@@ -10,6 +10,7 @@ import com.quizzgame.debug.network.debugAppNetworkFactory
 import com.quizzgame.debug.network.mocks.SplashMockScenario
 import com.quizzgame.debug.startup.openDebugSession
 import com.quizzgame.mobile.BuildConfig
+import com.quizzgame.mobile.network.mocks.localizedMobileCatalogAssets
 import com.quizzgame.mobile.network.mocks.mobileMockRules
 import dagger.Module
 import dagger.Provides
@@ -41,7 +42,9 @@ object AppServicesModule {
             BuildConfig.DEBUG_FAIL_NETWORK_ONCE,
             revocationPolicy,
             externalLoopbackPort = BuildConfig.ROOM_MOCK_PORT,
-            platformRules = ::mobileMockRules,
+            platformRules = { assets, json ->
+                mobileMockRules(localizedMobileCatalogAssets(context, assets, json), json)
+            },
         )
     }
 }
