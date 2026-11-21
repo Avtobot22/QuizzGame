@@ -48,7 +48,9 @@ internal fun TvQuizEntryDetails(entry: QuizEntry) {
             Text(it, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant)
         }
     }
-    entry.description?.let { Text(it, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant) }
+    entry.description?.takeUnless { it == entry.subtitle }?.let {
+        Text(it, style = MaterialTheme.typography.bodyLarge, color = colors.onSurfaceVariant)
+    }
     FlowRow(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         entry.questionCount?.let {
             EntryMetadata(UiR.drawable.ic_quizz_quiz, pluralStringResource(R.plurals.quiz_entry_question_count, it, it))

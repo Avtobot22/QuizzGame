@@ -21,7 +21,7 @@ internal fun TvQuizEntryStateContent(
 ) {
     Box(modifier.fillMaxSize()) {
         when (state) {
-            TvQuizEntryState.Loading -> TvQuizEntryLoading()
+            TvQuizEntryState.Loading -> TvQuizEntryLoading(onBack)
             is TvQuizEntryState.Error -> TvQuizEntryError(
                 state.spec,
                 { onIntent(TvQuizEntryIntent.Retry) },

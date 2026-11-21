@@ -8,12 +8,14 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvActionLabel
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
+import com.quizzgame.core.designsystem.tv.QuizzTvNoticeBanner
 import com.quizzgame.core.error.operation.ErrorOperationContext
 import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
-import com.quizzgame.core.error.presentation.ErrorSurface
-import com.quizzgame.core.error.ui.tv.components.QuizzTvErrorInline
+import com.quizzgame.core.error.ui.common.presentation.errorUiModel
 import com.quizzgame.core.error.ui.tv.policy.TvErrorDecisionPolicy
+import com.quizzgame.core.ui.status.QuizzNoticeTone
+import com.quizzgame.core.ui.status.QuizzStatusIcon
 import com.quizzgame.feature.quizentry.tv.R
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizEntryIntent
 import com.quizzgame.feature.quizentry.tv.presentation.TvQuizRoomState
@@ -28,10 +30,16 @@ internal fun TvQuizRoomAction(
     onIntent: (TvQuizEntryIntent) -> Unit,
     onSignIn: (() -> Unit)?,
 ) {
+    if (!available && state.activeRoom == null) {
+        QuizzTvNoticeBanner(tone = QuizzNoticeTone.NEUTRAL, icon = QuizzStatusIcon.CATALOG) {
+            Text(stringResource(R.string.quiz_entry_unavailable), style = MaterialTheme.typography.titleSmall)
+        }
+        return
+    }
     val label = when {
         state.activeRoom != null -> RoomR.string.room_resume
         state.creating -> R.string.quiz_entry_creating_room
-        available && onSignIn != null -> R.string.quiz_entry_sign_in
+        onSignIn != null -> R.string.quiz_entry_sign_in
         else -> R.string.quiz_entry_create_room
     }
     QuizzTvButton(
@@ -43,15 +51,24 @@ internal fun TvQuizRoomAction(
             }
         },
         modifier = Modifier.testTag(TvQuizEntryTags.CREATE_ROOM),
-        enabled = !state.creating && (available || state.activeRoom != null),
+        enabled = !state.creating,
     ) { QuizzTvActionLabel(stringResource(label)) }
 
     val failure = state.failure ?: return
     if (failure.reason == RoomFailureReason.HOST_AUTH_REQUIRED && onSignIn != null) {
-        Text(stringResource(R.string.quiz_entry_room_auth_required), style = MaterialTheme.typography.bodyMedium)
+        QuizzTvNoticeBanner(icon = QuizzStatusIcon.AUTH) {
+            Text(stringResource(R.string.quiz_entry_room_auth_required), style = MaterialTheme.typography.titleSmall)
+        }
     } else {
         val context = ErrorOperationContext(OperationKind.USER_COMMAND, true, RetrySafety.SAFE_TO_REPEAT)
-        val spec = TvErrorDecisionPolicy().decide(failure.cause, context)
-        QuizzTvErrorInline(spec.copy(surface = ErrorSurface.INLINE, actions = emptyList()), {})
+        val error = errorUiModel(TvErrorDecisionPolicy().decide(failure.cause, context))
+        QuizzTvNoticeBanner(tone = QuizzNoticeTone.ERROR, icon = error.icon) {
+            Text(stringResource(R.string.quiz_entry_room_create_failed), style = MaterialTheme.typography.titleSmall)
+            Text(
+                error.title,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.bodyMedium,
+            )
+        }
     }
 }
