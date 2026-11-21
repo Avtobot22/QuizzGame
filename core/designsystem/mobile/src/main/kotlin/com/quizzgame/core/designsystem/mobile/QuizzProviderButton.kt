@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.ui.QuizzIconLabel
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.core.ui.tokens.QuizzProviderColors
 
 /** Кнопка внешнего провайдера с оригинальным цветом логотипа и подписью вызывающего экрана. */
@@ -40,6 +41,6 @@ fun QuizzProviderButton(
         border = if (dark) BorderStroke(1.dp, colors.DarkOutline) else null,
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
     ) {
-        QuizzIconLabel(icon, gap = 10.dp) { Text(text) }
+        QuizzIconLabel(icon, iconSize = QuizzIdentityDimensions.actionIcon.dp, gap = 10.dp) { Text(text) }
     }
 }

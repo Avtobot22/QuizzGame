@@ -6,36 +6,35 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.heading
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.quizzgame.core.ui.QuizzSceneIllustration
+import com.quizzgame.core.designsystem.mobile.QuizzStatusContent
+import com.quizzgame.core.ui.QuizzAuthArtwork
+import com.quizzgame.core.ui.status.QuizzStatusIcon
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.feature.auth.mobile.R
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInStep
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.presentation.OtpStep
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun MobileAuthIntro(step: OtpStep, recovery: Boolean, compact: Boolean) {
+internal fun MobileAuthIntro(step: MobileSignInStep, recovery: Boolean, compact: Boolean) {
     val colors = MaterialTheme.colorScheme
     val title = when (step) {
-        is OtpStep.Identifier -> if (step.method == AuthMethod.EMAIL) R.string.auth_email else R.string.auth_sms
-        is OtpStep.Code       -> R.string.auth_enter_code
+        is MobileSignInStep.Identifier ->
+            if (step.method == AuthMethod.EMAIL) R.string.auth_email else R.string.auth_sms
+        is MobileSignInStep.Code       -> R.string.auth_enter_code
         else                  -> R.string.auth_title
     }
     val supporting = authSupporting(step, recovery)
@@ -46,7 +45,9 @@ internal fun MobileAuthIntro(step: OtpStep, recovery: Boolean, compact: Boolean)
     ) {
         if (!compact) {
             AuthArtwork(step)
-            if (step is OtpStep.Identifier || step is OtpStep.Code) AuthPhase(step is OtpStep.Code)
+            if (step is MobileSignInStep.Identifier || step is MobileSignInStep.Code) {
+                AuthPhase(step is MobileSignInStep.Code)
+            }
         }
         Text(
             stringResource(title),
@@ -66,29 +67,33 @@ internal fun MobileAuthIntro(step: OtpStep, recovery: Boolean, compact: Boolean)
 }
 
 @Composable
-private fun authSupporting(step: OtpStep, recovery: Boolean): String? {
+private fun authSupporting(step: MobileSignInStep, recovery: Boolean): String? {
     return when {
-        step is OtpStep.Identifier -> stringResource(R.string.auth_code_explanation)
-        step is OtpStep.Code       -> stringResource(R.string.auth_sent, step.challenge.maskedDestination)
+        step is MobileSignInStep.Identifier -> stringResource(R.string.auth_code_explanation)
+        step is MobileSignInStep.Code       -> stringResource(R.string.auth_sent, step.form.challenge.maskedDestination)
         recovery                   -> stringResource(R.string.auth_reauth)
-        step is OtpStep.Methods && step.choices.isNotEmpty() -> stringResource(R.string.auth_choose)
+        step is MobileSignInStep.Methods &&
+            (step.otp.isNotEmpty() || step.providers.isNotEmpty()) -> stringResource(R.string.auth_choose)
         else -> null
     }
 }
 
 @Composable
-private fun AuthArtwork(step: OtpStep) {
+private fun AuthArtwork(step: MobileSignInStep) {
     val colors = MaterialTheme.colorScheme
     val icon = when (step) {
-        is OtpStep.Identifier ->
+        is MobileSignInStep.Identifier ->
             if (step.method == AuthMethod.EMAIL) UiR.drawable.ic_quizz_mail else UiR.drawable.ic_quizz_sms
-        is OtpStep.Code -> UiR.drawable.ic_quizz_status_auth
+        is MobileSignInStep.Code -> UiR.drawable.ic_quizz_status_auth
         else -> UiR.drawable.ic_quizz_monochrome
     }
-    val form = step is OtpStep.Identifier || step is OtpStep.Code
-    QuizzSceneIllustration(colors.primary, colors.tertiary, Modifier.size(if (form) 60.dp else 88.dp)) {
-        Icon(painterResource(icon), null, Modifier.size(if (form) 27.dp else 42.dp), colors.primary)
-    }
+    QuizzAuthArtwork(
+        icon,
+        colors.primary,
+        colors.tertiary,
+        QuizzIdentityDimensions.mobileArtwork.dp,
+        QuizzIdentityDimensions.mobileArtworkIcon.dp,
+    )
 }
 
 @Composable
@@ -109,14 +114,7 @@ private fun AuthPhase(code: Boolean) {
 @Composable
 internal fun MobileAuthSuccess() {
     val colors = MaterialTheme.colorScheme
-    Column(
-        Modifier.verticalScroll(rememberScrollState()).padding(24.dp).semantics { liveRegion = LiveRegionMode.Polite },
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        QuizzSceneIllustration(colors.primary, colors.tertiary, Modifier.size(148.dp)) {
-            Icon(painterResource(UiR.drawable.ic_quizz_check), null, Modifier.size(54.dp), colors.primary)
-        }
+    QuizzStatusContent(Modifier.verticalScroll(rememberScrollState()), icon = QuizzStatusIcon.CHECK) {
         Text(
             stringResource(R.string.auth_signed_in),
             Modifier.semantics { heading() },

@@ -14,8 +14,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.MaterialTheme
 import com.quizzgame.core.designsystem.tv.QuizzTvSkeleton
+import com.quizzgame.core.ui.QuizzProfileIdentity
 import com.quizzgame.core.ui.QuizzProfilePanel
 import com.quizzgame.core.ui.quizzSkeleton
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.account.tv.R
 
@@ -34,9 +36,13 @@ internal fun TvProfileLoading() {
                 colors.primaryContainer,
                 shapes.extraLarge,
             ) {
-                Box(Modifier.size(76.dp).quizzSkeleton(CircleShape))
-                Box(Modifier.fillMaxWidth(0.38f).height(26.dp).quizzSkeleton())
-                Box(Modifier.fillMaxWidth(0.63f).height(20.dp).quizzSkeleton())
+                QuizzProfileIdentity(avatar = {
+                    Box(Modifier.size(QuizzIdentityDimensions.tvAvatar.dp).quizzSkeleton(CircleShape))
+                }) {
+                    Box(Modifier.fillMaxWidth(0.38f).height(26.dp).quizzSkeleton())
+                    Box(Modifier.fillMaxWidth(0.63f).height(20.dp).quizzSkeleton())
+                }
+                Box(Modifier.fillMaxWidth(0.3f).height(QuizzTvLayout.buttonHeight.dp).quizzSkeleton(shapes.medium))
             }
             Box(Modifier.fillMaxWidth(0.35f).height(QuizzTvLayout.buttonHeight.dp).quizzSkeleton(shapes.medium))
         }

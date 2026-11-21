@@ -28,20 +28,20 @@ import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.feature.auth.tv.R
+import com.quizzgame.feature.auth.tv.presentation.TvSignInIntent
+import com.quizzgame.feature.auth.tv.presentation.TvSignInState
+import com.quizzgame.feature.auth.tv.presentation.TvSignInStep
 import com.quizzgame.feature.auth.tv.ui.TvAuthError
 import com.quizzgame.feature.auth.tv.ui.tags.TvSignInTags
 import com.quizzgame.shared.auth.domain.entity.AuthFailure
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.presentation.OtpIntent
-import com.quizzgame.shared.auth.presentation.OtpState
-import com.quizzgame.shared.auth.presentation.OtpStep
 
 @Composable
 internal fun TvAuthIdentifier(
-    step: OtpStep.Identifier,
-    state: OtpState,
+    step: TvSignInStep.Identifier,
+    state: TvSignInState,
     elapsed: Long,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (TvSignInIntent) -> Unit,
     onBack: () -> Unit,
 ) {
     val email = step.method == AuthMethod.EMAIL
@@ -52,11 +52,11 @@ internal fun TvAuthIdentifier(
     val backFocus = remember { FocusRequester() }
     val send = {
         keyboard?.hide()
-        onIntent(OtpIntent.Send)
+        onIntent(TvSignInIntent.RequestCode)
     }
     OutlinedTextField(
         value = step.input,
-        onValueChange = { onIntent(OtpIntent.Edit(it)) },
+        onValueChange = { onIntent(TvSignInIntent.Edit(it)) },
         modifier = Modifier.fillMaxWidth()
             .focusRequester(focus).testTag(TvSignInTags.IDENTIFIER).onPreviewKeyEvent { key ->
                 when (key.key) {

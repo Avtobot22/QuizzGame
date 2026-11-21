@@ -9,6 +9,7 @@ dependencies {
     api(projects.core.navigation)
     implementation(projects.feature.authProvider.mobile)
     implementation(projects.shared.auth)
+    implementation(projects.core.presentation)
     implementation(projects.core.designsystem.mobile)
     implementation(projects.core.error.uiMobile)
     implementation(libs.androidx.activity.compose)

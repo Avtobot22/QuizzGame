@@ -30,30 +30,32 @@ import com.quizzgame.core.designsystem.mobile.QuizzMobileLayout
 import com.quizzgame.core.designsystem.mobile.QuizzScreenScaffold
 import com.quizzgame.core.designsystem.mobile.QuizzTopBar
 import com.quizzgame.feature.auth.mobile.R
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInIntent
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInState
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInStep
 import com.quizzgame.feature.auth.mobile.ui.intro.MobileAuthIntro
 import com.quizzgame.feature.auth.mobile.ui.intro.MobileAuthSuccess
 import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
-import com.quizzgame.shared.auth.presentation.OtpIntent
-import com.quizzgame.shared.auth.presentation.OtpState
-import com.quizzgame.shared.auth.presentation.OtpStep
+import com.quizzgame.shared.auth.domain.entity.AuthMethod
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 internal fun MobileSignInContent(
-    state: OtpState,
-    onIntent: (OtpIntent) -> Unit,
+    state: MobileSignInState,
+    onIntent: (MobileSignInIntent) -> Unit,
+    onProvider: (AuthMethod) -> Unit,
     onCancel: () -> Unit,
     recovery: Boolean,
     previewElapsedMillis: Long? = null,
 ) {
-    val isInput = state.step is OtpStep.Identifier || state.step is OtpStep.Code
-    val complete = state.step == OtpStep.Finished
+    val isInput = state.step is MobileSignInStep.Identifier || state.step is MobileSignInStep.Code
+    val complete = state.step == MobileSignInStep.Finished
     val showMethodsStatus = state.methodsUnavailable
     val back = {
         when {
             complete -> Unit
-            isInput -> onIntent(OtpIntent.Back)
+            isInput -> onIntent(MobileSignInIntent.Back)
             else -> onCancel()
         }
     }
@@ -71,19 +73,20 @@ internal fun MobileSignInContent(
             showMethodsStatus -> MobileAuthMethodsStatus(
                 state.failure,
                 onBack = back,
-                onRetry = { onIntent(OtpIntent.Load) },
+                onRetry = { onIntent(MobileSignInIntent.Load) },
                 modifier = content,
             )
-            else -> MobileAuthStage(state, elapsed, onIntent, recovery, content)
+            else -> MobileAuthStage(state, elapsed, onIntent, onProvider, recovery, content)
         }
     }
 }
 
 @Composable
 private fun MobileAuthStage(
-    state: OtpState,
+    state: MobileSignInState,
     elapsed: Long,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (MobileSignInIntent) -> Unit,
+    onProvider: (AuthMethod) -> Unit,
     recovery: Boolean,
     modifier: Modifier,
 ) {
@@ -97,13 +100,18 @@ private fun MobileAuthStage(
             verticalArrangement = Arrangement.spacedBy(20.dp),
         ) {
             MobileAuthIntro(state.step, recovery, compact)
-            MobileAuthPanel(state, elapsed, onIntent)
+            MobileAuthPanel(state, elapsed, onIntent, onProvider)
         }
     }
 }
 
 @Composable
-private fun MobileAuthPanel(state: OtpState, elapsed: Long, onIntent: (OtpIntent) -> Unit) {
+private fun MobileAuthPanel(
+    state: MobileSignInState,
+    elapsed: Long,
+    onIntent: (MobileSignInIntent) -> Unit,
+    onProvider: (AuthMethod) -> Unit,
+) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
@@ -111,20 +119,20 @@ private fun MobileAuthPanel(state: OtpState, elapsed: Long, onIntent: (OtpIntent
     ) {
         Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Box(Modifier.fillMaxWidth().height(4.dp)) {
-                if (state.step !is OtpStep.Loading && state.busy) {
+                if (state.step !is MobileSignInStep.Loading && state.busy) {
                     LinearProgressIndicator(Modifier.fillMaxWidth().height(4.dp))
                 }
             }
-            MobileAuthStepContent(state, elapsed, onIntent)
+            MobileAuthStepContent(state, elapsed, onIntent, onProvider)
         }
     }
 }
 
 @Composable
-private fun rememberAuthElapsed(state: OtpState): Long {
-    val step = state.step as? OtpStep.Code
-    val cooldown = maxOf(state.requestBlockedUntil, step?.resendAtMillis ?: 0)
-    val until = maxOf(cooldown, step?.expiresAtMillis ?: 0)
+private fun rememberAuthElapsed(state: MobileSignInState): Long {
+    val step = state.step as? MobileSignInStep.Code
+    val cooldown = maxOf(state.requestBlockedUntil, step?.form?.resendAtMillis ?: 0)
+    val until = maxOf(cooldown, step?.form?.expiresAtMillis ?: 0)
     val elapsed by produceState(SystemClock.elapsedRealtime(), cooldown, until) {
         value = SystemClock.elapsedRealtime()
         while (value < until) {

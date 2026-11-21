@@ -15,58 +15,75 @@ import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
 import com.quizzgame.core.designsystem.mobile.QuizzProviderButton
 import com.quizzgame.core.ui.QuizzGroupDivider
 import com.quizzgame.core.ui.QuizzIconLabel
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.feature.auth.mobile.R
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInIntent
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInState
+import com.quizzgame.feature.auth.mobile.presentation.MobileSignInStep
 import com.quizzgame.feature.auth.mobile.ui.code.MobileAuthCode
 import com.quizzgame.feature.auth.mobile.ui.form.MobileAuthIdentifier
 import com.quizzgame.feature.auth.mobile.ui.loading.MobileAuthLoading
 import com.quizzgame.feature.auth.mobile.ui.tags.MobileSignInTags
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.presentation.OtpIntent
-import com.quizzgame.shared.auth.presentation.OtpState
-import com.quizzgame.shared.auth.presentation.OtpStep
 import com.quizzgame.core.ui.R as UiR
 
 @Composable
-internal fun MobileAuthStepContent(state: OtpState, elapsed: Long, onIntent: (OtpIntent) -> Unit) {
+internal fun MobileAuthStepContent(
+    state: MobileSignInState,
+    elapsed: Long,
+    onIntent: (MobileSignInIntent) -> Unit,
+    onProvider: (AuthMethod) -> Unit,
+) {
     when (val step = state.step) {
-        OtpStep.Loading -> MobileAuthLoading()
-        is OtpStep.Methods -> {
+        MobileSignInStep.Loading -> MobileAuthLoading()
+        is MobileSignInStep.Methods -> {
             MobileAuthError(state.failure)
-            AuthMethods(step, !state.busy, onIntent)
+            AuthMethods(step, !state.busy, { onIntent(MobileSignInIntent.ChooseOtp(it)) }, onProvider)
         }
-        is OtpStep.Identifier -> MobileAuthIdentifier(step, state, elapsed, onIntent)
-        is OtpStep.Code -> MobileAuthCode(step, state, elapsed, onIntent)
-        OtpStep.Finished -> Unit
+        is MobileSignInStep.Identifier -> MobileAuthIdentifier(step, state, elapsed, onIntent)
+        is MobileSignInStep.Code -> MobileAuthCode(step, state, elapsed, onIntent)
+        MobileSignInStep.Finished -> Unit
     }
 }
 
 @Composable
-private fun AuthMethods(step: OtpStep.Methods, enabled: Boolean, onIntent: (OtpIntent) -> Unit) {
-    val (direct, providers) = step.choices.partition(AuthMethod::usesOtp)
-    direct.forEachIndexed { index, method ->
+private fun AuthMethods(
+    step: MobileSignInStep.Methods,
+    enabled: Boolean,
+    onOtp: (AuthMethod) -> Unit,
+    onProvider: (AuthMethod) -> Unit,
+) {
+    step.otp.forEachIndexed { index, method ->
         val email = method == AuthMethod.EMAIL
         val icon = if (email) UiR.drawable.ic_quizz_mail else UiR.drawable.ic_quizz_sms
         val label = if (email) R.string.auth_email else R.string.auth_sms
         val tag = if (email) MobileSignInTags.EMAIL else MobileSignInTags.SMS
         QuizzButton(
-            { onIntent(OtpIntent.Choose(method)) },
+            { onOtp(method) },
             Modifier.fillMaxWidth().heightIn(min = 52.dp).testTag(tag),
             style = if (index == 0) QuizzButtonStyle.FILLED else QuizzButtonStyle.OUTLINED,
             enabled = enabled,
         ) {
-            QuizzIconLabel(icon, gap = 10.dp, tint = LocalContentColor.current) { Text(stringResource(label)) }
+            QuizzIconLabel(
+                icon,
+                iconSize = QuizzIdentityDimensions.actionIcon.dp,
+                gap = 10.dp,
+                tint = LocalContentColor.current,
+            ) {
+                Text(stringResource(label))
+            }
         }
     }
-    if (direct.isNotEmpty() && providers.isNotEmpty()) {
+    if (step.otp.isNotEmpty() && step.providers.isNotEmpty()) {
         QuizzGroupDivider(MaterialTheme.colorScheme.outlineVariant)
     }
-    providers.forEach { method ->
+    step.providers.forEach { method ->
         val google = method == AuthMethod.GOOGLE
         val tag = if (google) MobileSignInTags.GOOGLE else MobileSignInTags.YANDEX
         QuizzProviderButton(
             text = stringResource(if (google) R.string.auth_google else R.string.auth_yandex),
             icon = if (google) UiR.drawable.ic_quizz_google_g else UiR.drawable.ic_quizz_yandex_id,
-            onClick = { onIntent(OtpIntent.Choose(method)) },
+            onClick = { onProvider(method) },
             modifier = Modifier.fillMaxWidth().testTag(tag),
             enabled = enabled,
         )

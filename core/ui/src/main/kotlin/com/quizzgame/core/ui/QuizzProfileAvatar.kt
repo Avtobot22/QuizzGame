@@ -17,6 +17,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 
 /** Показывает инициал рядом с полным именем или общий символ профиля. */
 @Composable
@@ -37,7 +38,7 @@ fun QuizzProfileAvatar(
             Image(
                 painterResource(R.drawable.ic_quizz_profile),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(QuizzIdentityDimensions.avatarIcon.dp),
                 colorFilter = ColorFilter.tint(foreground),
             )
         } else {

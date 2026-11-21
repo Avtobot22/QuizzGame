@@ -100,16 +100,20 @@ class MobileCatalogJourneyTest {
         await(MobilePlayTags.ROOT)
         screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
         await(MobileProfileTags.SIGN_IN)
+        captureScreen(MobileProfileTags.SCREEN, "mobile-profile-guest.png")
         screen.tag(MobileProfileTags.SIGN_IN).performClick()
         await(MobileSignInTags.EMAIL)
+        captureScreen(MobileSignInTags.SCREEN, "mobile-auth-methods.png")
         pressBack()
         await(MobileProfileTags.SIGN_IN)
         screen.tag(MobileProfileTags.SIGN_IN).performClick()
         await(MobileSignInTags.EMAIL)
         screen.tag(MobileSignInTags.EMAIL).performClick()
+        captureScreen(MobileSignInTags.SCREEN, "mobile-auth-email.png")
         screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("guest@example.test")
         screen.tag(MobileSignInTags.SEND).performClick()
         await(MobileSignInTags.CODE)
+        captureScreen(MobileSignInTags.SCREEN, "mobile-auth-code.png")
         screen.tag(MobileSignInTags.CODE).performTextInput("012345")
         screen.tag(MobileSignInTags.VERIFY).performClick()
         await(MobileProfileTags.SIGN_OUT)
@@ -134,6 +138,7 @@ class MobileCatalogJourneyTest {
         screen.tag(MobileSignInTags.CODE).performTextInput("111111")
         screen.tag(MobileSignInTags.VERIFY).performClick()
         await(MobileSignInTags.ERROR)
+        captureScreen(MobileSignInTags.SCREEN, "mobile-auth-code-error.png")
         screen.tag(MobileSignInTags.CODE).assertIsDisplayed()
         screen.tag(MobileSignInTags.VERIFY).assertIsNotEnabled()
         screen.tag(MobileSignInTags.CHANGE_DESTINATION).apply {
@@ -141,6 +146,33 @@ class MobileCatalogJourneyTest {
             performClick()
         }
         await(MobileSignInTags.IDENTIFIER)
+    }
+
+    @Test
+    fun switchingFromEmailToSmsKeepsTheServerCooldown() {
+        await(MobilePlayTags.ROOT)
+        screen.tag(MobileChromeTags.item(ProfileRoute)).performClick()
+        await(MobileProfileTags.SIGN_IN)
+        screen.tag(MobileProfileTags.SIGN_IN).performClick()
+        await(MobileSignInTags.EMAIL)
+        screen.tag(MobileSignInTags.EMAIL).performClick()
+        screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("guest@example.test")
+        screen.tag(MobileSignInTags.SEND).performClick()
+        await(MobileSignInTags.CODE)
+        screen.tag(MobileSignInTags.CODE).performTextInput("999999")
+        screen.tag(MobileSignInTags.VERIFY).performClick()
+        await(MobileSignInTags.ERROR)
+
+        screen.tag(MobileSignInTags.CHANGE_DESTINATION).apply {
+            performScrollTo()
+            performClick()
+        }
+        await(MobileSignInTags.IDENTIFIER)
+        pressBack()
+        await(MobileSignInTags.SMS)
+        screen.tag(MobileSignInTags.SMS).performClick()
+        screen.tag(MobileSignInTags.IDENTIFIER).performTextInput("+79123456789")
+        screen.tag(MobileSignInTags.SEND).assertIsNotEnabled()
     }
 
     @Test
@@ -158,13 +190,13 @@ class MobileCatalogJourneyTest {
         screen.tag(MobileSignInTags.VERIFY).performClick()
 
         await(MobileProfileTags.EDIT_NICKNAME)
-        captureProfile(MobileProfileTags.SCREEN, "mobile-profile.png")
+        captureScreen(MobileProfileTags.SCREEN, "mobile-profile.png")
         screen.tag(MobileProfileTags.EDIT_NICKNAME).performClick()
         await(MobileProfileTags.NICKNAME_FIELD)
         val generated = compose.onNodeWithTag(MobileProfileTags.NICKNAME_FIELD).fetchSemanticsNode()
             .config[SemanticsProperties.EditableText].text
         check(generated.startsWith("Quiz"))
-        captureProfile(MobileProfileTags.NICKNAME_EDITOR, "mobile-nickname.png")
+        captureScreen(MobileProfileTags.NICKNAME_EDITOR, "mobile-nickname.png")
         screen.tag(MobileProfileTags.SAVE_NICKNAME).performClick()
         screen.tag(MobileProfileTags.NICKNAME_EDITOR).assertDoesNotExist()
 
@@ -179,7 +211,7 @@ class MobileCatalogJourneyTest {
         await(MobilePlayTags.ROOT)
     }
 
-    private fun captureProfile(tag: String, filename: String) {
+    private fun captureScreen(tag: String, filename: String) {
         val directory = checkNotNull(compose.activity.getExternalFilesDir("visual-previews"))
         File(directory, filename).outputStream().use { output ->
             val bitmap = compose.onNodeWithTag(tag).captureToImage().asAndroidBitmap()

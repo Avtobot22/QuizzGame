@@ -105,6 +105,7 @@ class DashboardNavigationTest {
         TvRemote.press(KeyEvent.KEYCODE_BACK)
         awaitVisible(TvProfileTags.SCREEN)
         compose.awaitFocused(TvProfileTags.SIGN_IN)
+        captureScreen(TvProfileTags.SCREEN, "tv-profile-guest.png")
         TvRemote.press(KeyEvent.KEYCODE_BACK)
         compose.awaitFocused(TvDashboardTags.PROFILE)
     }
@@ -125,9 +126,11 @@ class DashboardNavigationTest {
     @Test
     fun tvOtpOpensItsOwnScreenAndAcceptsHardwareDigits() {
         openSignInWithRemote()
+        captureScreen(TvSignInTags.SCREEN, "tv-auth-methods.png")
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         val auth = TvAuthTestScreen(compose)
         awaitVisible(TvSignInTags.IDENTIFIER)
+        captureScreen(TvSignInTags.SCREEN, "tv-auth-email.png")
         auth.identifier.performTextInput("guest@example.test")
         TvRemote.press(KeyEvent.KEYCODE_DPAD_DOWN)
         compose.awaitFocused(TvSignInTags.SEND)
@@ -135,6 +138,7 @@ class DashboardNavigationTest {
 
         awaitVisible(TvSignInTags.CODE_SCREEN)
         awaitVisible(TvSignInTags.CODE)
+        captureScreen(TvSignInTags.SCREEN, "tv-auth-code.png")
         for (key in KeyEvent.KEYCODE_0..KeyEvent.KEYCODE_5) TvRemote.press(key)
         compose.awaitFocused(TvSignInTags.VERIFY)
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
@@ -150,23 +154,23 @@ class DashboardNavigationTest {
         compose.awaitFocused(TvSignInTags.GOOGLE)
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         awaitVisible(TvProfileTags.EDIT_NICKNAME)
-        captureProfile(TvProfileTags.SCREEN, "tv-profile.png")
+        captureScreen(TvProfileTags.SCREEN, "tv-profile.png")
         compose.awaitFocused(TvProfileTags.SETTINGS)
         TvRemote.press(KeyEvent.KEYCODE_DPAD_UP)
         compose.awaitFocused(TvProfileTags.EDIT_NICKNAME)
         TvRemote.press(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.awaitFocused(TvProfileTags.SAVE_NICKNAME)
-        captureProfile(TvProfileTags.NICKNAME_EDITOR, "tv-nickname.png")
+        captureScreen(TvProfileTags.NICKNAME_EDITOR, "tv-nickname.png")
         TvRemote.pressInDialog(KeyEvent.KEYCODE_DPAD_CENTER)
         compose.awaitFocused(TvProfileTags.EDIT_NICKNAME)
         val nodes = AppShellScreen(compose)
         nodes.tag(TvProfileTags.NICKNAME_EDITOR).assertDoesNotExist()
-        nodes.tag(TvProfileTags.SIGN_OUT).performClick()
-        awaitVisible(TvDashboardTags.NAVIGATION)
+        TvRemote.press(KeyEvent.KEYCODE_DPAD_DOWN)
+        signOutWithRemote()
         ProfileMockScenario.reset()
     }
 
-    private fun captureProfile(tag: String, filename: String) {
+    private fun captureScreen(tag: String, filename: String) {
         val directory = checkNotNull(compose.activity.getExternalFilesDir("visual-previews"))
         File(directory, filename).outputStream().use { output ->
             val bitmap = compose.onNodeWithTag(tag).captureToImage().asAndroidBitmap()

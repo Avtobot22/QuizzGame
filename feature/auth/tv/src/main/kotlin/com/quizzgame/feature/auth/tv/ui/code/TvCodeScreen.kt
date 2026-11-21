@@ -28,32 +28,35 @@ import com.quizzgame.core.designsystem.tv.QuizzTvCodeInput
 import com.quizzgame.core.designsystem.tv.QuizzTvProgressStrip
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.feature.auth.tv.R
+import com.quizzgame.feature.auth.tv.presentation.TvSignInIntent
+import com.quizzgame.feature.auth.tv.presentation.TvSignInState
+import com.quizzgame.feature.auth.tv.presentation.TvSignInStep
 import com.quizzgame.feature.auth.tv.ui.TvAuthError
+import com.quizzgame.feature.auth.tv.ui.intro.TvAuthArtwork
 import com.quizzgame.feature.auth.tv.ui.intro.TvAuthHeading
 import com.quizzgame.feature.auth.tv.ui.tags.TvSignInTags
 import com.quizzgame.shared.auth.domain.entity.AuthFailure
 import com.quizzgame.shared.auth.domain.entity.AuthMethod
-import com.quizzgame.shared.auth.presentation.OtpIntent
-import com.quizzgame.shared.auth.presentation.OtpState
-import com.quizzgame.shared.auth.presentation.OtpStep
+import com.quizzgame.core.ui.R as UiR
 
 @Composable
 internal fun TvCodeScreen(
-    step: OtpStep.Code,
-    state: OtpState,
+    step: TvSignInStep.Code,
+    state: TvSignInState,
     elapsed: Long,
     onBack: () -> Unit,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (TvSignInIntent) -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
-    val failure = state.failure ?: AuthFailure.Expired.takeIf { elapsed >= step.expiresAtMillis }
-    val expired = state.isCodeExpired(step, elapsed)
+    val failure = state.failure ?: AuthFailure.Expired.takeIf { elapsed >= step.form.expiresAtMillis }
+    val expired = step.form.isExpired(elapsed, state.failure)
     val canRequest = state.canRequest(elapsed)
-    val canVerify = canRequest && !expired && step.code.length == step.challenge.codeLength
+    val canVerify = canRequest && !expired && step.form.complete
     QuizzTvCenteredContent {
+        TvAuthArtwork(UiR.drawable.ic_quizz_status_auth)
         TvAuthHeading(
             stringResource(R.string.auth_enter_code),
-            stringResource(R.string.auth_sent, step.challenge.maskedDestination),
+            stringResource(R.string.auth_sent, step.form.challenge.maskedDestination),
         )
         Column(
             Modifier.widthIn(max = 780.dp).fillMaxWidth().testTag(TvSignInTags.CODE_SCREEN)
@@ -62,12 +65,12 @@ internal fun TvCodeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            key(step.challenge.id) {
+            key(step.form.challenge.id) {
                 QuizzTvCodeInput(
-                    value = step.code,
-                    onValueChange = { onIntent(OtpIntent.Edit(it)) },
+                    value = step.form.code,
+                    onValueChange = { onIntent(TvSignInIntent.Edit(it)) },
                     onComplete = {},
-                    length = step.challenge.codeLength,
+                    length = step.form.challenge.codeLength,
                     characters = "0123456789",
                     label = stringResource(R.string.auth_code),
                     modifier = Modifier.testTag(TvSignInTags.CODE),
@@ -81,7 +84,7 @@ internal fun TvCodeScreen(
                     QuizzTvProgressStrip(stringResource(R.string.auth_busy))
                 }
             }
-            val wait = state.resendWaitMillis(step, elapsed)
+            val wait = step.form.resendWaitMillis(state.requestBlockedUntil, elapsed)
             TvCodeActions(step.method, canVerify, canRequest && wait == 0L, wait, expired, onBack, onIntent)
         }
     }
@@ -95,19 +98,19 @@ private fun TvCodeActions(
     wait: Long,
     expired: Boolean,
     onBack: () -> Unit,
-    onIntent: (OtpIntent) -> Unit,
+    onIntent: (TvSignInIntent) -> Unit,
 ) {
     val verify = remember { FocusRequester() }
     val resend = remember { FocusRequester() }
     val back = remember { FocusRequester() }
     QuizzTvActionRow {
         QuizzTvButton(
-            { onIntent(OtpIntent.Verify) },
+            { onIntent(TvSignInIntent.Verify) },
             Modifier.focusRequester(verify).testTag(TvSignInTags.VERIFY),
             enabled = canVerify,
         ) { Text(stringResource(R.string.auth_verify)) }
         QuizzTvButton(
-            { onIntent(OtpIntent.Resend) },
+            { onIntent(TvSignInIntent.RequestCode) },
             modifier = Modifier.focusRequester(resend).testTag(TvSignInTags.RESEND),
             style = QuizzTvButtonStyle.SECONDARY,
             enabled = canResend,

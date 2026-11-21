@@ -1,16 +1,12 @@
 package com.quizzgame.feature.authprovider.tv.ui
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -18,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
@@ -34,6 +29,8 @@ import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
 import com.quizzgame.core.designsystem.tv.QuizzTvCenteredContent
 import com.quizzgame.core.designsystem.tv.QuizzTvScreenScaffold
 import com.quizzgame.core.navigation.focus.TvEntryFocus
+import com.quizzgame.core.ui.QuizzAuthArtwork
+import com.quizzgame.core.ui.tokens.QuizzIdentityDimensions
 import com.quizzgame.feature.authprovider.tv.R
 import com.quizzgame.feature.authprovider.tv.presentation.TvDeviceAuthIntent
 import com.quizzgame.feature.authprovider.tv.presentation.TvDeviceAuthState
@@ -89,18 +86,19 @@ internal fun TvDeviceAuthStage(state: TvDeviceAuthState, onRetry: () -> Unit, on
 
 @Composable
 private fun TvDeviceAuthIntro() {
+    val colors = MaterialTheme.colorScheme
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
     ) {
-        Box(
-            Modifier
-                .size(56.dp)
-                .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
-            contentAlignment = Alignment.Center,
-        ) {
-            Image(painterResource(UiR.drawable.ic_quizz_google_g), null, Modifier.size(30.dp))
-        }
+        QuizzAuthArtwork(
+            UiR.drawable.ic_quizz_google_g,
+            colors.primary,
+            colors.tertiary,
+            QuizzIdentityDimensions.tvArtwork.dp,
+            QuizzIdentityDimensions.tvArtworkIcon.dp,
+            branded = true,
+        )
         Text(
             stringResource(R.string.auth_device_google),
             Modifier.semantics { heading() },
