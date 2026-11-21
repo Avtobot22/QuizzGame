@@ -1,12 +1,4 @@
 <resources>
-    <string name="account_library">Library</string>
-    <string name="account_profile">Profile</string>
-    <string name="library_guest">Sign in to see your quizzes.</string>
-    <string name="profile_guest">You are playing as a guest. You can sign in to your account.</string>
-    <string name="account_sign_in">Sign in</string>
-    <string name="account_logout">Sign out</string>
-    <string name="account_signed_in">Your account</string>
-    <string name="library_pending">Your personal library is still in development.</string>
-    <string name="account_unavailable">Unable to check your account.</string>
-    <string name="account_retry">Retry</string>
+    <string name="library_title">Library</string>
+    <string name="library_unavailable">Your library is not available yet.</string>
 </resources>

@@ -1,11 +1,16 @@
 package com.quizzgame.mobile.network.mocks
 
+import android.content.Context
+import com.quizzgame.mobile.R
 import dev.androidmock.core.dsl.BodyAssetResolver
 import dev.androidmock.core.dsl.RulesDsl
 import dev.androidmock.core.request.HeaderEntry
 import dev.androidmock.core.response.ResponseBody
 import dev.androidmock.core.response.ResponseSpec
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -75,4 +80,30 @@ private fun catalogResponse(bytes: ByteArray) = ResponseSpec(
     status = 200,
     headers = listOf(HeaderEntry("Content-Type", "application/json")),
     body = ResponseBody.Bytes(bytes),
+)
+
+internal fun localizedMobileCatalogAssets(
+    context: Context,
+    assets: BodyAssetResolver,
+    json: Json,
+): BodyAssetResolver = BodyAssetResolver { path ->
+    val content = assets.read(path)
+    if (path == "mock/bodies/mobile-dashboard.json") localizedDashboard(context, json, content) else content
+}
+
+private fun localizedDashboard(context: Context, json: Json, data: ByteArray): ByteArray {
+    val dashboard = json.parseToJsonElement(data.decodeToString()).jsonObject
+    val tabs = dashboard.getValue("tabs").jsonArray.map {
+        val tab = it.jsonObject
+        val label = mobileTabLabels[tab.getValue("id").jsonPrimitive.content]
+        if (label == null) tab else JsonObject(tab + ("title" to JsonPrimitive(context.getString(label))))
+    }
+    return JsonObject(dashboard + ("tabs" to JsonArray(tabs))).toString().encodeToByteArray()
+}
+
+private val mobileTabLabels = mapOf(
+    "play" to R.string.navigation_play,
+    "explore" to R.string.navigation_explore,
+    "library" to R.string.navigation_library,
+    "profile" to R.string.navigation_profile,
 )

@@ -14,7 +14,6 @@ import com.quizzgame.core.network.result.NetworkResult
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.core.session.lifecycle.SessionStateReader
 import com.quizzgame.core.session.storage.SessionStorageFailure
-import com.quizzgame.shared.splash.data.CurrentUserStore
 import com.quizzgame.shared.splash.data.SplashRemoteDataSource
 import com.quizzgame.shared.splash.data.SplashRepositoryImpl
 import com.quizzgame.shared.splash.data.dto.AccountDto
@@ -29,7 +28,6 @@ import com.quizzgame.shared.splash.domain.usecase.RefreshSplashFlagsUseCase
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -48,11 +46,10 @@ class StartSplashScenarioTest {
     }
 
     @Test
-    fun authenticatedLaunchLoadsRequiredUserAndStoresForCurrentGeneration() = runTest {
+    fun authenticatedLaunchChecksUserAfterRefreshingFlags() = runTest {
         val fixture = Fixture().apply { state = SessionState.Authenticated(7) }
         assertEquals(SplashResult.Continue, fixture.useCase())
         assertEquals(listOf("launch", "flags", "user"), fixture.calls)
-        assertEquals("719278b4-e7af-4e50-af40-25701f2b2b27", fixture.users.current()?.id.toString())
     }
 
     @Test
@@ -72,21 +69,12 @@ class StartSplashScenarioTest {
     }
 
     @Test
-    fun generationChangeDuringUserResponseNeverPublishesOldProfile() = runTest {
+    fun generationChangeDuringUserResponseInterruptsStartup() = runTest {
         val fixture = Fixture().apply {
             state = SessionState.Authenticated(1)
             afterUser = { state = SessionState.Authenticated(2) }
         }
         assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
-        assertNull(fixture.users.current())
-    }
-
-    @Test
-    fun logoutHidesStoredProfileFromPreviousSession() = runTest {
-        val fixture = Fixture().apply { state = SessionState.Authenticated(1) }
-        fixture.useCase()
-        fixture.state = SessionState.Guest
-        assertNull(fixture.users.current())
     }
 
     @Test
@@ -131,13 +119,12 @@ class StartSplashScenarioTest {
     }
 
     @Test
-    fun expiryDuringUserRequestInterruptsStartupWithoutPublishingProfile() = runTest {
+    fun expiryDuringUserRequestInterruptsStartup() = runTest {
         val fixture = Fixture().apply {
             state = SessionState.Authenticated(1)
             afterUser = { state = SessionState.Expired }
         }
         assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
-        assertNull(fixture.users.current())
     }
 
     @Test
@@ -159,7 +146,6 @@ class StartSplashScenarioTest {
         val fixture = Fixture().apply { afterFlags = { state = SessionState.Authenticated(2) } }
         assertEquals(SplashResult.Failed(AppFailure.OperationInterrupted), fixture.useCase())
         assertEquals(listOf("launch", "flags"), fixture.calls)
-        assertNull(fixture.users.current())
     }
 
     private class Fixture {
@@ -173,7 +159,6 @@ class StartSplashScenarioTest {
         var afterLaunch: () -> Unit = {}
         var afterFlags: () -> Unit = {}
         val reader = SessionStateReader { state }
-        val users = CurrentUserStore(reader)
         private val remote = object : SplashRemoteDataSource {
             override suspend fun launch(): ApiCallResult<Unit> = response {
                 calls += "launch"
@@ -211,7 +196,6 @@ class StartSplashScenarioTest {
                 }
             },
             reader,
-            users,
         )
         val useCase = StartSplashScenario(
             repository,

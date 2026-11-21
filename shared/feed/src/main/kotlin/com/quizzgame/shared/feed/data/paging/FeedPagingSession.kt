@@ -15,11 +15,11 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import java.util.concurrent.atomic.AtomicLong
 
-/** Связывает снимок секций и его ряды; не запускает корутины и не кеширует страницы. */
 class FeedPagingSession(
     private val remote: FeedRemoteDataSource,
     private val owner: SessionState,
 ) {
+
     private var recoveryUsed = false
     private var automaticRestart = false
     private var snapshotId = 0L

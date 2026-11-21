@@ -11,13 +11,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusRestorer
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.tv.dashboard.fixture.ui.tags.FixtureDashboardTags
+import com.quizzgame.tv.navigation.fixtureString
 import com.quizzgame.tv.test.R as FixtureR
 
 @Composable
@@ -38,7 +38,7 @@ internal fun FixtureTabContent(
                     open(DashboardDestination.QuizDetail("$tab-$id"))
                 },
                 modifier = Modifier.testTag(FixtureDashboardTags.quiz(tab, id)),
-            ) { Text(stringResource(FixtureR.string.fixture_quiz, id + 1)) }
+            ) { Text(fixtureString(FixtureR.string.fixture_quiz, id + 1)) }
         }
     }
     TvEntryFocus(focus, requestFocus)
@@ -52,9 +52,9 @@ internal fun FixtureQuizDetail(
 ) {
     val focus = remember { FocusRequester() }
     Column(Modifier.testTag(FixtureDashboardTags.DETAIL), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text(stringResource(FixtureR.string.fixture_detail, quizId))
+        Text(fixtureString(FixtureR.string.fixture_detail, quizId))
         Text(
-            stringResource(FixtureR.string.fixture_counter, viewModel.counter),
+            fixtureString(FixtureR.string.fixture_counter, viewModel.counter),
             Modifier.testTag(FixtureDashboardTags.COUNTER),
         )
         QuizzTvButton(
@@ -62,12 +62,12 @@ internal fun FixtureQuizDetail(
             Modifier.testTag(FixtureDashboardTags.INCREMENT)
                 .focusRequester(focus),
         ) {
-            Text(stringResource(FixtureR.string.fixture_increment))
+            Text(fixtureString(FixtureR.string.fixture_increment))
         }
         QuizzTvButton(
             back,
             Modifier.testTag(FixtureDashboardTags.BACK),
-        ) { Text(stringResource(FixtureR.string.fixture_back)) }
+        ) { Text(fixtureString(FixtureR.string.fixture_back)) }
     }
     TvEntryFocus(focus)
 }

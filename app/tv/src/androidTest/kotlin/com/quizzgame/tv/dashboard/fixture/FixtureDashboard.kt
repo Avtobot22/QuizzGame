@@ -22,7 +22,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
@@ -36,6 +35,7 @@ import com.quizzgame.core.navigation.registration.FeatureEntries
 import com.quizzgame.core.navigation.registration.rememberFeatureEntryProvider
 import com.quizzgame.tv.dashboard.fixture.ui.tags.FixtureDashboardTags
 import com.quizzgame.tv.navigation.DashboardNavigationContext
+import com.quizzgame.tv.navigation.fixtureString
 import com.quizzgame.tv.ui.tags.TvNavigationTags
 import com.quizzgame.tv.test.R as FixtureR
 
@@ -57,8 +57,8 @@ internal fun FixtureDashboard(
     val entries = current.state.decoratedEntries(provider)
     if (current.selectedTab == null) {
         Column(Modifier.fillMaxSize().padding(48.dp)) {
-            Text(stringResource(FixtureR.string.fixture_dashboard_empty), Modifier.testTag(FixtureDashboardTags.EMPTY))
-            QuizzTvButton(onLogout) { Text(stringResource(FixtureR.string.fixture_signout)) }
+            Text(fixtureString(FixtureR.string.fixture_dashboard_empty), Modifier.testTag(FixtureDashboardTags.EMPTY))
+            QuizzTvButton(onLogout) { Text(fixtureString(FixtureR.string.fixture_signout)) }
         }
         return
     }
@@ -98,7 +98,7 @@ private fun DashboardNavigationBar(
         }
     }
     Column(Modifier.padding(start = 48.dp, end = 48.dp, top = 48.dp, bottom = 16.dp)) {
-        Text(stringResource(FixtureR.string.fixture_label))
+        Text(fixtureString(FixtureR.string.fixture_label))
         QuizzTvNavigationBar(
             items = current.tabs.map { it.id },
             selected = current.selectedTab,
@@ -114,13 +114,13 @@ private fun DashboardNavigationBar(
             },
             label = { tab ->
                 Text(
-                    stringResource(tab.titleResource),
+                    fixtureString(tab.titleResource),
                     fontWeight = if (current.selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
                 )
             },
             trailingContent = {
                 QuizzTvButton(onLogout, Modifier.testTag(FixtureDashboardTags.SIGN_OUT)) {
-                    Text(stringResource(FixtureR.string.fixture_signout))
+                    Text(fixtureString(FixtureR.string.fixture_signout))
                 }
             },
         )

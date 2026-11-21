@@ -41,7 +41,6 @@ class StartSplashScenario @Inject constructor(
     }
 
     private fun finishGuestStartup(): SplashResult {
-        repository.clearUser()
         return if (repository.guestAllowed()) SplashResult.Continue else SplashResult.SignIn
     }
 

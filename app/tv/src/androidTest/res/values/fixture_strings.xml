@@ -1,4 +1,6 @@
 <resources>
+    <string name="fixture_splash_title">Запуск</string>
+    <string name="fixture_signin_title">Вход</string>
     <string name="fixture_label">TEST — локальная проверка переходов</string>
     <string name="fixture_signin">TEST: открыть вход</string>
     <string name="fixture_continue">TEST: продолжить без авторизации</string>

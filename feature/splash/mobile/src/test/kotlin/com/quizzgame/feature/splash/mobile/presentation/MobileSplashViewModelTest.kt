@@ -146,7 +146,6 @@ class MobileSplashViewModelTest {
             override suspend fun loadUser(expectedGeneration: Long): AppFailure? =
                 error("Guest fixture must not load user")
             override fun guestAllowed(): Boolean = result == SplashResult.Continue
-            override fun clearUser() = Unit
         }
         val scenario = StartSplashScenario(
             repository,

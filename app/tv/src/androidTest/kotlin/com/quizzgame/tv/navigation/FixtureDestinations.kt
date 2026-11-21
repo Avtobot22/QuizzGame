@@ -1,5 +1,6 @@
 package com.quizzgame.tv.navigation
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,15 +14,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.test.platform.app.InstrumentationRegistry
 import androidx.tv.material3.Text
 import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.navigation.effect.NavigationResultEffect
 import com.quizzgame.debug.navigation.FixtureSignInViewModel
-import com.quizzgame.tv.R
 import com.quizzgame.tv.ui.tags.TvFixtureTags
 import com.quizzgame.tv.test.R as FixtureR
 
@@ -33,7 +33,7 @@ internal fun TvFixtureSignInDestination(
     val result by viewModel.result.collectAsStateWithLifecycle()
     NavigationResultEffect(result, viewModel::resultHandled) { onContinue() }
     FixturePlaceholder(
-        R.string.signin_placeholder,
+        FixtureR.string.fixture_signin_title,
         listOf(FixtureR.string.fixture_restart to viewModel::requestRestart),
     )
 }
@@ -46,15 +46,18 @@ internal fun FixturePlaceholder(title: Int, actions: List<Pair<Int, () -> Unit>>
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
     ) {
-        Text(stringResource(FixtureR.string.fixture_label))
-        Text(stringResource(title))
+        Text(fixtureString(FixtureR.string.fixture_label))
+        Text(fixtureString(title))
         actions.forEachIndexed { index, (label, action) ->
             QuizzTvButton(
                 onClick = action,
                 modifier = Modifier.testTag(TvFixtureTags.action(index))
                     .then(if (index == 0) Modifier.focusRequester(firstFocus) else Modifier),
-            ) { Text(stringResource(label)) }
+            ) { Text(fixtureString(label)) }
         }
     }
     LaunchedEffect(Unit) { firstFocus.requestFocus() }
 }
+
+internal fun fixtureString(@StringRes id: Int, vararg args: Any): String =
+    InstrumentationRegistry.getInstrumentation().context.getString(id, *args)

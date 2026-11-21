@@ -9,7 +9,6 @@ android { namespace = "com.quizzgame.feature.dashboard.mobile" }
 dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    implementation(projects.shared.splash)
     implementation(projects.core.coroutines)
     implementation(projects.core.presentation)
     implementation(projects.core.network)
