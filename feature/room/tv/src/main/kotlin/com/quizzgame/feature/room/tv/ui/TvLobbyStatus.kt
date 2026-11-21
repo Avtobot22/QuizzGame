@@ -17,6 +17,7 @@ import com.quizzgame.core.designsystem.tv.QuizzTvButton
 import com.quizzgame.core.designsystem.tv.QuizzTvButtonStyle
 import com.quizzgame.core.designsystem.tv.QuizzTvStatusContent
 import com.quizzgame.core.designsystem.tv.QuizzTvStatusCopy
+import com.quizzgame.core.error.failure.AppFailure
 import com.quizzgame.core.error.operation.ErrorOperationContext
 import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
@@ -27,15 +28,15 @@ import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.status.QuizzNoticeTone
 import com.quizzgame.core.ui.status.QuizzStatusIcon
 import com.quizzgame.feature.room.tv.R
+import com.quizzgame.feature.room.tv.presentation.TvLobbyState
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
-import com.quizzgame.shared.room.presentation.RoomLobbyState
 import com.quizzgame.shared.room.presentation.endDescription
 import com.quizzgame.shared.room.presentation.endLabel
 import com.quizzgame.shared.room.R as RoomR
 
 @Composable
-internal fun TvLobbyStatus(state: RoomLobbyState, onBack: () -> Unit, onRetry: () -> Unit) {
+internal fun TvLobbyStatus(state: TvLobbyState, onBack: () -> Unit, onRetry: () -> Unit) {
     val reason = state.endReason
     if (reason != null) {
         TvLobbyStatusPage(
@@ -55,22 +56,34 @@ internal fun TvLobbyStatus(state: RoomLobbyState, onBack: () -> Unit, onRetry: (
         return
     }
     when (val stream = state.stream) {
-        is RoomStreamState.Failed -> {
-            val context = ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT)
-            val spec = TvErrorDecisionPolicy().decide(stream.failure.cause, context)
-            QuizzTvErrorFullScreen(
-                spec.copy(actions = spec.actions.filter { it == ErrorActionKind.RETRY } + ErrorActionKind.GO_BACK),
-                onAction = { if (it == ErrorActionKind.RETRY) onRetry() else onBack() },
-            )
-        }
+        is RoomStreamState.Failed -> TvLobbyFailure(stream.failure.cause, onBack, onRetry)
         else -> TvLobbyStatusPage(
             stringResource(RoomR.string.room_reconnecting),
             stringResource(RoomR.string.room_reconnecting_description),
-            QuizzStatusIcon.NETWORK,
+            QuizzStatusIcon.SYNC,
             onBack,
-            tone = QuizzNoticeTone.ERROR,
+            tone = QuizzNoticeTone.INFORMATION,
         )
     }
+}
+
+@Composable
+private fun TvLobbyFailure(failure: AppFailure, onBack: () -> Unit, onRetry: () -> Unit) {
+    if (failure == AppFailure.InvalidServerData) {
+        TvLobbyStatusPage(
+            stringResource(RoomR.string.room_open_failed),
+            stringResource(RoomR.string.room_unavailable_description),
+            QuizzStatusIcon.ROOM,
+            onBack,
+        )
+        return
+    }
+    val context = ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT)
+    val spec = TvErrorDecisionPolicy().decide(failure, context)
+    QuizzTvErrorFullScreen(
+        spec.copy(actions = spec.actions.filter { it == ErrorActionKind.RETRY } + ErrorActionKind.GO_BACK),
+        onAction = { if (it == ErrorActionKind.RETRY) onRetry() else onBack() },
+    )
 }
 
 @Composable

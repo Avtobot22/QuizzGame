@@ -1,14 +1,15 @@
 package com.quizzgame.feature.room.mobile
 
 import androidx.activity.ComponentActivity
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.test.espresso.Espresso.pressBack
 import com.quizzgame.core.designsystem.mobile.preview.QuizzMobilePreviewScreen
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyIntent
 import com.quizzgame.feature.room.mobile.ui.MobileLobbyContent
 import com.quizzgame.feature.room.mobile.ui.preview.MobileLobbyPreviewProvider
 import com.quizzgame.feature.room.mobile.ui.tags.MobileLobbyTags
-import com.quizzgame.shared.room.domain.entity.command.RoomCommand
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomPhase
 import io.github.kakaocup.compose.node.element.ComposeScreen
@@ -16,6 +17,7 @@ import io.github.kakaocup.compose.node.element.KNode
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import com.quizzgame.shared.room.R as RoomR
 
 class MobileLobbyUiTest {
     @get:Rule
@@ -24,21 +26,21 @@ class MobileLobbyUiTest {
     @Test
     fun readyUsesTheCurrentPlayerAndBackRequiresConfirmation() {
         val state = MobileLobbyPreviewProvider().values.first { it.stream is RoomStreamState.Active }
-        val sent = mutableListOf<RoomCommand>()
+        val sent = mutableListOf<MobileLobbyIntent>()
         val screen = MobileLobbyScreenObject(compose)
         val label = InstrumentationStrings(compose.activity).leave
-        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, sent::add, {}) } }
+        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, sent::add) } }
         screen.ready.performClick()
         pressBack()
         screen.confirmation(label).assertIsDisplayed()
-        compose.runOnIdle { assertEquals(listOf(RoomCommand.Ready(false)), sent) }
+        compose.runOnIdle { assertEquals(listOf(MobileLobbyIntent.SetReady(false)), sent) }
     }
 
     @Test
     fun startedScreenHasNoActionAndSystemBackCanLeave() {
         val state = MobileLobbyPreviewProvider().values.first { it.snapshot?.phase == RoomPhase.IN_GAME }
         val screen = MobileLobbyScreenObject(compose)
-        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, {}, {}) } }
+        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, {}) } }
 
         screen.exit.assertDoesNotExist()
         pressBack()
@@ -50,7 +52,7 @@ class MobileLobbyUiTest {
         val state = MobileLobbyPreviewProvider().values.first { it.stream is RoomStreamState.Failed }
         val screen = MobileLobbyScreenObject(compose)
         var returned = false
-        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, { returned = true }, {}, {}) } }
+        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, { returned = true }, {}) } }
 
         screen.exit.performClick()
         compose.runOnIdle { assertEquals(true, returned) }
@@ -62,10 +64,31 @@ class MobileLobbyUiTest {
         val screen = MobileLobbyScreenObject(compose)
         val description = requireNotNull(state.gameInfo?.description)
         val questions = compose.activity.resources.getQuantityString(R.plurals.room_game_questions, 12, 12)
-        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, {}, {}) } }
+        compose.setContent { QuizzMobilePreviewScreen { MobileLobbyContent(state, {}, {}) } }
 
         screen.text(description).assertIsDisplayed()
         screen.text(questions).assertIsDisplayed()
+    }
+
+    @Test
+    fun exitRetryKeepsTheSameAccessibleActionInLobbyAndAfterStart() {
+        val failures = MobileLobbyPreviewProvider().values
+            .filter { it.commandError?.command == MobileLobbyIntent.Leave }.toList()
+        val state = mutableStateOf(failures.first())
+        val screen = MobileLobbyScreenObject(compose)
+        val retry = compose.activity.getString(RoomR.string.room_retry)
+        var retried = 0
+        compose.setContent {
+            QuizzMobilePreviewScreen {
+                MobileLobbyContent(state.value, {}) { if (it == MobileLobbyIntent.Retry) retried++ }
+            }
+        }
+
+        screen.retry(retry).performClick()
+        compose.runOnIdle { state.value = failures.last() }
+        screen.retry(retry).performClick()
+
+        compose.runOnIdle { assertEquals(2, retried) }
     }
 
     private class InstrumentationStrings(activity: ComponentActivity) {
@@ -78,5 +101,6 @@ private class MobileLobbyScreenObject(private val provider: SemanticsNodeInterac
     val ready = KNode(provider) { hasTestTag(MobileLobbyTags.READY) }
     val exit = KNode(provider) { hasTestTag(MobileLobbyTags.EXIT) }
     fun confirmation(title: String) = text(title)
+    fun retry(label: String) = KNode(provider) { hasContentDescription(label) }
     fun text(value: String) = KNode(provider) { hasText(value) }
 }

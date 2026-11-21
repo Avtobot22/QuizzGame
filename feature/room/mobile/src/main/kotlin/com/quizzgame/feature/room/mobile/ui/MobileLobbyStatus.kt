@@ -30,16 +30,17 @@ import com.quizzgame.core.error.ui.common.presentation.errorUiModel
 import com.quizzgame.core.ui.status.QuizzNoticeTone
 import com.quizzgame.core.ui.status.QuizzStatusIcon
 import com.quizzgame.feature.room.mobile.R
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyState
 import com.quizzgame.feature.room.mobile.ui.tags.MobileLobbyTags
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
-import com.quizzgame.shared.room.presentation.RoomLobbyState
 import com.quizzgame.shared.room.presentation.endDescription
 import com.quizzgame.shared.room.presentation.endLabel
 import com.quizzgame.shared.room.R as RoomR
 
 @Composable
-internal fun MobileLobbyStatus(state: RoomLobbyState, onBack: () -> Unit, onRetry: () -> Unit) {
+internal fun MobileLobbyStatus(state: MobileLobbyState, onBack: () -> Unit, onRetry: () -> Unit) {
     val reason = state.endReason
+    val commandNotice = state.notice().takeIf { state.commandError != null }
     if (reason != null) {
         MobileLobbyStatusPage(
             stringResource(reason.endLabel()),
@@ -54,7 +55,9 @@ internal fun MobileLobbyStatus(state: RoomLobbyState, onBack: () -> Unit, onRetr
             stringResource(RoomR.string.room_started),
             stringResource(R.string.room_started_description),
             QuizzStatusIcon.CATALOG,
-        )
+        ) {
+            commandNotice?.let { MobileLobbyNotice(it, onRetry) }
+        }
         return
     }
     when (val stream = state.stream) {
@@ -62,9 +65,14 @@ internal fun MobileLobbyStatus(state: RoomLobbyState, onBack: () -> Unit, onRetr
         else -> MobileLobbyStatusPage(
             stringResource(RoomR.string.room_reconnecting),
             stringResource(RoomR.string.room_reconnecting_description),
-            QuizzStatusIcon.NETWORK,
-            tone = QuizzNoticeTone.ERROR,
-            actions = { ReturnToPlay(onBack) },
+            QuizzStatusIcon.SYNC,
+            tone = QuizzNoticeTone.INFORMATION,
+            actions = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    commandNotice?.let { MobileLobbyNotice(it, onRetry) }
+                    ReturnToPlay(onBack)
+                }
+            },
         )
     }
 }
@@ -74,7 +82,7 @@ private fun MobileLobbyFailure(failure: AppFailure, onBack: () -> Unit, onRetry:
     val context = ErrorOperationContext(OperationKind.INITIAL_LOAD, false, RetrySafety.SAFE_TO_REPEAT)
     val model = errorUiModel(DefaultErrorDecisionPolicy().decide(failure, context))
     val retry = model.actions.firstOrNull { it.kind == ErrorActionKind.RETRY }
-    val title = if (failure == AppFailure.InvalidServerData) stringResource(R.string.room_open_failed) else model.title
+    val title = stringResource(RoomR.string.room_open_failed)
     val message = model.message ?: stringResource(
         if (retry == null) R.string.room_open_from_play else R.string.room_try_open_again,
     )

@@ -32,8 +32,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.feature.room.mobile.R
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyGameInfo
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomPhase
-import com.quizzgame.shared.room.presentation.RoomLobbyGameInfo
 import com.quizzgame.core.ui.R as UiR
 import com.quizzgame.shared.room.R as RoomR
 
@@ -41,7 +41,7 @@ internal val MobileLobbyHeroHeight = 168.dp
 private const val SECONDS_PER_MINUTE = 60
 
 @Composable
-internal fun MobileLobbyHero(title: String, phase: RoomPhase, gameInfo: RoomLobbyGameInfo?) {
+internal fun MobileLobbyHero(title: String, phase: RoomPhase, gameInfo: MobileLobbyGameInfo?) {
     val colors = MaterialTheme.colorScheme
     val tint = lerp(colors.surfaceContainer, colors.primaryContainer, 0.46f)
     Column(
@@ -77,7 +77,7 @@ internal fun MobileLobbyHero(title: String, phase: RoomPhase, gameInfo: RoomLobb
 }
 
 @Composable
-private fun MobileLobbyGameMetadata(info: RoomLobbyGameInfo) {
+private fun MobileLobbyGameMetadata(info: MobileLobbyGameInfo) {
     if (info.questionCount == null && info.durationSeconds == null) return
     FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         info.questionCount?.let { count ->

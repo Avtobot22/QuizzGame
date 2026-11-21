@@ -1,6 +1,5 @@
 <resources>
     <string name="room_invite_help">Scan the QR code in Play</string>
-    <string name="room_invite_or">or</string>
     <string name="room_pin_help">Enter this code in Play on your phone.</string>
     <string name="room_qr">QR code to join the room</string>
     <string name="room_pin">Room code</string>
@@ -16,7 +15,7 @@
     <string name="room_all_ready">Everyone is ready</string>
     <string name="room_enough_players">Enough players have joined</string>
     <string name="room_roster_empty">Waiting for players</string>
-    <string name="room_roster_empty_description">Names will appear here as players join.</string>
+    <string name="room_roster_empty_description">Show players the room code so they can join on their phones.</string>
     <string name="room_started_description">Players are now in the game.</string>
     <string name="room_create_again">Open a quiz to create a new room.</string>
     <string name="room_host_account_changed">Create a new room with your current account.</string>

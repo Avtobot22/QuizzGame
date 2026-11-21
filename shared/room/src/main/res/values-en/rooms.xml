@@ -1,7 +1,7 @@
 <resources>
     <string name="room_lobby">Lobby</string>
     <string name="room_connecting">Connecting to the room</string>
-    <string name="room_reconnecting">Reconnecting to the room</string>
+    <string name="room_reconnecting">Reconnecting</string>
     <string name="room_roster">Players</string>
     <string name="room_count">%1$d of %2$d</string>
     <string name="room_ready">Ready</string>
@@ -22,6 +22,13 @@
     <string name="room_resume">Return to room</string>
     <string name="room_action_denied">Action unavailable</string>
     <string name="room_conflict">The room changed. Try the action again if it is still needed.</string>
+    <string name="room_ready_failed">Couldn’t change readiness</string>
+    <string name="room_kick_failed">Couldn’t remove the player</string>
+    <string name="room_start_failed">Couldn’t start the game</string>
+    <string name="room_close_failed">Couldn’t close the room</string>
+    <string name="room_leave_failed">Couldn’t leave the room</string>
+    <string name="room_command_unconfirmed">No confirmation received.</string>
+    <string name="room_open_failed">Couldn’t open the room</string>
     <string name="room_closed_description">Join a new room to play.</string>
     <string name="room_removed_description">You can join a different room.</string>
     <string name="room_expired_description">Ask the host to create a new room.</string>

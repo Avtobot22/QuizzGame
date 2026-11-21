@@ -56,8 +56,6 @@ include(":shared:splash")
 include(":shared:auth")
 include(":shared:account")
 include(":shared:room")
-include(":feature:room:tv")
-include(":feature:room:mobile")
 
 include(":feature:splash:tv")
 include(":feature:splash:mobile")
@@ -74,6 +72,8 @@ include(":feature:account:mobile")
 include(":feature:play:mobile")
 include(":feature:feed:mobile")
 include(":feature:quiz-entry:mobile")
+include(":feature:room:tv")
+include(":feature:room:mobile")
 
 val mockSdkDirectory = file("external/android-mock-server")
 check(mockSdkDirectory.resolve("settings.gradle.kts").isFile) {

@@ -19,22 +19,22 @@ import com.quizzgame.core.designsystem.mobile.QuizzConfirmationDialog
 import com.quizzgame.core.designsystem.mobile.QuizzScreenScaffold
 import com.quizzgame.core.designsystem.mobile.QuizzTopBar
 import com.quizzgame.feature.room.mobile.R
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyIntent
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyState
 import com.quizzgame.feature.room.mobile.ui.tags.MobileLobbyTags
-import com.quizzgame.shared.room.domain.entity.command.RoomCommand
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
-import com.quizzgame.shared.room.presentation.RoomLobbyState
 import com.quizzgame.shared.room.R as RoomR
 
 @Composable
 internal fun MobileLobbyContent(
-    state: RoomLobbyState,
+    state: MobileLobbyState,
     onBack: () -> Unit,
-    onCommand: (RoomCommand) -> Unit,
-    onRetry: () -> Unit,
+    onIntent: (MobileLobbyIntent) -> Unit,
 ) {
     var confirm by rememberSaveable { mutableStateOf(false) }
     val inRoom = state.self != null && state.endReason == null
     val back = { if (inRoom) confirm = true else onBack() }
+    val onRetry = { onIntent(MobileLobbyIntent.Retry) }
     val showLobby = !state.gameStarted && (state.snapshot != null || state.stream == RoomStreamState.Connecting)
     BackHandler { back() }
     QuizzScreenScaffold(
@@ -47,7 +47,7 @@ internal fun MobileLobbyContent(
             val modifier = Modifier.widthIn(max = 560.dp).fillMaxSize().padding(horizontal = 20.dp)
             when {
                 showLobby && state.snapshot != null -> {
-                    MobileLobbyReadyContent(state, onCommand, onRetry, back, modifier)
+                    MobileLobbyReadyContent(state, onIntent, onRetry, back, modifier)
                 }
                 showLobby -> MobileLobbySkeleton(modifier)
                 else -> MobileLobbyStatus(state, back, onRetry)
@@ -60,7 +60,7 @@ internal fun MobileLobbyContent(
             stringResource(R.string.room_leave_description),
             {
                 confirm = false
-                onCommand(RoomCommand.Leave)
+                onIntent(MobileLobbyIntent.Leave)
             },
             { confirm = false },
             enabled = !state.sending,

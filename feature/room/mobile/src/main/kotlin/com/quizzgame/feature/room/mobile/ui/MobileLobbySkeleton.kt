@@ -15,21 +15,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.mobile.QuizzMobileSkeleton
 import com.quizzgame.core.ui.quizzSkeleton
+import com.quizzgame.core.ui.tokens.QuizzDimensions
 import com.quizzgame.shared.room.R
 
 @Composable
 internal fun MobileLobbySkeleton(modifier: Modifier = Modifier) {
     val shapes = MaterialTheme.shapes
     QuizzMobileSkeleton(stringResource(R.string.room_connecting), modifier) {
-        Column(
-            Modifier.verticalScroll(rememberScrollState()).padding(top = 12.dp, bottom = 20.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Box(Modifier.fillMaxWidth().height(MobileLobbyHeroHeight).quizzSkeleton(shapes.extraLarge))
-            MobileRosterHeading(count = null)
-            repeat(3) {
-                Box(Modifier.fillMaxWidth().height(MobileLobbyPlayerHeight).quizzSkeleton(shapes.large))
+        Column {
+            Column(
+                Modifier.weight(1f).verticalScroll(rememberScrollState()).padding(top = 12.dp, bottom = 20.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Box(Modifier.fillMaxWidth().height(MobileLobbyHeroHeight).quizzSkeleton(shapes.extraLarge))
+                MobileRosterHeading(count = null)
+                repeat(3) {
+                    Box(Modifier.fillMaxWidth().height(MobileLobbyPlayerHeight).quizzSkeleton(shapes.large))
+                }
             }
+            Box(
+                Modifier.fillMaxWidth().padding(top = 8.dp).height(QuizzDimensions.mobileMinTouchDp.dp)
+                    .quizzSkeleton(shapes.large),
+            )
+            Box(Modifier.height(QuizzDimensions.mobileMinTouchDp.dp + 8.dp))
         }
     }
 }

@@ -8,6 +8,7 @@ android { namespace = "com.quizzgame.feature.room.mobile" }
 
 dependencies {
     api(projects.shared.room)
+    implementation(projects.shared.quizEntry)
     implementation(projects.core.designsystem.mobile)
     implementation(projects.core.error.uiMobile)
     implementation(projects.core.presentation)

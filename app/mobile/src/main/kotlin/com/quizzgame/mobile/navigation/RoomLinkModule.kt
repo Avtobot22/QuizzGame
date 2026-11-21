@@ -18,8 +18,8 @@ internal object RoomLinkModule {
     @Provides
     @IntoSet
     fun parser(links: RoomJoinLink): ExternalNavigationParser = ExternalNavigationParser { uri ->
-        links.codeFrom(
-            uri,
-        )?.let { code -> NavigationRequest(UUID.randomUUID().toString(), MobileJoinRoute(code), PlayRoute) }
+        links.codeFrom(uri)?.let { code ->
+            NavigationRequest(UUID.randomUUID().toString(), MobileJoinRoute(code), PlayRoute)
+        }
     }
 }

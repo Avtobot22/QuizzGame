@@ -34,7 +34,7 @@ class TvLobbyVisualTest(private val index: Int) {
         compose.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f)) {
                 QuizzTvPreviewScreen(Modifier.size(960.dp, 540.dp)) {
-                    TvLobbyContent(state, {}, {}, {})
+                    TvLobbyContent(state, {}, {})
                 }
             }
         }

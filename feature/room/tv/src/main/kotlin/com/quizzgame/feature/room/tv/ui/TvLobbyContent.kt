@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,22 +33,22 @@ import com.quizzgame.core.designsystem.tv.QuizzTvScreenScaffold
 import com.quizzgame.core.navigation.focus.TvEntryFocus
 import com.quizzgame.core.ui.tokens.QuizzTvLayout
 import com.quizzgame.feature.room.tv.R
+import com.quizzgame.feature.room.tv.presentation.TvLobbyIntent
+import com.quizzgame.feature.room.tv.presentation.TvLobbyState
 import com.quizzgame.feature.room.tv.ui.tags.TvLobbyTags
-import com.quizzgame.shared.room.domain.entity.command.RoomCommand
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
-import com.quizzgame.shared.room.presentation.RoomLobbyState
 import com.quizzgame.core.ui.R as UiR
 import com.quizzgame.shared.room.R as RoomR
 
 @Composable
 internal fun TvLobbyContent(
-    state: RoomLobbyState,
+    state: TvLobbyState,
     onBack: () -> Unit,
-    onCommand: (RoomCommand) -> Unit,
-    onRetry: () -> Unit,
+    onIntent: (TvLobbyIntent) -> Unit,
 ) {
     val returnFocus = remember { FocusRequester() }
     val closeFocus = remember { FocusRequester() }
+    val onRetry = { onIntent(TvLobbyIntent.Retry) }
     val showLobby = !state.gameStarted && (state.snapshot != null || state.stream == RoomStreamState.Connecting)
     var confirmation by remember { mutableStateOf<TvLobbyConfirmation?>(null) }
     QuizzTvScreenScaffold(Modifier.testTag(TvLobbyTags.ROOT)) {
@@ -75,18 +76,26 @@ internal fun TvLobbyContent(
             TvLobbyStatus(state, onBack, onRetry)
         }
     }
-    confirmation?.let {
-        TvLobbyDialog(it, onDismiss = { confirmation = null }) { command ->
+    val selected = confirmation
+    val canConfirm = selected?.allowedBy(state) == true
+    LaunchedEffect(selected, canConfirm) {
+        if (selected != null && !canConfirm) {
             confirmation = null
             if (showLobby) returnFocus.requestFocus()
-            onCommand(command)
+        }
+    }
+    if (selected != null && canConfirm) {
+        TvLobbyDialog(selected, onDismiss = { confirmation = null }) { command ->
+            confirmation = null
+            if (showLobby) returnFocus.requestFocus()
+            onIntent(command)
         }
     }
 }
 
 @Composable
 private fun TvLobbyTopBar(
-    state: RoomLobbyState,
+    state: TvLobbyState,
     onBack: () -> Unit,
     backFocus: FocusRequester,
     closeFocus: FocusRequester,

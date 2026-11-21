@@ -2,6 +2,9 @@ package com.quizzgame.feature.room.tv.ui.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.quizzgame.core.error.failure.AppFailure
+import com.quizzgame.core.error.failure.ConnectivityKind
+import com.quizzgame.feature.room.tv.presentation.TvLobbyIntent
+import com.quizzgame.feature.room.tv.presentation.TvLobbyState
 import com.quizzgame.shared.room.domain.entity.result.RoomFailure
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 import com.quizzgame.shared.room.domain.entity.session.ParticipantId
@@ -16,11 +19,11 @@ import com.quizzgame.shared.room.domain.entity.snapshot.RoomPermissions
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomPhase
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomPolicy
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomSnapshot
-import com.quizzgame.shared.room.presentation.RoomLobbyState
+import com.quizzgame.shared.room.presentation.RoomLobbyCommandError
 import java.time.Instant
 import java.util.UUID
 
-internal class TvLobbyPreviewProvider : PreviewParameterProvider<RoomLobbyState> {
+internal class TvLobbyPreviewProvider : PreviewParameterProvider<TvLobbyState> {
     private val expiry = Instant.parse("2027-01-01T18:00:00Z")
     private val roomId = RoomId(UUID(0, 1))
     private val maya = RoomParticipant(ParticipantId(UUID(0, 2)), "Майя", true, RoomConnection.CONNECTED)
@@ -37,18 +40,26 @@ internal class TvLobbyPreviewProvider : PreviewParameterProvider<RoomLobbyState>
         expiry,
         RoomInvite("031482", "https://join.example.test/r/031482", expiry),
     )
-    private val content = RoomLobbyState(RoomStreamState.Active(room), self = null)
+    private val content = TvLobbyState(RoomStreamState.Active(room))
+    private val kickError = RoomLobbyCommandError(
+        TvLobbyIntent.Kick(lev.id),
+        RoomFailure(AppFailure.Connectivity(ConnectivityKind.TIMEOUT), uncertain = true),
+    )
     override val values = sequenceOf(
-        RoomLobbyState(),
+        TvLobbyState(),
         content,
         content.copy(stream = RoomStreamState.Active(room.copy(players = emptyList()))),
         content.copy(stream = RoomStreamState.Reconnecting(room)),
         content.copy(stream = RoomStreamState.Active(room.copy(phase = RoomPhase.STARTING))),
-        RoomLobbyState(RoomStreamState.Ended(roomId, RoomFailureReason.CLOSED)),
-        RoomLobbyState(RoomStreamState.Failed(RoomFailure(AppFailure.InvalidServerData))),
-        RoomLobbyState(RoomStreamState.Reconnecting(last = null)),
-        content.copy(error = RoomFailure(AppFailure.InvalidServerData)),
-        RoomLobbyState(RoomStreamState.Started(UUID(0, 5))),
+        TvLobbyState(RoomStreamState.Ended(roomId, RoomFailureReason.CLOSED)),
+        TvLobbyState(RoomStreamState.Failed(RoomFailure(AppFailure.InvalidServerData))),
+        TvLobbyState(RoomStreamState.Reconnecting(last = null)),
+        content.copy(
+            commandError = RoomLobbyCommandError(TvLobbyIntent.Close, RoomFailure(AppFailure.InvalidServerData)),
+        ),
+        TvLobbyState(RoomStreamState.Started(UUID(0, 5))),
         content.copy(stream = RoomStreamState.Active(room.copy(phase = RoomPhase.IN_GAME))),
+        content.copy(commandError = kickError),
+        content.copy(stream = RoomStreamState.Reconnecting(room), commandError = kickError),
     )
 }
