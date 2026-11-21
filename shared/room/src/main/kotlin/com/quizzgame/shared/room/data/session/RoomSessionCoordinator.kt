@@ -12,6 +12,7 @@ import com.quizzgame.shared.room.data.storage.StoredRoom
 import com.quizzgame.shared.room.data.stream.RoomConnectionLoop
 import com.quizzgame.shared.room.data.stream.RoomConnectionObserver
 import com.quizzgame.shared.room.data.stream.RoomStreamConnector
+import com.quizzgame.shared.room.data.stream.RoomStreamEvent
 import com.quizzgame.shared.room.domain.entity.command.RoomCommand
 import com.quizzgame.shared.room.domain.entity.result.RoomFailure
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
@@ -26,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,9 +36,11 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.IOException
+import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.time.toKotlinDuration
 
 @Singleton
 internal class RoomSessionCoordinator @Inject constructor(
@@ -53,9 +57,20 @@ internal class RoomSessionCoordinator @Inject constructor(
     private val lock = Mutex()
     private val mutableSession = MutableStateFlow<RoomSession?>(null)
     private val connection = RoomConnectionLoop(remote::snapshot, connector::observe)
+    private var expiration: Job? = null
     private var room: ActiveRoom? = null
         set(value) {
             field = value
+            expiration?.cancel()
+            expiration = value?.let { current ->
+                scope.launch {
+                    val ttl = Duration.between(Instant.now(), current.saved.credential.expiresAt)
+                    delay(ttl.toKotlinDuration())
+                    lock.withLock {
+                        if (room === current) end(current, RoomFailureReason.EXPIRED)
+                    }
+                }
+            }
             mutableSession.value = value?.saved?.session
         }
     private var hydrated = false
@@ -67,11 +82,11 @@ internal class RoomSessionCoordinator @Inject constructor(
 
     init {
         scope.launch {
-            accountState.collect { account ->
+            accountState.collect {
                 lock.withLock {
                     val current = room ?: return@withLock
                     val owner = current.saved.accountGeneration
-                    if (owner != null && account.conflictsWith(owner)) {
+                    if (owner != null && accountState.value.conflictsWith(owner)) {
                         end(current, RoomFailureReason.ACCOUNT_CHANGED)
                     }
                 }
@@ -96,6 +111,7 @@ internal class RoomSessionCoordinator @Inject constructor(
         } catch (_: IOException) {
             storageFailure(StorageKind.READ)
         }
+
     suspend fun enterLobby(id: RoomId): RoomResult<RoomLobbySubscription> = lock.withLock {
         val restored = restoreLocked()
         if (restored is RoomResult.Failed) return@withLock restored
@@ -137,6 +153,7 @@ internal class RoomSessionCoordinator @Inject constructor(
     private fun startConnection(current: ActiveRoom) {
         if (stream?.isActive == true) return
         val epoch = ++connectionEpoch
+        val reconcileFirst = current.state.value != RoomStreamState.Connecting || current.snapshot == null
         val observer = object : RoomConnectionObserver {
             private fun currentConnection(): Boolean =
                 room === current && connectionEpoch == epoch && current.isValid(accountState.value)
@@ -145,19 +162,28 @@ internal class RoomSessionCoordinator @Inject constructor(
                 current.snapshot.takeIf { currentConnection() }
             }
 
+            override suspend fun lastVersion(): Long = lock.withLock { current.latestVersion }
+
             override suspend fun publish(value: RoomSnapshot, connected: Boolean) = lock.withLock {
                 if (currentConnection()) current.applySnapshot(value, connected)
+            }
+
+            override suspend fun started(event: RoomStreamEvent.Started) = lock.withLock {
+                if (currentConnection()) current.applyStarted(event)
             }
 
             override suspend fun update(state: RoomStreamState) = lock.withLock {
                 if (currentConnection()) current.updateConnectionState(state)
             }
 
-            override suspend fun end(reason: RoomFailureReason) = lock.withLock {
-                if (room === current && connectionEpoch == epoch) end(current, reason)
+            override suspend fun end(reason: RoomFailureReason, version: Long?): Boolean = lock.withLock {
+                if (room !== current || connectionEpoch != epoch) return@withLock true
+                if (version != null && version < current.latestVersion) return@withLock false
+                end(current, reason)
+                true
             }
         }
-        stream = scope.launch { connection.run(current.saved, observer) }
+        stream = scope.launch { connection.run(current.saved, observer, reconcileFirst) }
     }
 
     suspend fun sendCommand(id: RoomId, command: RoomCommand): RoomResult<Unit> = mutations.withLock {
@@ -224,17 +250,26 @@ internal class RoomSessionCoordinator @Inject constructor(
     private class ActiveRoom(val saved: StoredRoom, var snapshot: RoomSnapshot?) {
         val state = MutableStateFlow<RoomStreamState>(RoomStreamState.Connecting)
         val subscription = RoomLobbySubscription(saved.self, state.asStateFlow())
+        var latestVersion = snapshot?.version ?: -1L
+            private set
         var attendance = 0
 
         fun isValid(account: SessionState): Boolean = saved.invalidReason(account) == null
 
         fun applySnapshot(value: RoomSnapshot, connected: Boolean) {
-            val previous = snapshot
-            val latest = if (previous == null || value.version > previous.version) value else previous
+            if (value.version < latestVersion) return
+            latestVersion = value.version
+            val latest = snapshot?.takeIf { it.version == value.version } ?: value
             snapshot = latest
             updateConnectionState(
                 if (connected) RoomStreamState.Active(latest) else RoomStreamState.Reconnecting(latest),
             )
+        }
+
+        fun applyStarted(event: RoomStreamEvent.Started) {
+            if (event.version < latestVersion) return
+            latestVersion = event.version
+            state.value = RoomStreamState.Started(event.gameSessionId)
         }
 
         fun updateConnectionState(next: RoomStreamState) {

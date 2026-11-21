@@ -16,23 +16,23 @@ import androidx.compose.ui.unit.dp
 import com.quizzgame.core.designsystem.mobile.QuizzButton
 import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
 import com.quizzgame.feature.room.mobile.R
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyIntent
+import com.quizzgame.feature.room.mobile.presentation.MobileLobbyState
 import com.quizzgame.feature.room.mobile.ui.tags.MobileLobbyTags
-import com.quizzgame.shared.room.domain.entity.command.RoomCommand
-import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomPhase
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomSnapshot
-import com.quizzgame.shared.room.presentation.RoomLobbyState
 import com.quizzgame.shared.room.R as RoomR
 
 @Composable
 internal fun MobileLobbyReadyContent(
-    state: RoomLobbyState,
-    onCommand: (RoomCommand) -> Unit,
+    state: MobileLobbyState,
+    onCommand: (MobileLobbyIntent) -> Unit,
     onRetry: () -> Unit,
     onLeave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val room = requireNotNull(state.snapshot)
+    val notice = state.notice()
     Column(modifier) {
         LazyColumn(
             Modifier.weight(1f).fillMaxWidth(),
@@ -40,8 +40,8 @@ internal fun MobileLobbyReadyContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             item(key = "room_title") { MobileLobbyHero(room.entry.title, room.phase, state.gameInfo) }
-            if (state.error != null || state.stream is RoomStreamState.Reconnecting) {
-                item(key = "room_notice") { MobileLobbyNotice(state, onRetry) }
+            if (notice != null) {
+                item(key = "room_notice") { MobileLobbyNotice(notice, onRetry) }
             }
             item(key = "roster_title") {
                 val count = stringResource(RoomR.string.room_count, room.players.size, room.capacity.maxPlayers)
@@ -60,9 +60,9 @@ internal fun MobileLobbyReadyContent(
 
 @Composable
 private fun MobileLobbyActions(
-    state: RoomLobbyState,
+    state: MobileLobbyState,
     room: RoomSnapshot,
-    onCommand: (RoomCommand) -> Unit,
+    onCommand: (MobileLobbyIntent) -> Unit,
     onLeave: () -> Unit,
 ) {
     val ready = room.players.firstOrNull { it.id == state.self }?.ready == true
@@ -70,7 +70,7 @@ private fun MobileLobbyActions(
     Column(Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 8.dp)) {
         if (showReady) {
             QuizzButton(
-                { onCommand(RoomCommand.Ready(!ready)) },
+                { onCommand(MobileLobbyIntent.SetReady(!ready)) },
                 Modifier.fillMaxWidth().testTag(MobileLobbyTags.READY),
                 style = if (ready) QuizzButtonStyle.TONAL else QuizzButtonStyle.FILLED,
                 enabled = state.live && !state.sending,

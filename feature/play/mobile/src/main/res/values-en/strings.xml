@@ -1,6 +1,9 @@
 <resources>
     <string name="play_title">Play</string>
     <string name="play_heading">Join a game</string>
+    <string name="play_resume_heading">You’re already in a room</string>
+    <string name="play_resume_description">Return to the lobby to see who’s ready.</string>
+    <string name="play_join_failed">Couldn’t join the room</string>
     <string name="play_description">Enter the code shown on the TV or scan its QR code.</string>
     <string name="play_code">Room code</string>
     <string name="play_connect">Connect</string>

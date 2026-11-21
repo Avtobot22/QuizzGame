@@ -1,66 +1,83 @@
 package com.quizzgame.feature.play.mobile.ui
 
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import com.quizzgame.core.designsystem.mobile.QuizzButton
-import com.quizzgame.core.designsystem.mobile.QuizzButtonStyle
+import com.quizzgame.core.designsystem.mobile.QuizzNoticeBanner
 import com.quizzgame.core.error.operation.ErrorOperationContext
 import com.quizzgame.core.error.operation.OperationKind
 import com.quizzgame.core.error.operation.RetrySafety
 import com.quizzgame.core.error.policy.DefaultErrorDecisionPolicy
-import com.quizzgame.core.error.presentation.ErrorActionKind
-import com.quizzgame.core.error.presentation.ErrorSurface
-import com.quizzgame.core.error.ui.mobile.components.QuizzMobileErrorInline
+import com.quizzgame.core.error.ui.common.presentation.errorUiModel
+import com.quizzgame.core.ui.status.QuizzNoticeTone
+import com.quizzgame.core.ui.status.QuizzStatusIcon
 import com.quizzgame.feature.play.mobile.R
-import com.quizzgame.feature.play.mobile.presentation.MobilePlayIntent
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayState
 import com.quizzgame.feature.play.mobile.presentation.MobilePlayValidation
+import com.quizzgame.feature.play.mobile.ui.tags.MobilePlayTags
 import com.quizzgame.shared.room.domain.entity.result.RoomFailureReason
 
 @Composable
-internal fun MobilePlayFeedback(
-    state: MobilePlayState,
-    onIntent: (MobilePlayIntent) -> Unit,
-    onSignIn: () -> Unit,
-) {
-    val validation = state.validation.validationLabel()
-    validation?.let { MobilePlayValidationText(stringResource(it)) }
+internal fun MobilePlayFeedback(state: MobilePlayState) {
     if (state.retryAfter > 0) {
-        MobilePlayValidationText(stringResource(R.string.play_wait_to_retry, state.retryAfter))
+        Text(
+            stringResource(R.string.play_wait_to_retry, state.retryAfter),
+            Modifier.testTag(MobilePlayTags.VALIDATION),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.bodyMedium,
+        )
         return
     }
-    val failure = state.failure ?: return
-    val label = failure.reason.failureLabel()
-    if (label != null) {
-        MobilePlayValidationText(stringResource(label))
-    } else {
-        val context = ErrorOperationContext(OperationKind.USER_COMMAND, true, RetrySafety.SAFE_TO_REPEAT)
-        val spec = DefaultErrorDecisionPolicy().decide(failure.cause, context)
-        val actions = spec.actions.filter { it == ErrorActionKind.RETRY }
-        QuizzMobileErrorInline(spec.copy(surface = ErrorSurface.INLINE, actions = actions), {
-            onIntent(MobilePlayIntent.Connect)
-        })
+    val scanError = when (state.validation) {
+        MobilePlayValidation.QR_INVALID -> R.string.play_invalid_qr
+        MobilePlayValidation.CAMERA_DENIED -> R.string.play_permission_denied
+        MobilePlayValidation.CAMERA_UNAVAILABLE -> R.string.play_camera_unavailable
+        else -> null
     }
-    if (failure.reason == RoomFailureReason.PARTICIPANT_AUTH_REQUIRED && state.account == null) {
-        QuizzButton(onSignIn, style = QuizzButtonStyle.TONAL) { Text(stringResource(R.string.play_sign_in)) }
+    val failure = state.failure
+    when {
+        scanError != null -> PlayNotice(stringResource(scanError), QuizzStatusIcon.ROOM)
+        failure == null || failure.reason == RoomFailureReason.NAME_TAKEN -> Unit
+        failure.reason == RoomFailureReason.PARTICIPANT_AUTH_REQUIRED ->
+            PlayNotice(stringResource(R.string.play_auth_required), QuizzStatusIcon.AUTH, QuizzNoticeTone.INFORMATION)
+        else -> {
+            val label = failure.reason.failureLabel()
+            if (label != null) {
+                PlayNotice(stringResource(label), QuizzStatusIcon.ROOM)
+            } else {
+                val context = ErrorOperationContext(OperationKind.USER_COMMAND, true, RetrySafety.SAFE_TO_REPEAT)
+                val model = errorUiModel(DefaultErrorDecisionPolicy().decide(failure.cause, context))
+                PlayNotice(stringResource(R.string.play_join_failed), model.icon, message = model.title)
+            }
+        }
     }
 }
 
-private fun MobilePlayValidation?.validationLabel(): Int? = when (this) {
-    MobilePlayValidation.CODE -> R.string.play_invalid_code
-    MobilePlayValidation.NICKNAME -> R.string.play_invalid_nickname
-    MobilePlayValidation.QR_INVALID -> R.string.play_invalid_qr
-    MobilePlayValidation.CAMERA_DENIED -> R.string.play_permission_denied
-    MobilePlayValidation.CAMERA_UNAVAILABLE -> R.string.play_camera_unavailable
-    null -> null
+@Composable
+private fun PlayNotice(
+    text: String,
+    icon: QuizzStatusIcon,
+    tone: QuizzNoticeTone = QuizzNoticeTone.ERROR,
+    message: String? = null,
+) {
+    QuizzNoticeBanner(
+        Modifier.testTag(MobilePlayTags.VALIDATION),
+        tone = tone,
+        icon = icon,
+    ) {
+        Text(text, style = MaterialTheme.typography.titleSmall)
+        message?.let {
+            Text(it, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+        }
+    }
 }
 
 private fun RoomFailureReason?.failureLabel(): Int? = when (this) {
-    RoomFailureReason.PARTICIPANT_AUTH_REQUIRED -> R.string.play_auth_required
     RoomFailureReason.NOT_FOUND -> R.string.play_room_not_found
     RoomFailureReason.FULL -> R.string.play_room_full
-    RoomFailureReason.NAME_TAKEN -> R.string.play_nickname_taken
     RoomFailureReason.EXPIRED, RoomFailureReason.CLOSED -> R.string.play_room_closed
     RoomFailureReason.RATE_LIMITED -> R.string.play_rate_limited
     RoomFailureReason.ALREADY_IN_ROOM -> R.string.play_existing_room

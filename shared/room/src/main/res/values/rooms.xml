@@ -1,7 +1,7 @@
 <resources>
     <string name="room_lobby">Лобби</string>
     <string name="room_connecting">Подключаемся к комнате</string>
-    <string name="room_reconnecting">Восстанавливаем связь с комнатой</string>
+    <string name="room_reconnecting">Восстанавливаем связь</string>
     <string name="room_roster">Участники</string>
     <string name="room_count">%1$d из %2$d</string>
     <string name="room_ready">Готов</string>
@@ -21,7 +21,14 @@
     <string name="room_cancel">Отмена</string>
     <string name="room_resume">Вернуться в комнату</string>
     <string name="room_action_denied">Это действие недоступно</string>
-    <string name="room_conflict">Комната обновилась. Повторите действие, если оно ещё нужно.</string>
+    <string name="room_conflict">Состояние комнаты изменилось. Проверьте участников и попробуйте снова.</string>
+    <string name="room_ready_failed">Не удалось изменить готовность</string>
+    <string name="room_kick_failed">Не удалось исключить игрока</string>
+    <string name="room_start_failed">Не удалось запустить игру</string>
+    <string name="room_close_failed">Не удалось закрыть комнату</string>
+    <string name="room_leave_failed">Не удалось выйти из комнаты</string>
+    <string name="room_command_unconfirmed">Подтверждение не пришло.</string>
+    <string name="room_open_failed">Не удалось открыть комнату</string>
     <string name="room_closed_description">Чтобы сыграть, подключитесь к новой комнате.</string>
     <string name="room_removed_description">Вы можете присоединиться к другой комнате.</string>
     <string name="room_expired_description">Попросите ведущего создать новую комнату.</string>

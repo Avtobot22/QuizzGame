@@ -2,6 +2,9 @@
     <string name="play_title">Играть</string>
     <string name="play_heading">Подключитесь к игре</string>
     <string name="play_description">Введите код с экрана ТВ или отсканируйте QR-код.</string>
+    <string name="play_resume_heading">Вы уже в комнате</string>
+    <string name="play_resume_description">Вернитесь в лобби, чтобы увидеть участников и их готовность.</string>
+    <string name="play_join_failed">Не удалось подключиться к комнате</string>
     <string name="play_code">Код комнаты</string>
     <string name="play_connect">Подключиться</string>
     <string name="play_scan">Сканировать QR</string>
@@ -18,7 +21,7 @@
     <string name="play_sign_in">Войти с аккаунтом</string>
     <string name="play_room_not_found">Проверьте PIN на экране ТВ.</string>
     <string name="play_room_full">В комнате больше нет мест.</string>
-    <string name="play_nickname_taken">Выберите другой ник.</string>
+    <string name="play_nickname_taken">Этот ник уже занят в комнате.</string>
     <string name="play_room_closed">Комната уже закрыта.</string>
     <string name="play_rate_limited">Слишком много попыток. Попробуйте позже.</string>
     <string name="play_existing_room">Сначала покиньте открытую комнату.</string>

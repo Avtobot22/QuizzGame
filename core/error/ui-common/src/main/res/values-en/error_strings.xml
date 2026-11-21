@@ -6,7 +6,7 @@
     <string name="quizz_error_access_denied">Access denied</string>
     <string name="quizz_error_sign_in_required">Sign in to continue</string>
     <string name="quizz_error_session_expired">Sign in again</string>
-    <string name="quizz_error_unexpected_response">Could not process the server response</string>
+    <string name="quizz_error_unexpected_response">Couldn’t get the data</string>
     <string name="quizz_error_storage_problem">Could not read or save data</string>
     <string name="quizz_error_generic_failure">Could not complete the action</string>
     <string name="quizz_error_action_retry">Retry</string>

@@ -21,6 +21,9 @@ import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.quizzgame.core.designsystem.mobile.QuizzNoticeBanner
+import com.quizzgame.core.ui.status.QuizzNoticeTone
+import com.quizzgame.core.ui.status.QuizzStatusIcon
 import com.quizzgame.feature.room.mobile.R
 import com.quizzgame.feature.room.mobile.ui.tags.MobileLobbyTags
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomConnection
@@ -103,12 +106,12 @@ internal fun MobileRoomPlayer(player: RoomParticipant, self: Boolean) {
 @Composable
 internal fun MobileRosterEmpty() {
     val colors = MaterialTheme.colorScheme
-    Surface(Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, color = colors.surfaceContainerLow) {
+    QuizzNoticeBanner(tone = QuizzNoticeTone.NEUTRAL, icon = QuizzStatusIcon.PEOPLE) {
+        Text(stringResource(RoomR.string.room_keep_waiting), style = MaterialTheme.typography.titleSmall)
         Text(
-            stringResource(RoomR.string.room_keep_waiting),
-            Modifier.padding(18.dp),
+            stringResource(R.string.room_roster_hint),
             color = colors.onSurfaceVariant,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
         )
     }
 }

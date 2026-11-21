@@ -6,10 +6,9 @@
     <string name="room_set_ready">Я готов</string>
     <string name="room_unset_ready">Пока не готов</string>
     <string name="room_wait_host">Ждём старта на телевизоре</string>
+    <string name="room_roster_hint">Имена появятся здесь, когда игроки подключатся.</string>
     <string name="room_started_description">Следите за игрой на телевизоре.</string>
     <string name="room_to_play">В раздел «Играть»</string>
-    <string name="room_update_failed">Не удалось подтвердить действие.</string>
-    <string name="room_open_failed">Не удалось открыть комнату</string>
     <string name="room_open_from_play">Откройте комнату снова из раздела «Играть».</string>
     <string name="room_try_open_again">Попробуйте открыть комнату ещё раз.</string>
     <plurals name="room_game_questions">

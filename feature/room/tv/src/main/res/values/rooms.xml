@@ -1,6 +1,5 @@
 <resources>
     <string name="room_invite_help">Сканируйте QR в разделе «Играть»</string>
-    <string name="room_invite_or">или</string>
     <string name="room_pin_help">Введите этот код в разделе «Играть» на телефоне.</string>
     <string name="room_qr">QR-код для входа в комнату</string>
     <string name="room_pin">Код комнаты</string>
@@ -16,7 +15,7 @@
     <string name="room_all_ready">Все участники готовы</string>
     <string name="room_enough_players">Участники на месте</string>
     <string name="room_roster_empty">Ждём участников</string>
-    <string name="room_roster_empty_description">Имена появятся здесь, когда игроки подключатся.</string>
+    <string name="room_roster_empty_description">Покажите игрокам код комнаты. Они смогут подключиться с телефона.</string>
     <string name="room_started_description">Участники уже в игре.</string>
     <string name="room_create_again">Откройте викторину, чтобы создать новую комнату.</string>
     <string name="room_host_account_changed">Создайте комнату заново с текущим аккаунтом.</string>

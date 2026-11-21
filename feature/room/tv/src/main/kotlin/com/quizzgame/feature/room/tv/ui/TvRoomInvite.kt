@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +19,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -28,14 +28,17 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import com.quizzgame.core.ui.QuizzIconLabel
 import com.quizzgame.feature.room.tv.R
 import com.quizzgame.feature.room.tv.ui.tags.TvLobbyTags
 import com.quizzgame.shared.room.domain.entity.snapshot.RoomInvite
 import kotlin.math.floor
+import com.quizzgame.core.ui.R as UiR
 
 private const val LARGE_PIN_LENGTH = 6
 
@@ -45,10 +48,14 @@ internal fun TvRoomInvite(invite: RoomInvite?, modifier: Modifier = Modifier) {
     Column(
         modifier.fillMaxWidth().fillMaxHeight()
             .clip(MaterialTheme.shapes.extraLarge)
-            .background(Brush.linearGradient(listOf(colors.primaryContainer, colors.surfaceVariant)))
+            .background(
+                Brush.verticalGradient(
+                    listOf(lerp(colors.surface, colors.primaryContainer, 0.76f), colors.surfaceVariant),
+                ),
+            )
             .padding(horizontal = 16.dp, vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(20.dp, Alignment.CenterVertically),
     ) {
         TvRoomPin(invite?.code)
         val qrUrl = invite?.url
@@ -76,8 +83,8 @@ private fun TvRoomPin(code: String?) {
         Text(
             stringResource(R.string.room_pin),
             Modifier.semantics { heading() },
-            color = colors.onPrimaryContainer,
-            style = MaterialTheme.typography.titleMedium,
+            color = colors.onSurfaceVariant,
+            style = MaterialTheme.typography.labelLarge,
         )
         if (code == null) {
             Text(
@@ -92,8 +99,9 @@ private fun TvRoomPin(code: String?) {
                 code,
                 Modifier.testTag(TvLobbyTags.CODE),
                 color = colors.onPrimaryContainer,
-                style = if (code.length <= LARGE_PIN_LENGTH) typography.displayLarge else typography.displaySmall,
+                style = if (code.length <= LARGE_PIN_LENGTH) typography.displayLarge else typography.headlineMedium,
                 fontFamily = FontFamily.Monospace,
+                letterSpacing = 2.sp,
                 maxLines = 1,
             )
         }
@@ -102,21 +110,10 @@ private fun TvRoomPin(code: String?) {
 
 @Composable
 private fun TvInviteDivider() {
-    val colors = MaterialTheme.colorScheme
-    val rule = Modifier.height(1.dp).background(colors.onPrimaryContainer.copy(alpha = 0.22f))
-    Row(
-        Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(rule.weight(1f))
-        Text(
-            stringResource(R.string.room_invite_or),
-            color = colors.onSurface,
-            style = MaterialTheme.typography.labelMedium,
-        )
-        Box(rule.weight(1f))
-    }
+    Box(
+        Modifier.fillMaxWidth(0.58f).height(1.dp)
+            .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.16f)),
+    )
 }
 
 @Composable
@@ -126,12 +123,15 @@ private fun TvQrInvite(link: String) {
         verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         RoomQr(link)
-        Text(
-            stringResource(R.string.room_invite_help),
-            color = MaterialTheme.colorScheme.onSurface,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-        )
+        val color = MaterialTheme.colorScheme.onSurfaceVariant
+        QuizzIconLabel(UiR.drawable.ic_quizz_scan, tint = color) {
+            Text(
+                stringResource(R.string.room_invite_help),
+                color = color,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
+        }
     }
 }
 

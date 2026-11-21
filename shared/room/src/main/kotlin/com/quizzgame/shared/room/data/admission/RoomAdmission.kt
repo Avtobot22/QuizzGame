@@ -56,19 +56,22 @@ internal class RoomAdmission @Inject constructor(
             is RoomResult.Failed -> return@withLock saved
             is RoomResult.Success -> if (saved.value != null) return@withLock alreadyInRoom()
         }
+        val currentOwner = when (val current = accounts.state().value) {
+            SessionState.Guest -> null
+            is SessionState.Authenticated -> current.sessionGeneration
+            else -> return@withLock RoomResult.Failed(RoomFailure(AppFailure.OperationInterrupted))
+        }
+        if (request is Request.Join && accountGeneration != currentOwner) {
+            return@withLock RoomResult.Failed(
+                RoomFailure(AppFailure.OperationInterrupted, RoomFailureReason.ACCOUNT_CHANGED),
+            )
+        }
         val installation = try {
             store.installationId()
         } catch (_: IOException) {
             return@withLock storageFailure(StorageKind.WRITE)
         }
-        val current = accounts.state().value as? SessionState.Authenticated
-        if (accountGeneration != null && accountGeneration != current?.sessionGeneration) {
-            return@withLock RoomResult.Failed(
-                RoomFailure(AppFailure.OperationInterrupted, RoomFailureReason.ACCOUNT_CHANGED),
-            )
-        }
-        val owner = if (request is Request.Create) current?.sessionGeneration else accountGeneration
-        requestRoom(request, installation, owner)
+        requestRoom(request, installation, currentOwner)
     }
 
     private suspend fun requestRoom(request: Request, installation: String, owner: Long?): RoomResult<RoomSession> {

@@ -2,6 +2,7 @@ package com.quizzgame.shared.room.data
 
 import com.quizzgame.core.coroutines.DispatcherProvider
 import com.quizzgame.core.network.api.ApiWebSockets
+import com.quizzgame.core.network.auth.CredentialUnavailableKind
 import com.quizzgame.core.session.lifecycle.SessionState
 import com.quizzgame.shared.room.data.admission.RoomAdmission
 import com.quizzgame.shared.room.data.api.AcquiredRoom
@@ -22,8 +23,10 @@ import com.quizzgame.shared.room.domain.repository.RoomAccountState
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
@@ -75,6 +78,63 @@ class RoomSessionCoordinatorTest {
     }
 
     @Test
+    fun clearsAnExpiredRoomWithoutAnOpenLobby() = runTest {
+        RoomHttpFixture().use { http ->
+            val fixture = Fixture(http, StandardTestDispatcher(testScheduler))
+            val acquired = fixture.acquired(null, Instant.now().plusSeconds(2))
+            fixture.coordinator.restore()
+            fixture.coordinator.persist(acquired)
+            assertEquals(acquired.room.session, fixture.coordinator.session.value)
+
+            runCurrent()
+            advanceTimeBy(3_000)
+            runCurrent()
+
+            assertNull(fixture.coordinator.session.value)
+            assertNull(fixture.store.saved)
+        }
+    }
+
+    @Test
+    fun ignoresAnOldSessionEmissionAfterTheAccountRecoversDuringStorageWrite() = runTest {
+        RoomHttpFixture().use { http ->
+            val fixture = Fixture(http, StandardTestDispatcher(testScheduler))
+            val owner = SessionState.Authenticated(OWNER)
+            val acquired = fixture.acquired(OWNER)
+            fixture.coordinator.restore()
+            runCurrent()
+            fixture.store.onSave = {
+                fixture.account.value = SessionState.Guest
+                yield()
+                fixture.account.value = owner
+            }
+
+            assertEquals(RoomResult.Success(acquired.room.session), fixture.coordinator.persist(acquired))
+            runCurrent()
+
+            assertEquals(acquired.room.session, fixture.coordinator.session.value)
+            assertEquals(acquired.room, fixture.store.saved)
+        }
+    }
+
+    @Test
+    fun cannotFallBackToGuestAdmissionWhileTheAccountIsSwitchingOrBlocked() = runTest {
+        RoomHttpFixture().use { http ->
+            val fixture = Fixture(http, StandardTestDispatcher(testScheduler))
+            val repository = RoomAdmission(fixture.coordinator, http.remote, fixture.store, fixture.accounts)
+            val entry = fixture.acquired(OWNER).snapshot.entry.id.toString()
+
+            val staleDraft = repository.join("031482", "QuizFox", accountGeneration = null) as RoomResult.Failed
+            assertEquals(RoomFailureReason.ACCOUNT_CHANGED, staleDraft.failure.reason)
+
+            fixture.account.value = SessionState.Blocked(CredentialUnavailableKind.REFRESH_UNCERTAIN)
+            assertTrue(repository.create(entry) is RoomResult.Failed)
+            assertTrue(repository.join("031482", "QuizFox", accountGeneration = null) is RoomResult.Failed)
+            assertEquals(0, http.requestCount)
+        }
+    }
+
+    @Test
     fun reusesAnUncertainAdmissionKeyUntilTheServerGivesADefiniteAnswer() = runTest {
         RoomHttpFixture().use { http ->
             val fixture = Fixture(http, StandardTestDispatcher(testScheduler))
@@ -113,18 +173,18 @@ class RoomSessionCoordinatorTest {
             },
         )
 
-        fun acquired(owner: Long?): AcquiredRoom {
+        fun acquired(owner: Long?, expiresAt: Instant = Instant.now().plus(1, ChronoUnit.DAYS)): AcquiredRoom {
             val dto = http.json.decodeFromString<CreateRoomResponse>(fixture("tv-create-response"))
             val id = RoomId(UUID.randomUUID())
             val snapshot = dto.room.toDomain(RoomRole.HOST, http.links).copy(roomId = id)
-            val credential = RoomCredential(RoomRole.HOST, "fixture", Instant.now().plus(1, ChronoUnit.DAYS))
+            val credential = RoomCredential(RoomRole.HOST, "fixture", expiresAt)
             return AcquiredRoom(StoredRoom(id, credential, null, owner), snapshot)
         }
     }
 
     private class MemoryStore : RoomCredentialStore {
         var saved: StoredRoom? = null
-        var onSave: () -> Unit = {}
+        var onSave: suspend () -> Unit = {}
         private val installation = UUID.randomUUID().toString()
 
         override suspend fun load(): StoredRoom? = saved

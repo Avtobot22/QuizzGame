@@ -13,8 +13,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.produceIn
 import kotlinx.coroutines.withTimeoutOrNull
-import java.time.Duration
-import java.time.Instant
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -22,17 +20,11 @@ internal class RoomConnectionLoop(
     private val fetchSnapshot: suspend (StoredRoom) -> RoomResult<RoomSnapshot>,
     private val observe: (StoredRoom, Long?) -> Flow<RoomStreamEvent>,
 ) {
-    suspend fun run(room: StoredRoom, observer: RoomConnectionObserver) {
-        val ttl = Duration.between(Instant.now(), room.credential.expiresAt).toMillis().coerceAtLeast(0)
-        withTimeoutOrNull(ttl.milliseconds) { reconnect(room, observer) } ?: observer.end(RoomFailureReason.EXPIRED)
-    }
-
-    private suspend fun reconnect(room: StoredRoom, observer: RoomConnectionObserver) {
+    suspend fun run(room: StoredRoom, observer: RoomConnectionObserver, reconcileFirst: Boolean) {
         var retry = 0
+        var refresh = reconcileFirst
         while (true) {
-            if (retry > 0 || observer.lastSnapshot() == null) {
-                if (!reconcile(room, observer)) return
-            }
+            if (refresh && !reconcile(room, observer)) return
             when (listen(room, observer)) {
                 ConnectionOutcome.ENDED -> return
                 ConnectionOutcome.RETRY_AFTER_ACTIVE -> retry = 0
@@ -41,28 +33,18 @@ internal class RoomConnectionLoop(
             observer.update(RoomStreamState.Reconnecting(observer.lastSnapshot()))
             delay(retryDelay(retry).milliseconds)
             retry = (retry + 1).coerceAtMost(BACKOFF.lastIndex)
+            refresh = true
         }
     }
 
     private suspend fun reconcile(room: StoredRoom, observer: RoomConnectionObserver): Boolean =
         when (val result = fetchSnapshot(room)) {
-            is RoomResult.Success -> if (result.value.phase == RoomPhase.CLOSED) {
-                observer.end(RoomFailureReason.CLOSED)
-                false
-            } else {
-                observer.publish(result.value, connected = false)
-                true
-            }
-            is RoomResult.Failed -> if (result.failure.terminal) {
-                observer.end(requireNotNull(result.failure.reason))
-                false
-            } else {
-                true
-            }
+            is RoomResult.Success -> !applySnapshot(result.value, room, observer, connected = false)
+            is RoomResult.Failed -> !result.failure.terminal || !observer.end(requireNotNull(result.failure.reason))
         }
 
     private suspend fun listen(room: StoredRoom, observer: RoomConnectionObserver): ConnectionOutcome = coroutineScope {
-        val events = observe(room, observer.lastSnapshot()?.version).produceIn(this)
+        val events = observe(room, observer.lastVersion().takeIf { it >= 0 }).produceIn(this)
         try {
             val initial = withTimeoutOrNull(INITIAL_SNAPSHOT_TIMEOUT.milliseconds) {
                 events.receiveCatching().getOrNull()
@@ -70,7 +52,7 @@ internal class RoomConnectionLoop(
             if (initial !is RoomStreamEvent.Snapshot || initial.value.roomId != room.id) {
                 return@coroutineScope handleMissingInitial(initial, observer)
             }
-            if (initial.value.version < (observer.lastSnapshot()?.version ?: 0)) {
+            if (initial.value.version < observer.lastVersion()) {
                 return@coroutineScope ConnectionOutcome.RETRY
             }
             if (handle(initial, room, observer)) return@coroutineScope ConnectionOutcome.ENDED
@@ -88,8 +70,7 @@ internal class RoomConnectionLoop(
         initial: RoomStreamEvent?,
         observer: RoomConnectionObserver,
     ): ConnectionOutcome {
-        if (initial is RoomStreamEvent.Ended && initial.version >= (observer.lastSnapshot()?.version ?: 0)) {
-            observer.end(initial.reason)
+        if (initial is RoomStreamEvent.Ended && observer.end(initial.reason, initial.version)) {
             return ConnectionOutcome.ENDED
         }
         if (initial != null && observer.lastSnapshot() == null) {
@@ -102,31 +83,26 @@ internal class RoomConnectionLoop(
         event: RoomStreamEvent,
         room: StoredRoom,
         observer: RoomConnectionObserver,
-    ): Boolean {
-        val version = observer.lastSnapshot()?.version ?: 0
-        val terminal = when (event) {
-            is RoomStreamEvent.Snapshot -> snapshotEvent(event.value, room, observer, version)
-            is RoomStreamEvent.Ended -> event.reason.takeIf { event.version >= version }
-            is RoomStreamEvent.Started -> {
-                if (event.version >= version) observer.update(RoomStreamState.Started(event.gameSessionId))
-                null
-            }
-            RoomStreamEvent.Invalid -> null
+    ): Boolean = when (event) {
+        is RoomStreamEvent.Snapshot -> applySnapshot(event.value, room, observer, connected = true)
+        is RoomStreamEvent.Ended -> observer.end(event.reason, event.version)
+        is RoomStreamEvent.Started -> {
+            observer.started(event)
+            false
         }
-        if (terminal != null) observer.end(terminal)
-        return terminal != null
+        RoomStreamEvent.Invalid -> false
     }
 
-    private suspend fun snapshotEvent(
+    private suspend fun applySnapshot(
         snapshot: RoomSnapshot,
         room: StoredRoom,
         observer: RoomConnectionObserver,
-        version: Long,
-    ): RoomFailureReason? {
-        if (snapshot.roomId != room.id || snapshot.version < version) return null
-        if (snapshot.phase == RoomPhase.CLOSED) return RoomFailureReason.CLOSED
-        observer.publish(snapshot, connected = true)
-        return null
+        connected: Boolean,
+    ): Boolean {
+        if (snapshot.roomId != room.id) return false
+        if (snapshot.phase == RoomPhase.CLOSED) return observer.end(RoomFailureReason.CLOSED, snapshot.version)
+        observer.publish(snapshot, connected)
+        return false
     }
 
     private fun retryDelay(attempt: Int): Long = (BACKOFF[attempt] * Random.nextDouble(JITTER_MIN, JITTER_MAX)).toLong()

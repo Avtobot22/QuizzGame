@@ -1,4 +1,4 @@
-package com.quizzgame.shared.room.presentation
+package com.quizzgame.feature.room.mobile.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.quizzgame.core.presentation.BaseViewModel
@@ -10,6 +10,10 @@ import com.quizzgame.shared.room.domain.entity.session.RoomId
 import com.quizzgame.shared.room.domain.entity.session.RoomStreamState
 import com.quizzgame.shared.room.domain.usecase.ObserveRoomLobbyUseCase
 import com.quizzgame.shared.room.domain.usecase.SendRoomCommandUseCase
+import com.quizzgame.shared.room.presentation.RoomLobbyCommandError
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,39 +22,36 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.UUID
-import javax.inject.Inject
 
-@HiltViewModel
-class RoomLobbyViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = MobileLobbyViewModel.Factory::class)
+internal class MobileLobbyViewModel @AssistedInject constructor(
+    @Assisted id: UUID,
     private val observeRoomLobbyUseCase: ObserveRoomLobbyUseCase,
     private val sendRoomCommandUseCase: SendRoomCommandUseCase,
     private val loadQuizEntryUseCase: LoadQuizEntryUseCase,
-) : BaseViewModel<RoomLobbyState, RoomLobbyIntent, Nothing>() {
+) : BaseViewModel<MobileLobbyState, MobileLobbyIntent, Nothing>() {
 
+    private val roomId = RoomId(id)
     private val restarts = MutableStateFlow(0)
-    private var lastCommand: RoomLobbyIntent.Send? = null
     private var loadedGameId: UUID? = null
 
-    override fun createInitialState() = RoomLobbyState()
+    override fun createInitialState() = MobileLobbyState()
 
-    override fun handleIntent(intent: RoomLobbyIntent) {
+    override fun handleIntent(intent: MobileLobbyIntent) {
+        val current = state.value
+        if (current.sending || current.exited || current.endReason != null) return
         when (intent) {
-            is RoomLobbyIntent.Send      -> send(intent)
-
-            RoomLobbyIntent.Retry        -> {
-                val command = lastCommand
-                if (command != null) send(command) else restarts.value++
+            is MobileLobbyIntent.Command -> send(intent)
+            MobileLobbyIntent.Retry -> {
+                val error = current.commandError
+                if (error?.failure?.uncertain == true) send(error.command) else restarts.value++
             }
         }
     }
 
-    suspend fun observe(id: RoomId) {
-        restarts.collectLatest { connect(id) }
-    }
-
-    suspend fun observeWithGameInfo(id: RoomId): Unit = coroutineScope {
+    suspend fun observe(): Unit = coroutineScope {
         launch { observeGameInfo() }
-        observe(id)
+        restarts.collectLatest { connect() }
     }
 
     private suspend fun observeGameInfo() {
@@ -61,7 +62,7 @@ class RoomLobbyViewModel @Inject constructor(
             val info = entry?.let {
                 val description = it.description?.takeIf { text -> text.isNotBlank() && text != entry.title }
                 val subtitle = it.subtitle?.takeIf { text -> text.isNotBlank() && text != entry.title }
-                RoomLobbyGameInfo(
+                MobileLobbyGameInfo(
                     description = description ?: subtitle,
                     questionCount = it.questionCount,
                     durationSeconds = it.durationSeconds,
@@ -73,8 +74,9 @@ class RoomLobbyViewModel @Inject constructor(
         }
     }
 
-    private suspend fun connect(id: RoomId) {
-        observeRoomLobbyUseCase(id).collect { result ->
+    private suspend fun connect() {
+        if (state.value.endReason != null) return
+        observeRoomLobbyUseCase(roomId).collect { result ->
             when (result) {
                 is RoomResult.Failed -> updateState { it.copy(stream = RoomStreamState.Failed(result.failure)) }
                 is RoomResult.Success -> {
@@ -85,20 +87,27 @@ class RoomLobbyViewModel @Inject constructor(
         }
     }
 
-    private fun send(intent: RoomLobbyIntent.Send) {
-        if (state.value.sending) return
-        updateState { it.copy(sending = true, error = null) }
+    private fun send(intent: MobileLobbyIntent.Command) {
+        val command = when (intent) {
+            is MobileLobbyIntent.SetReady -> RoomCommand.Ready(intent.ready)
+            MobileLobbyIntent.Leave        -> RoomCommand.Leave
+        }
+        updateState { it.copy(sending = true, commandError = null) }
         viewModelScope.launch {
-            val result = sendRoomCommandUseCase(intent.id, intent.command)
-            lastCommand = intent.takeIf { result is RoomResult.Failed && result.failure.uncertain }
-            val exiting = intent.command == RoomCommand.Leave || intent.command == RoomCommand.Close
+            val result = sendRoomCommandUseCase(roomId, command)
+            val failure = (result as? RoomResult.Failed)?.failure
             updateState {
                 it.copy(
                     sending = false,
-                    error = (result as? RoomResult.Failed)?.failure,
-                    exited = exiting && result is RoomResult.Success,
+                    commandError = failure?.let { RoomLobbyCommandError(intent, it) },
+                    exited = intent == MobileLobbyIntent.Leave && result is RoomResult.Success,
                 )
             }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(id: UUID): MobileLobbyViewModel
     }
 }

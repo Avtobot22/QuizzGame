@@ -36,6 +36,7 @@ internal fun MobilePlayContent(
     }) { padding ->
         BoxWithConstraints(Modifier.fillMaxSize().padding(padding)) {
             val wide = maxWidth >= 720.dp
+            val hasRoom = state.activeRoom != null
             Column(
                 Modifier.fillMaxSize().verticalScroll(
                     rememberScrollState(),
@@ -45,7 +46,7 @@ internal fun MobilePlayContent(
             ) {
                 if (wide) {
                     Row(Modifier.widthIn(max = 1040.dp), horizontalArrangement = Arrangement.spacedBy(32.dp)) {
-                        MobilePlayIntro(Modifier.weight(1f))
+                        MobilePlayIntro(hasRoom, Modifier.weight(1f))
                         MobilePlayConnection(
                             state,
                             onIntent,
@@ -55,7 +56,7 @@ internal fun MobilePlayContent(
                         )
                     }
                 } else {
-                    MobilePlayIntro(Modifier.widthIn(max = 440.dp).fillMaxWidth())
+                    MobilePlayIntro(hasRoom, Modifier.widthIn(max = 440.dp).fillMaxWidth())
                     MobilePlayConnection(
                         state,
                         onIntent,

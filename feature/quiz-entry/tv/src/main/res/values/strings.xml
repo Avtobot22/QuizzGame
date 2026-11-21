@@ -1,7 +1,8 @@
 <resources>
     <string name="quiz_entry_duration">%1$d мин.</string>
     <string name="quiz_entry_bookmarked">В избранном</string>
-    <string name="quiz_entry_label">О квизе</string>
+    <string name="quiz_entry_unavailable">Эту викторину пока нельзя запустить</string>
+    <string name="quiz_entry_room_create_failed">Не удалось создать комнату</string>
     <plurals name="quiz_entry_question_count">
         <item quantity="one">%1$d вопрос</item>
         <item quantity="few">%1$d вопроса</item>
